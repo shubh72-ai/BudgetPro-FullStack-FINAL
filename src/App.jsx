@@ -1561,6 +1561,34 @@ const ProductPage = memo(() => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
+//  RAZORPAY SCRIPT LOADER
+// ═══════════════════════════════════════════════════════════════════
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (typeof window !== "undefined" && window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const scriptSrc = "https://checkout.razorpay.com/v1/checkout.js";
+    const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(true), { once: true });
+      existingScript.addEventListener("error", () => resolve(false), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = scriptSrc;
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
+// ═══════════════════════════════════════════════════════════════════
 //  CHECKOUT PAGE
 // ═══════════════════════════════════════════════════════════════════
 const CheckoutPage = memo(() => {
@@ -1683,7 +1711,12 @@ const CheckoutPage = memo(() => {
           modal: { ondismiss: function () { setLoading(false); } },
         };
 
-        if (!window.Razorpay) throw new Error("Payment system failed to load. Please refresh and try again.");
+        const razorpayLoaded = await loadRazorpayScript();
+
+        if (!razorpayLoaded || !window.Razorpay) {
+          throw new Error("Payment system failed to load. Please refresh and try again.");
+        }
+
         const rzp = new window.Razorpay(options);
         rzp.open();
       } catch (err) {
