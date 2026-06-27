@@ -4,10 +4,15 @@
   "env": {
     "GENERATE_SOURCEMAP": "false"
   },
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "product-files/**"
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/download/:token",
+      "destination": "/api/download/[token]"
     },
     {
       "source": "/(.*)",

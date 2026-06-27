@@ -1,7 +1,3 @@
-// api/download/[token].js
-//
-// GET /api/download/:token
-
 const fs = require("fs");
 const path = require("path");
 const { getDb } = require("../lib/db");
@@ -9,12 +5,10 @@ const { applyCors } = require("../lib/cors");
 
 const FILE_CONFIG = {
   monthly: {
-    envUrl: process.env.MONTHLY_FILE_URL,
-    localFile: "Monthly_Budget_Template_.xlsx",
+    localFile: "Monthly_Budget_Template.xlsx",
     downloadName: "BudgetPro-Monthly-Template.xlsx",
   },
   yearly: {
-    envUrl: process.env.YEARLY_FILE_URL,
     localFile: "Yearly_Budget_Template.xlsx",
     downloadName: "BudgetPro-Yearly-Template.xlsx",
   },
@@ -50,6 +44,19 @@ module.exports = async (req, res) => {
       return res.status(500).send("Invalid product plan.");
     }
 
+    const filePath = path.join(
+      process.cwd(),
+      "product-files",
+      config.localFile
+    );
+
+    if (!fs.existsSync(filePath)) {
+      console.error("File not found:", filePath);
+      return res.status(500).send(
+        `Product file not found: ${config.localFile}`
+      );
+    }
+
     await db.collection("orders").updateOne(
       { _id: order._id },
       {
@@ -57,23 +64,6 @@ module.exports = async (req, res) => {
         $set: { lastDownloadAt: new Date() },
       }
     );
-
-    // Option 1: If file URL is configured in Vercel env, redirect to it
-    if (config.envUrl) {
-      res.writeHead(302, { Location: config.envUrl });
-      return res.end();
-    }
-
-    // Option 2: Download from local product-files folder
-    const filePath = path.join(process.cwd(), "product-files", config.localFile);
-
-    if (!fs.existsSync(filePath)) {
-      console.error("File not found:", filePath);
-
-      return res.status(500).send(
-        `Product file not found. Please check product-files folder and filename: ${config.localFile}`
-      );
-    }
 
     const stat = fs.statSync(filePath);
 
