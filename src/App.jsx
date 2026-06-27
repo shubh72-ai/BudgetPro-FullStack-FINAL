@@ -1599,9 +1599,15 @@ const CheckoutPage = memo(() => {
 
   const handlePay = useCallback(() => {
     const e = {};
-    if (!form.name.trim())                       e.name  = "Full name is required";
-    if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) e.email = "Valid email is required";
-    if (!form.phone.match(/^\d{10}$/))           e.phone = "10-digit mobile number required";
+    const cleanForm = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+    };
+
+    if (!cleanForm.name)                         e.name  = "Full name is required";
+    if (!cleanForm.email.match(/^[^@]+@[^@]+\.[^@]+$/)) e.email = "Valid email is required";
+    if (!cleanForm.phone.match(/^\d{10}$/))     e.phone = "10-digit mobile number required";
     if (Object.keys(e).length) { setErrors(e); return; }
 
     setLoading(true);
@@ -1610,19 +1616,32 @@ const CheckoutPage = memo(() => {
         const orderRes = await fetch("/api/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, plan: selectedPlan }),
+          body: JSON.stringify({ ...cleanForm, plan: selectedPlan }),
         });
-        const order = await orderRes.json();
-        if (order.error) throw new Error(order.error);
+
+        const order = await orderRes.json().catch(() => ({}));
+
+        if (!orderRes.ok || order.error) {
+          throw new Error(order.error || order.details || "Could not create order");
+        }
+
+        // Supports both backend response formats:
+        // { keyId, razorpayOrderId } and { key, orderId }
+        const razorpayKey = order.keyId || order.key;
+        const razorpayOrderId = order.razorpayOrderId || order.orderId || order.id;
+
+        if (!razorpayKey || !razorpayOrderId) {
+          throw new Error("Payment order was created but Razorpay key/order ID is missing. Please check /api/create-order response.");
+        }
 
         const options = {
-          key: order.keyId,
+          key: razorpayKey,
           amount: order.amount,
-          currency: order.currency,
+          currency: order.currency || "INR",
           name: "BudgetPro",
           description: plan.label,
-          order_id: order.razorpayOrderId,
-          prefill: { name: form.name, email: form.email, contact: form.phone },
+          order_id: razorpayOrderId,
+          prefill: { name: cleanForm.name, email: cleanForm.email, contact: cleanForm.phone },
           theme: { color: DS.color.mint },
           handler: async function (response) {
             try {
@@ -1635,14 +1654,31 @@ const CheckoutPage = memo(() => {
                   razorpay_signature:  response.razorpay_signature,
                 }),
               });
-              const result = await verifyRes.json();
+
+              const result = await verifyRes.json().catch(() => ({}));
+
+              if (!verifyRes.ok || result.error) {
+                throw new Error(result.error || result.details || "Payment verification failed");
+              }
+
               if (result.success) {
-                navigate("/success", { state: { name: result.customerName, email: result.customerEmail, plan: result.plan, token: result.downloadToken } });
+                navigate("/success", {
+                  state: {
+                    name: result.customerName || cleanForm.name,
+                    email: result.customerEmail || cleanForm.email,
+                    plan: result.plan || selectedPlan,
+                    token: result.downloadToken || result.token,
+                  },
+                });
                 window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
                 alert("Payment verification failed. If money was deducted, contact support with your payment ID: " + response.razorpay_payment_id);
               }
-            } finally { setLoading(false); }
+            } catch (verifyErr) {
+              alert((verifyErr && verifyErr.message) || "Payment verification failed. Please contact support.");
+            } finally {
+              setLoading(false);
+            }
           },
           modal: { ondismiss: function () { setLoading(false); } },
         };
@@ -1651,7 +1687,7 @@ const CheckoutPage = memo(() => {
         const rzp = new window.Razorpay(options);
         rzp.open();
       } catch (err) {
-        alert(err.message || "Something went wrong. Please try again.");
+        alert((err && err.message) || "Something went wrong. Please try again.");
         setLoading(false);
       }
     })();
@@ -2326,23 +2362,39 @@ const AdminLogin = memo(({ onLogin }) => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = useCallback(async () => {
-    if (!creds.username || !creds.password) { setError("Please fill in all fields"); return; }
+    const loginPayload = {
+      username: creds.username.trim(),
+      password: creds.password,
+    };
+
+    if (!loginPayload.username || !loginPayload.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     setLoading(true);
     try {
       const res  = await fetch("/api/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(creds),
+        body: JSON.stringify(loginPayload),
       });
-      const data = await res.json();
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(data.error || "Invalid credentials");
+        return;
+      }
+
       if (data.token) {
         localStorage.setItem("budgetpro_admin_token", data.token);
         onLogin(data.token);
       } else {
-        setError(data.error || "Invalid credentials");
+        setError("Login API did not return a token");
       }
     } catch {
-      setError("Server error. Please try again.");
+      setError("Server error. Please check /api/admin-login and Vercel environment variables.");
     } finally {
       setLoading(false);
     }
