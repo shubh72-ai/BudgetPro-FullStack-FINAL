@@ -102,6 +102,8 @@ const DS = {
   },
 };
 
+const SUPPORT_MAILTO = "mailto:theunseenworld2@gmail.com?subject=BudgetPro%20Support%20Request&body=Hello%20BudgetPro%20Team%2C%0A%0AI%20need%20assistance%20regarding%3A%0A%0AThank%20you.";
+
 // ═══════════════════════════════════════════════════════════════════
 //  GLOBAL STYLES
 // ═══════════════════════════════════════════════════════════════════
@@ -1107,7 +1109,7 @@ const HomePage = memo(() => {
       {/* ══════════════════════════════════════════════════════════
           PRICING SECTION
       ══════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "96px 20px", background: DS.color.bg }}>
+      <section id="pricing" style={{ padding: "96px 20px", background: DS.color.bg }}>
         <div style={{ maxWidth: 920, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <Badge style={{ marginBottom: 16 }}>Choose Your Plan</Badge>
@@ -2245,7 +2247,7 @@ const SuccessPage = memo(() => {
         {/* Nav buttons */}
         <div className="fade-in-up" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, animationDelay: "0.5s" }}>
           <Btn variant="outline" onClick={() => goTo("/")} style={{ justifyContent: "center" }}>← Back to Home</Btn>
-          <Btn variant="navy" onClick={() => goTo("/affiliate")} style={{ justifyContent: "center" }}>Browse Finance Books</Btn>
+          <Btn variant="navy" onClick={() => { window.location.href = SUPPORT_MAILTO; }} style={{ justifyContent: "center" }}>Contact Support</Btn>
         </div>
       </div>
     </div>
@@ -2253,142 +2255,139 @@ const SuccessPage = memo(() => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-//  AFFILIATE PAGE
+//  LEGAL PAGES
 // ═══════════════════════════════════════════════════════════════════
-const AffiliatePage = memo(() => {
-  const [filter, setFilter] = useState("all");
+const TERMS_SECTIONS = [
+  {
+    title: "Use of BudgetPro",
+    body: "BudgetPro provides downloadable budgeting templates and related digital materials for personal finance tracking. By using this website or purchasing a product, you agree to use the templates lawfully and for your own personal or internal household purposes.",
+  },
+  {
+    title: "Digital Delivery",
+    body: "Products are delivered digitally after successful payment verification. Download links may be shown on the success page and sent to the email address provided during checkout. You are responsible for entering an accurate email address.",
+  },
+  {
+    title: "Payments and Pricing",
+    body: "Payments are processed through Razorpay. Prices are displayed in INR and may change without prior notice. A purchase is complete only after payment confirmation and successful order verification.",
+  },
+  {
+    title: "License Restrictions",
+    body: "Your purchase grants a limited, non-transferable license to use the template. You may not resell, redistribute, upload, sublicense, copy for commercial resale, or claim ownership of BudgetPro files or designs.",
+  },
+  {
+    title: "No Financial Advice",
+    body: "BudgetPro is a budgeting tool and educational template. It does not provide financial, investment, tax, legal, or accounting advice. You remain responsible for your financial decisions and should consult qualified professionals when needed.",
+  },
+  {
+    title: "Refunds and Failed Delivery",
+    body: "Because products are digital and available immediately after purchase, sales are generally final. If you were charged twice, did not receive access after successful payment, or believe there was a technical delivery issue, contact support with your order details.",
+  },
+  {
+    title: "Limitation of Liability",
+    body: "BudgetPro is provided as is. To the maximum extent permitted by law, BudgetPro is not liable for indirect, incidental, special, consequential, or financial losses arising from use of the website or templates.",
+  },
+  {
+    title: "Contact",
+    body: "For support, delivery issues, or questions about these terms, contact BudgetPro using the Contact Us link in the footer.",
+  },
+];
 
-  const products = [
-    { id: 1, title: "The Psychology of Money",      author: "Morgan Housel",    price: "₹399", originalPrice: "₹599", category: "books",      store: "amazon",   rating: 4.8, reviews: 12400, desc: "Timeless lessons on wealth, greed, and happiness.",                             tags: ["Bestseller","Finance"] },
-    { id: 2, title: "Let's Talk Money",             author: "Monika Halan",     price: "₹299", originalPrice: "₹450", category: "books",      store: "amazon",   rating: 4.7, reviews: 8200,  desc: "India's favourite personal finance book. Simple, practical money advice.",       tags: ["Indian Author","Practical"] },
-    { id: 3, title: "Casio MX-12B Calculator",      author: "Casio",            price: "₹395", originalPrice: "₹599", category: "tools",      store: "amazon",   rating: 4.6, reviews: 5600,  desc: "Desktop calculator perfect for monthly budget calculations.",                   tags: ["Top Pick"] },
-    { id: 4, title: "Rich Dad Poor Dad",            author: "Robert Kiyosaki",  price: "₹399", originalPrice: "₹650", category: "books",      store: "flipkart", rating: 4.6, reviews: 18000, desc: "The #1 personal finance book of all time.",                                    tags: ["Classic","Must Read"] },
-    { id: 5, title: "Budget Planner Notebook 2026", author: "Plan•It",          price: "₹249", originalPrice: "₹399", category: "stationery", store: "flipkart", rating: 4.5, reviews: 2100,  desc: "Monthly & weekly budget planner. Perfect companion to your dashboard.",        tags: ["Stationery"] },
-    { id: 6, title: "Atomic Habits",               author: "James Clear",      price: "₹449", originalPrice: "₹699", category: "books",      store: "amazon",   rating: 4.9, reviews: 21000, desc: "Build better money habits with the science of tiny changes.",                  tags: ["Habits","Bestseller"] },
-    { id: 7, title: "CRED: India's Best Credit Card Reward App", author: "CRED", price: "Free", originalPrice: null,  category: "apps",       store: "amazon",   rating: 4.4, reviews: 3400,  desc: "Track your credit card bills and earn rewards.",                               tags: ["App","Free"] },
-    { id: 8, title: "Financial Freedom",            author: "Grant Sabatier",   price: "₹499", originalPrice: "₹799", category: "books",      store: "flipkart", rating: 4.5, reviews: 4200,  desc: "Step-by-step guide to achieving financial independence.",                      tags: ["FI/RE","Goal Setting"] },
-  ];
+const PRIVACY_SECTIONS = [
+  {
+    title: "Information We Collect",
+    body: "When you purchase BudgetPro, we may collect your name, email address, phone number, selected plan, payment status, order identifiers, download activity, and support messages you send to us.",
+  },
+  {
+    title: "Payment Information",
+    body: "Payments are handled by Razorpay. BudgetPro does not store your full card number, UPI credentials, bank login details, or sensitive payment credentials on this website.",
+  },
+  {
+    title: "How We Use Information",
+    body: "We use your information to process orders, verify payments, deliver download links, resend purchase emails, provide customer support, maintain admin records, prevent fraud, and improve the website.",
+  },
+  {
+    title: "Service Providers",
+    body: "We may use trusted providers such as Razorpay for payment processing, Resend for email delivery, MongoDB for order data storage, and Vercel for hosting and serverless APIs. These providers process data only as needed for their services.",
+  },
+  {
+    title: "Data Retention",
+    body: "Order and support records may be retained for business, tax, accounting, dispute resolution, and security purposes. We keep personal information only as long as reasonably necessary for these purposes.",
+  },
+  {
+    title: "Security",
+    body: "We use reasonable technical and organizational safeguards to protect order data. No internet service can guarantee absolute security, so please avoid sending sensitive financial information through support email.",
+  },
+  {
+    title: "Cookies and Local Storage",
+    body: "The website may use browser storage for normal app behavior, checkout flow, and admin authentication. You can clear browser storage through your browser settings, but some features may stop working.",
+  },
+  {
+    title: "Your Choices",
+    body: "You may contact us to request access, correction, or deletion of personal information where applicable. Some records may need to be retained where required for legal, tax, fraud prevention, or legitimate business reasons.",
+  },
+  {
+    title: "Contact",
+    body: "For privacy questions, contact BudgetPro using the Contact Us link in the footer.",
+  },
+];
 
-  const categories = ["all", "books", "tools", "stationery", "apps"];
-  const filtered   = filter === "all" ? products : products.filter(p => p.category === filter);
+const LegalPage = memo(({ title, intro, sections }) => (
+  <main style={{ background: DS.color.bg, minHeight: "100vh", padding: "72px 20px" }}>
+    <div style={{ maxWidth: 880, margin: "0 auto" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <Badge style={{ marginBottom: 16 }}>Legal</Badge>
+        <h1 style={{ fontSize: DS.type.h1, fontWeight: 900, color: DS.color.navy, marginBottom: 14, letterSpacing: "-0.03em" }}>
+          {title}
+        </h1>
+        <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7, maxWidth: 680, margin: "0 auto" }}>
+          {intro}
+        </p>
+      </div>
 
-  return (
-    <div style={{ background: DS.color.bg, minHeight: "100vh", padding: "60px 20px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 52 }}>
-          <Badge style={{ marginBottom: 16 }}>Curated for You</Badge>
-          <h1 style={{ fontSize: DS.type.h1, fontWeight: 900, color: DS.color.navy, margin: "16px 0 10px", letterSpacing: "-0.03em" }}>
-            Finance Products We Love
-          </h1>
-          <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7 }}>
-            Hand-picked books, tools, and resources to supercharge your financial journey
-          </p>
-          <p style={{ color: DS.color.slateLight, fontSize: DS.type.xs, marginTop: 8, opacity: 0.7 }}>
-            * Affiliate links — we earn a small commission that helps keep BudgetPro affordable.
-          </p>
-        </div>
-
-        {/* Filter tabs */}
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 44, flexWrap: "wrap" }}>
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => setFilter(c)}
-              style={{
-                padding: "9px 20px",
-                borderRadius: DS.radius.pill,
-                border: `1.5px solid ${filter === c ? DS.color.mint : DS.color.border}`,
-                background: filter === c ? DS.color.mintLight : "#fff",
-                color: filter === c ? DS.color.mintDark : DS.color.slate,
-                fontWeight: 700,
-                fontSize: DS.type.sm,
-                cursor: "pointer",
-                textTransform: "capitalize",
-                transition: `all 0.2s ${DS.ease.smooth}`,
-                boxShadow: filter === c ? DS.shadow.glow : DS.shadow.xs,
-              }}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-
-        {/* Product grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 24 }}>
-          {filtered.map((p) => (
-            <Card key={p.id} className="card-lift" style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
-                <div style={{
-                  background: p.store === "amazon"
-                    ? "linear-gradient(135deg, #FF9900, #E47911)"
-                    : "linear-gradient(135deg, #0096CC, #00729C)",
-                  color: "#fff",
-                  padding: "5px 12px",
-                  borderRadius: DS.radius.pill,
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                }}>
-                  {p.store}
-                </div>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                  {p.tags.map((tag) => (
-                    <Badge key={tag} color={DS.color.purpleLight} text={DS.color.purple} style={{ fontSize: 9, padding: "2px 8px" }}>
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <h3 style={{ fontSize: 15, fontWeight: 800, color: DS.color.navy, marginBottom: 4, lineHeight: 1.35, letterSpacing: "-0.01em" }}>
-                {p.title}
-              </h3>
-              <div style={{ fontSize: DS.type.xs, color: DS.color.slateLight, marginBottom: 10, fontWeight: 500 }}>
-                by {p.author}
-              </div>
-              <p style={{ color: DS.color.slate, fontSize: DS.type.sm, lineHeight: 1.7, flex: 1, marginBottom: 16 }}>
-                {p.desc}
+      <Card style={{ boxShadow: DS.shadow.md }}>
+        <p style={{ color: DS.color.slateLight, fontSize: DS.type.sm, marginBottom: 24 }}>
+          Last updated: June 28, 2026
+        </p>
+        <div style={{ display: "grid", gap: 24 }}>
+          {sections.map((section) => (
+            <section key={section.title}>
+              <h2 style={{ fontSize: DS.type.h4, fontWeight: 800, color: DS.color.navy, marginBottom: 8 }}>
+                {section.title}
+              </h2>
+              <p style={{ color: DS.color.slate, fontSize: DS.type.body, lineHeight: 1.8 }}>
+                {section.body}
               </p>
-
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
-                <div style={{ display: "flex", gap: 1 }}>
-                  {[1,2,3,4,5].map((s) => (
-                    <Icon key={s} name="star" size={11} color={s <= Math.floor(p.rating) ? DS.color.gold : DS.color.border} filled />
-                  ))}
-                </div>
-                <span style={{ fontSize: 11, color: DS.color.slateLight, fontWeight: 600 }}>
-                  {p.rating} ({p.reviews.toLocaleString()} reviews)
-                </span>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 14, borderTop: `1px solid ${DS.color.border}` }}>
-                <div>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: DS.color.navy, letterSpacing: "-0.02em" }}>{p.price}</span>
-                  {p.originalPrice && (
-                    <span style={{ fontSize: DS.type.sm, color: DS.color.slateLight, textDecoration: "line-through", marginLeft: 6 }}>
-                      {p.originalPrice}
-                    </span>
-                  )}
-                </div>
-                <Btn size="sm" variant="primary">
-                  <Icon name="link" size={13} color="#fff" />
-                  View
-                </Btn>
-              </div>
-            </Card>
+            </section>
           ))}
         </div>
-      </div>
+        <Divider style={{ margin: "28px 0 20px" }} />
+        <a
+          href={SUPPORT_MAILTO}
+          style={{ color: DS.color.mintDark, fontSize: DS.type.sm, fontWeight: 800, textDecoration: "none" }}
+        >
+          Contact BudgetPro Support
+        </a>
+      </Card>
     </div>
-  );
-});
+  </main>
+));
 
-// ═══════════════════════════════════════════════════════════════════
-//  ADMIN LOGIN
-// ═══════════════════════════════════════════════════════════════════
+const TermsPage = memo(() => (
+  <LegalPage
+    title="Terms of Service"
+    intro="These terms govern your access to the BudgetPro website, checkout flow, downloads, and digital budgeting templates."
+    sections={TERMS_SECTIONS}
+  />
+));
+
+const PrivacyPage = memo(() => (
+  <LegalPage
+    title="Privacy Policy"
+    intro="This policy explains what information BudgetPro collects, why it is used, and how order and support data is handled."
+    sections={PRIVACY_SECTIONS}
+  />
+));
+
 const AdminLogin = memo(({ onLogin }) => {
   const [creds, setCreds]   = useState({ username: "", password: "" });
   const [error, setError]   = useState("");
@@ -2504,11 +2503,6 @@ const AdminDashboard = memo(({ onLogout, token }) => {
   const [prices, setPrices]         = useState({ monthly: { price: 19 }, yearly: { price: 49 } });
   const [loadingData, setLoadingData] = useState(true);
   const [savingPlan, setSavingPlan]   = useState(null);
-  const [affiliateLinks, setAffiliateLinks] = useState([
-    { id: 1, product: "The Psychology of Money", store: "Amazon",   url: "amzn.to/abc123", active: true },
-    { id: 2, product: "Let's Talk Money",        store: "Amazon",   url: "amzn.to/xyz456", active: true },
-    { id: 3, product: "Budget Planner 2026",     store: "Flipkart", url: "fkrt.it/qwe789", active: false },
-  ]);
 
   const authedFetch = useCallback((url, opts = {}) =>
     fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${token}` } }), [token]);
@@ -2546,7 +2540,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
     }
   }, [authedFetch, prices]);
 
-  const adminTabs = ["overview", "orders", "pricing", "affiliate"];
+  const adminTabs = ["overview", "orders", "pricing"];
 
   return (
     <div style={{ background: DS.color.bg, minHeight: "100vh" }}>
@@ -2755,55 +2749,6 @@ const AdminDashboard = memo(({ onLogout, token }) => {
           </div>
         )}
 
-        {/* ── Affiliate ── */}
-        {!loadingData && activeTab === "affiliate" && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-              <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, letterSpacing: "-0.02em" }}>
-                Affiliate Links
-              </h2>
-              <Btn size="sm" onClick={() => alert("This list is currently stored in the browser only. Ask Claude to wire it to a backend collection (mirroring /api/settings) if you want it to persist and sync across devices.")}>
-                + Add Product
-              </Btn>
-            </div>
-            <div style={{ display: "grid", gap: 16 }}>
-              {affiliateLinks.map((l) => (
-                <Card key={l.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-                  <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                    <div style={{
-                      background: l.store === "Amazon" ? "#FFF8E7" : "#F0F4FF",
-                      borderRadius: DS.radius.lg,
-                      padding: "8px 12px",
-                      fontSize: 20,
-                    }}>
-                      {l.store === "Amazon" ? "🛒" : "🛍️"}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 800, color: DS.color.navy, fontSize: 15 }}>{l.product}</div>
-                      <div style={{ color: DS.color.slateLight, fontSize: DS.type.xs, marginTop: 2 }}>
-                        {l.store} · {l.url}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <Badge
-                      color={l.active ? DS.color.mintLight : DS.color.bg}
-                      text={l.active ? DS.color.mintDark : DS.color.slateLight}
-                    >
-                      {l.active ? "Active" : "Inactive"}
-                    </Badge>
-                    <Btn size="sm" variant="ghost" onClick={() => setAffiliateLinks(affiliateLinks.map(a => a.id === l.id ? { ...a, active: !a.active } : a))}>
-                      {l.active ? "Disable" : "Enable"}
-                    </Btn>
-                    <Btn size="sm" variant="danger" onClick={() => setAffiliateLinks(affiliateLinks.filter(a => a.id !== l.id))}>
-                      Remove
-                    </Btn>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -2836,7 +2781,6 @@ const Nav = memo(() => {
   const navLinks = [
     { id: "/",         label: "Home" },
     { id: "/product",  label: "Product" },
-    { id: "/affiliate", label: "Resources" },
   ];
 
   return (
@@ -2993,7 +2937,16 @@ const Nav = memo(() => {
 // ═══════════════════════════════════════════════════════════════════
 const Footer = memo(() => {
   const navigate = useNavigate();
-  const goTo = (path) => { navigate(path); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goTo = (path) => {
+    navigate(path);
+    const hash = path.split("#")[1];
+    if (hash) {
+      setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" }), 0);
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const openSupport = () => { window.location.href = SUPPORT_MAILTO; };
 
   return (
     <footer style={{
@@ -3031,7 +2984,7 @@ const Footer = memo(() => {
             <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
               Product
             </div>
-            {[["/","Home"],["/product","Product"],["/affiliate","Resources"]].map(([path,label]) => (
+            {[["/","Home"],["/#pricing","Pricing"],["/product","Product"]].map(([path,label]) => (
               <button
                 key={path}
                 onClick={() => goTo(path)}
@@ -3060,16 +3013,47 @@ const Footer = memo(() => {
             <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
               Support
             </div>
-            {["Contact Us", "Refund Policy", "Privacy Policy", "Terms of Service"].map((l) => (
-              <div
-                key={l}
-                style={{ fontSize: DS.type.sm, padding: "5px 0", cursor: "pointer", color: "rgba(255,255,255,0.5)", transition: `color 0.2s ${DS.ease.smooth}` }}
+            {[["/terms", "Terms of Service"], ["/privacy", "Privacy Policy"]].map(([path, label]) => (
+              <button
+                key={path}
+                onClick={() => goTo(path)}
+                style={{
+                  display: "block",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "rgba(255,255,255,0.5)",
+                  fontSize: DS.type.sm,
+                  padding: "5px 0",
+                  textAlign: "left",
+                  fontFamily: "inherit",
+                  transition: `color 0.2s ${DS.ease.smooth}`,
+                }}
                 onMouseEnter={(e) => e.target.style.color = "#fff"}
                 onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.5)"}
               >
-                {l}
-              </div>
+                {label}
+              </button>
             ))}
+            <button
+              onClick={openSupport}
+              style={{
+                display: "block",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "rgba(255,255,255,0.5)",
+                fontSize: DS.type.sm,
+                padding: "5px 0",
+                textAlign: "left",
+                fontFamily: "inherit",
+                transition: `color 0.2s ${DS.ease.smooth}`,
+              }}
+              onMouseEnter={(e) => e.target.style.color = "#fff"}
+              onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.5)"}
+            >
+              Contact Us
+            </button>
           </div>
 
           {/* Pricing */}
@@ -3137,8 +3121,8 @@ const AppLayout = () => {
   const location = useLocation();
   const path     = location.pathname;
 
-  const showNav    = path !== "/admin" && path !== "/success";
-  const showFooter = !["/admin", "/checkout", "/success"].includes(path);
+  const showNav    = !["/admin", "/dashboard", "/success"].includes(path);
+  const showFooter = !["/admin", "/dashboard", "/checkout", "/success"].includes(path);
 
   return (
     <div style={{
@@ -3153,8 +3137,11 @@ const AppLayout = () => {
         <Route path="/product"   element={<ProductPage />} />
         <Route path="/checkout"  element={<CheckoutPage />} />
         <Route path="/success"   element={<SuccessPage />} />
-        <Route path="/affiliate" element={<AffiliatePage />} />
         <Route path="/admin"     element={<AdminRoute />} />
+        <Route path="/dashboard" element={<AdminRoute />} />
+        <Route path="/terms"     element={<TermsPage />} />
+        <Route path="/privacy"   element={<PrivacyPage />} />
+        <Route path="/affiliate" element={<Navigate to="/" replace />} />
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
       {showFooter && <Footer />}

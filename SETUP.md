@@ -182,7 +182,6 @@ URL: `yourdomain.com/admin`
 | Overview | Total revenue, orders, downloads |
 | Orders | Customer list with Resend Email button |
 | Pricing | Change ₹19/₹49 live without redeploy |
-| Affiliate | Enable/disable affiliate product links |
 
 ---
 
