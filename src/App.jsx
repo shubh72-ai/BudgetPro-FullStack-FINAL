@@ -58,6 +58,12 @@ const DS = {
     xs:      "11px",
   },
 
+  font: {
+    body: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    heading: "'Sora', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    number: "'Space Grotesk', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+
   // Spacing scale (multiples of 4px)
   space: {
     1: "4px",  2: "8px",  3: "12px", 4: "16px",  5: "20px",
@@ -115,17 +121,30 @@ const SUPPORT_MAILTO = "mailto:theunseenworld2@gmail.com?subject=BudgetPro%20Sup
 // ═══════════════════════════════════════════════════════════════════
 const GlobalStyles = () => (
   <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { scroll-behavior: smooth; background: ${DS.color.bg}; }
 
     body {
       background: ${DS.color.bg};
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      font-family: ${DS.font.body};
       color: ${DS.color.text};
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, .heading-font {
+      font-family: ${DS.font.heading};
+    }
+
+    .number-font,
+    .price-font,
+    .kpi-number {
+      font-family: ${DS.font.number};
+      font-variant-numeric: tabular-nums;
     }
 
     body::before {
@@ -631,7 +650,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
       background: "linear-gradient(145deg, rgba(17,17,20,0.92), rgba(8,8,10,0.98))",
       borderRadius: DS.radius["2xl"],
       padding: 18,
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: DS.font.body,
       transition: `all 0.3s ${DS.ease.smooth}`,
       border: `1px solid ${DS.color.border}`,
       boxShadow: `${DS.shadow["2xl"]}, inset 0 1px 0 rgba(255,255,255,0.10)`,
@@ -645,7 +664,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 900, color: DS.color.navy, letterSpacing: 0 }}>BudgetPro Command Center</div>
+          <div className="heading-font" style={{ fontSize: 15, fontWeight: 900, color: DS.color.navy, letterSpacing: 0 }}>Smart Expense Tracker</div>
           <div style={{ fontSize: 11, color: DS.color.slateLight, marginTop: 2 }}>{selectedMonth} 2026 · Income, expenses, savings</div>
         </div>
         {onMonthChange ? (
@@ -701,7 +720,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
               <span style={{ fontSize: 10, fontWeight: 800, color: m.c }}>{m.icon}</span>
             </div>
             <div style={{ fontSize: 10, color: DS.color.slateLight, fontWeight: 600 }}>{m.l}</div>
-            <div style={{ fontSize: 15, fontWeight: 900, color: m.c, marginTop: 2, letterSpacing: 0 }}>{m.v}</div>
+            <div className="kpi-number" style={{ fontSize: 15, fontWeight: 900, color: m.c, marginTop: 2, letterSpacing: 0 }}>{m.v}</div>
           </div>
         ))}
       </div>
@@ -762,7 +781,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
                   <div style={{ width: 6, height: 6, borderRadius: 2, background: CAT_COLORS[i], flexShrink: 0 }} />
                   <span style={{ fontSize: 9, color: DS.color.slateLight }}>{c.cat}</span>
                 </div>
-                <span style={{ fontSize: 9, fontWeight: 700, color: DS.color.navy }}>{c.pct}%</span>
+                <span className="number-font" style={{ fontSize: 9, fontWeight: 700, color: DS.color.navy }}>{c.pct}%</span>
               </div>
             ))}
           </div>
@@ -785,7 +804,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: item.color, boxShadow: `0 0 14px ${item.color}` }} />
               <span style={{ fontSize: 10, color: DS.color.slateLight, fontWeight: 700 }}>{item.label}</span>
             </div>
-            <span style={{ fontSize: 11, color: item.color, fontWeight: 900 }}>{item.value}</span>
+            <span className="number-font" style={{ fontSize: 11, color: item.color, fontWeight: 900 }}>{item.value}</span>
           </div>
         ))}
       </div>
@@ -816,13 +835,13 @@ const StickyCTA = memo(({ visible }) => {
       animation: "slideDown 0.3s ease",
     }}>
       <div>
-        <div style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 0 }}>🎯 BudgetPro Template</div>
+        <div style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 0 }}>🎯 BudgetPro Smart Expense Tracker</div>
         <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2 }}>Starting at just ₹19 · One-time purchase</div>
       </div>
       <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
-        <Btn size="sm" variant="glass" onClick={() => goTo("/checkout?plan=monthly")}>₹19 / Month</Btn>
+        <Btn size="sm" variant="glass" onClick={() => goTo("/checkout?plan=monthly")}>Start Tracking for ₹19</Btn>
         <Btn size="sm" variant="gold" onClick={() => goTo("/checkout?plan=yearly")} style={{ animation: "pulse 2s infinite" }}>
-          ₹49 Full Year ★
+          Download Full Year — ₹49
         </Btn>
       </div>
     </div>
@@ -905,7 +924,7 @@ const PricingCard = memo(({ plan }) => {
         </p>
 
         <div style={{ display: "flex", alignItems: "flex-end", gap: 10, marginBottom: 6 }}>
-          <span style={{
+          <span className="price-font" style={{
             fontSize: 56,
             fontWeight: 900,
             color: isHighlighted ? "#fff" : DS.color.navy,
@@ -915,7 +934,7 @@ const PricingCard = memo(({ plan }) => {
             ₹{plan.price}
           </span>
           <div style={{ paddingBottom: 10 }}>
-            <div style={{
+            <div className="price-font" style={{
               color: isHighlighted ? "rgba(255,255,255,0.35)" : DS.color.slateLight,
               textDecoration: "line-through",
               fontSize: 18,
@@ -1045,8 +1064,8 @@ const HomePage = memo(() => {
 
   const testimonials = [
     { name: "Priya Sharma",  role: "Homemaker, Mumbai",              text: "This dashboard changed how I manage our family budget. I finally know where every rupee goes. Worth 10x the price!", avatar: "PS" },
-    { name: "Rahul Verma",   role: "Software Engineer, Bangalore",   text: "Worth every rupee. My savings went from 8% to 31% in just 4 months. This template is a game changer.", avatar: "RV" },
-    { name: "Ananya Patel",  role: "Freelancer, Ahmedabad",          text: "Finally a budget tracker that doesn't feel overwhelming. I set it up in 10 minutes and I've been using it every day.", avatar: "AP" },
+    { name: "Rahul Verma",   role: "Software Engineer, Bangalore",   text: "Worth every rupee. My savings went from 8% to 31% in just 4 months. Smart Expense Tracker is a game changer.", avatar: "RV" },
+    { name: "Ananya Patel",  role: "Freelancer, Ahmedabad",          text: "Finally an expense tracker that doesn't feel overwhelming. I set it up in 10 minutes and I've been using it every day.", avatar: "AP" },
     { name: "Deepak Singh",  role: "Teacher, Delhi",                 text: "My savings rate went from 10% to 28% in 3 months! I could finally afford my dream vacation.", avatar: "DS" },
   ];
 
@@ -1056,21 +1075,21 @@ const HomePage = memo(() => {
     { icon: "shield",   title: "100% Private & Secure",   desc: "Your data stays on your device. No cloud, no subscriptions, no data selling. Ever." },
     { icon: "star",     title: "Beginner Friendly",       desc: "No finance degree needed. If you can open Excel, you can master your budget." },
     { icon: "download", title: "Instant Download",        desc: "Pay once, download immediately. No waiting, no signup, no monthly fees." },
-    { icon: "check",    title: "Lifetime Access",         desc: "Buy once, use forever. Free updates whenever we improve the template." },
+    { icon: "check",    title: "Lifetime Access",         desc: "Buy once, use forever. Free updates whenever we improve Smart Expense Tracker." },
   ];
 
   const plans = [
     {
-      id: "monthly", name: "Monthly Template", badge: "Perfect for Beginners", price: 19, original: 299, discount: "94%",
-      desc: "Single month budgeting — the fastest way to start tracking your money.",
-      cta: "Buy Monthly — ₹19", highlight: false,
-      features: ["1 Month Dashboard", "Income & Expense Tracker", "Category Breakdown Charts", "Savings Goal Tracker", "Works on Excel + Google Sheets", "Instant Download"],
+      id: "monthly", name: "Monthly Smart Expense Tracker", badge: "Perfect for Beginners", price: 19, original: 299, discount: "94%",
+      desc: "Single-month expense tracking — the fastest way to see where your money goes.",
+      cta: "Start Tracking for ₹19", highlight: false,
+      features: ["1 Month Smart Expense Tracker", "Income & Expense Tracking", "Category Breakdown Charts", "Savings Goal Tracker", "Works on Excel + Google Sheets", "Instant Download"],
     },
     {
-      id: "yearly", name: "Full Year Template", badge: "12 Months + Yearly Dashboard", price: 49, original: 999, discount: "95%",
-      desc: "Complete annual budgeting with yearly overview — best for serious savers.",
-      cta: "Buy Full Year — ₹49", highlight: true,
-      features: ["All 12 Months Included", "Annual Overview Dashboard", "Year-on-Year Comparison", "Better Savings Tracking", "Category Trend Analysis", "Priority Email Support", "Free Future Updates", "Instant Download"],
+      id: "yearly", name: "Full Year Smart Expense Tracker", badge: "12 Months + Yearly View", price: 49, original: 999, discount: "95%",
+      desc: "Complete annual expense tracking with yearly overview — best for serious savers.",
+      cta: "Download Full Year — ₹49", highlight: true,
+      features: ["All 12 Months Included", "Annual Smart Expense Overview", "Year-on-Year Comparison", "Better Savings Tracking", "Category Trend Analysis", "Priority Email Support", "Free Future Updates", "Instant Download"],
     },
   ];
 
@@ -1121,7 +1140,7 @@ const HomePage = memo(() => {
                 </Badge>
               </div>
 
-              <h1 style={{
+              <h1 className="heading-font" style={{
                 fontSize: DS.type.h1,
                 fontWeight: 900,
                 color: "#fff",
@@ -1129,8 +1148,8 @@ const HomePage = memo(() => {
                 marginBottom: 22,
                 letterSpacing: 0,
               }}>
-                Budget smarter with a<br />
-                <span style={{ color: DS.color.mint }}>liquid-glass finance dashboard.</span>
+                Your money isn’t disappearing —<br />
+                <span style={{ color: DS.color.mint }}>it’s just untracked.</span>
               </h1>
 
               <p style={{
@@ -1140,14 +1159,14 @@ const HomePage = memo(() => {
                 lineHeight: 1.8,
                 maxWidth: 480,
               }}>
-                BudgetPro helps you track expenses, savings, income, monthly budgets, and yearly goals in one polished Excel and Google Sheets dashboard.
+                Meet Smart Expense Tracker — a premium Excel dashboard that shows exactly where every rupee goes, how much you save, and what you can control every month.
               </p>
 
               {/* Reasons grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 36 }}>
                 {[
                   { emoji: "₹", text: "Track every rupee with clarity" },
-                  { emoji: "📊", text: "Monthly and yearly budget views" },
+                  { emoji: "📊", text: "Monthly and yearly expense views" },
                   { emoji: "💎", text: "Premium dashboard visuals" },
                   { emoji: "♾️", text: "One-time purchase, lifetime use" },
                 ].map((r) => (
@@ -1169,10 +1188,10 @@ const HomePage = memo(() => {
               <div className="hero-actions" style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 40 }}>
                 <Btn size="lg" onClick={() => goTo("/checkout?plan=monthly")} style={{ boxShadow: DS.shadow.glowLg }}>
                   <Icon name="download" size={20} color="#fff" />
-                  Get Monthly — ₹19
+                  Start Tracking for ₹19
                 </Btn>
                 <Btn size="lg" variant="gold" onClick={() => goTo("/checkout?plan=yearly")} style={{ boxShadow: DS.shadow.gold }}>
-                  Full Year — ₹49 ★
+                  Download Instantly
                 </Btn>
               </div>
 
@@ -1185,7 +1204,7 @@ const HomePage = memo(() => {
                   { v: "< 2min", l: "Setup Time" },
                 ].map((s) => (
                   <div key={s.l}>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: 0 }}>{s.v}</div>
+                    <div className="number-font" style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: 0 }}>{s.v}</div>
                     <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, fontWeight: 500, letterSpacing: 0, textTransform: "uppercase" }}>{s.l}</div>
                   </div>
                 ))}
@@ -1222,7 +1241,7 @@ const HomePage = memo(() => {
                     marginLeft: 8,
                     flex: 1,
                   }}>
-                    budgetpro-dashboard.xlsx · Live Preview
+                    smart-expense-tracker.xlsx · Live Preview
                   </div>
                 </div>
                 <div style={{ padding: "0 3px 3px", borderRadius: `0 0 ${DS.radius["3xl"]} ${DS.radius["3xl"]}`, overflow: "hidden" }}>
@@ -1308,7 +1327,7 @@ const HomePage = memo(() => {
               See It In Action
             </h2>
             <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7 }}>
-              Switch months to simulate real usage — this is exactly what you'll get
+              Switch months to simulate real usage — this is exactly what Smart Expense Tracker shows you
             </p>
           </div>
 
@@ -1330,7 +1349,7 @@ const HomePage = memo(() => {
                 <div key={c} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />
               ))}
               <div style={{ background: DS.color.bgGlass, borderRadius: DS.radius.md, padding: "4px 22px", fontSize: 11, color: DS.color.slateLight, marginLeft: 8 }}>
-                budgetpro-dashboard.xlsx
+                smart-expense-tracker.xlsx
               </div>
               <div style={{ marginLeft: "auto", display: "flex", gap: 5, flexWrap: "wrap" }}>
                 {CHART_MONTHS.map(m => (
@@ -1448,14 +1467,14 @@ const HomePage = memo(() => {
             Ready to <span style={{ color: DS.color.mint }}>transform your finances</span>?
           </h2>
           <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 17, marginBottom: 44, lineHeight: 1.75 }}>
-            Join 5,000+ Indians already using BudgetPro to save more, spend smarter, and stress less about money.
+            Join 5,000+ Indians already using BudgetPro Smart Expense Tracker to save more, spend smarter, and stress less about money.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
             <Btn size="lg" variant="glass" onClick={() => goTo("/checkout?plan=monthly")}>
-              Get Monthly — ₹19
+              Take Control of My Money
             </Btn>
             <Btn size="lg" variant="gold" onClick={() => goTo("/checkout?plan=yearly")} style={{ animation: "pulse 2s infinite", boxShadow: DS.shadow.gold }}>
-              ⭐ Full Year — ₹49
+              Download Full Year — ₹49
             </Btn>
           </div>
           <div style={{ marginTop: 28, color: "rgba(255,255,255,0.4)", fontSize: DS.type.sm }}>
@@ -1480,9 +1499,9 @@ const ProductPage = memo(() => {
   const features = [
     "Monthly income & expense tracker", "Income vs Savings visualization charts",
     "Category-wise expense breakdown",  "Savings goal progress tracker",
-    "Annual financial summary (Full Year only)", "Beginner-friendly, no macros needed",
+    "Annual expense summary (Full Year only)", "Beginner-friendly, no macros needed",
     "Works on Excel 2016+ and Google Sheets",    "Indian Rupee (₹) formatted throughout",
-    "12-month rolling budget view (Full Year)",  "Print-ready monthly reports",
+    "12-month rolling expense view (Full Year)", "Print-ready monthly reports",
   ];
 
   const specs = [
@@ -1554,7 +1573,7 @@ const ProductPage = memo(() => {
               lineHeight: 1.15,
               letterSpacing: 0,
             }}>
-              Ultimate Budget Dashboard Template
+              BudgetPro Smart Expense Tracker
             </h1>
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
@@ -1565,7 +1584,7 @@ const ProductPage = memo(() => {
             </div>
 
             <p style={{ color: DS.color.slate, lineHeight: 1.8, marginBottom: 28, fontSize: DS.type.body }}>
-              A professionally designed Excel & Google Sheets template that makes budgeting simple, beautiful, and actually useful. Track every rupee, visualize your savings journey, and finally understand where your money goes.
+              A professionally designed Excel and Google Sheets dashboard that makes expense tracking simple, beautiful, and actually useful. Track every rupee, visualize your savings journey, and finally understand where your money goes.
             </p>
 
             {/* Plan selector */}
@@ -1598,7 +1617,7 @@ const ProductPage = memo(() => {
                   }}
                 >
                   {p.label}
-                  <span style={{ color: selectedPlan === p.id ? DS.color.mint : DS.color.slateLight, fontWeight: 900 }}>
+                  <span className="price-font" style={{ color: selectedPlan === p.id ? DS.color.mint : DS.color.slateLight, fontWeight: 900 }}>
                     {p.price}
                   </span>
                   {p.id === "yearly" && (
@@ -1618,11 +1637,11 @@ const ProductPage = memo(() => {
               boxShadow: `${DS.shadow.xl}, 0 0 40px rgba(0,200,150,0.1)`,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 22 }}>
-                <div style={{ fontSize: 58, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: 0 }}>
+                <div className="price-font" style={{ fontSize: 58, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: 0 }}>
                   {selectedPlan === "monthly" ? "₹19" : "₹49"}
                 </div>
                 <div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", textDecoration: "line-through", fontSize: 20, fontWeight: 600 }}>
+                  <div className="price-font" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "line-through", fontSize: 20, fontWeight: 600 }}>
                     {selectedPlan === "monthly" ? "₹299" : "₹999"}
                   </div>
                   <Badge color="rgba(252,129,129,0.2)" text={DS.color.rose}>
@@ -1641,7 +1660,7 @@ const ProductPage = memo(() => {
                 style={{ width: "100%", justifyContent: "center", boxShadow: DS.shadow.glowLg }}
               >
                 <Icon name="bag" size={20} color="#fff" />
-                {selectedPlan === "monthly" ? "Buy Monthly — ₹19" : "Buy Full Year — ₹49"}
+                {selectedPlan === "monthly" ? "Start Tracking for ₹19" : "Download Full Year — ₹49"}
               </Btn>
               <div style={{ textAlign: "center", marginTop: 12, color: "rgba(255,255,255,0.4)", fontSize: DS.type.xs }}>
                 🔒 256-bit SSL · Instant delivery · Razorpay secured
@@ -1757,8 +1776,8 @@ const CheckoutPage = memo(() => {
   const [loading, setLoading]         = useState(false);
   const [errors, setErrors]           = useState({});
   const [livePrices, setLivePrices]   = useState({
-    monthly: { price: 19, original: 299, discount: "94% OFF", desc: "Single month budgeting", label: "Monthly Template" },
-    yearly:  { price: 49, original: 999, discount: "95% OFF", desc: "12 months + yearly dashboard", label: "Full Year Template" },
+    monthly: { price: 19, original: 299, discount: "94% OFF", desc: "Single-month expense tracking", label: "Monthly Smart Expense Tracker" },
+    yearly:  { price: 49, original: 999, discount: "95% OFF", desc: "12 months + yearly expense overview", label: "Full Year Smart Expense Tracker" },
   });
 
   useEffect(() => {
@@ -1928,11 +1947,21 @@ const CheckoutPage = memo(() => {
       </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 20px" }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <Badge style={{ marginBottom: 14 }}>Secure Purchase</Badge>
+          <h1 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 10, letterSpacing: 0 }}>
+            Get Smart Expense Tracker
+          </h1>
+          <p style={{ color: DS.color.slateLight, fontSize: DS.type.body, lineHeight: 1.7, maxWidth: 560, margin: "0 auto" }}>
+            Start tracking every rupee with a premium Excel dashboard delivered instantly after payment.
+          </p>
+        </div>
+
         {/* Plan Toggle */}
         <div style={{ background: DS.color.bgCard, borderRadius: DS.radius.xl, padding: 4, display: "flex", gap: 4, marginBottom: 32, maxWidth: 400, border: `1px solid ${DS.color.border}` }}>
           {[
-            { id: "monthly", label: "Monthly Template", price: "₹19" },
-            { id: "yearly",  label: "Full Year",         price: "₹49" },
+            { id: "monthly", label: "Monthly",  price: "₹19" },
+            { id: "yearly",  label: "Full Year", price: "₹49" },
           ].map((p) => (
             <button
               key={p.id}
@@ -1952,7 +1981,7 @@ const CheckoutPage = memo(() => {
               }}
             >
               {p.label}
-              <span style={{ color: selectedPlan === p.id ? DS.color.mint : DS.color.slateLight, fontWeight: 900 }}>
+              <span className="price-font" style={{ color: selectedPlan === p.id ? DS.color.mint : DS.color.slateLight, fontWeight: 900 }}>
                 {p.price}
               </span>
             </button>
@@ -2136,7 +2165,7 @@ const CheckoutPage = memo(() => {
                 ].map(([l, v, strike, color]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
                     <span style={{ color: DS.color.slateLight, fontSize: DS.type.sm }}>{l}</span>
-                    <span style={{
+                    <span className="price-font" style={{
                       color: strike ? DS.color.slateLight : (color || DS.color.slate),
                       fontSize: DS.type.sm,
                       fontWeight: 600,
@@ -2152,7 +2181,7 @@ const CheckoutPage = memo(() => {
                   paddingTop: 14, marginTop: 8,
                 }}>
                   <span style={{ fontWeight: 800, color: DS.color.navy, fontSize: DS.type.h4 }}>Total</span>
-                  <span style={{ fontWeight: 900, color: DS.color.mint, fontSize: 28, letterSpacing: 0 }}>₹{plan.price}</span>
+                  <span className="price-font" style={{ fontWeight: 900, color: DS.color.mint, fontSize: 28, letterSpacing: 0 }}>₹{plan.price}</span>
                 </div>
               </div>
 
@@ -2282,7 +2311,7 @@ const SuccessPage = memo(() => {
             Payment Successful!
           </h1>
           <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7 }}>
-            Thank you{data.name ? `, ${data.name}` : ""}! Your {isYearly ? "Full Year" : "Monthly"} template is ready.<br />
+            Thank you{data.name ? `, ${data.name}` : ""}! Your {isYearly ? "Full Year" : "Monthly"} Smart Expense Tracker is ready.<br />
             A download link has been sent to <strong style={{ color: DS.color.navy }}>{data.email || "your email"}</strong>.
           </p>
         </div>
@@ -2305,7 +2334,7 @@ const SuccessPage = memo(() => {
             </div>
             <div>
               <div style={{ fontWeight: 800, color: DS.color.navy, fontSize: 16 }}>
-                BudgetPro {isYearly ? "Full Year" : "Monthly"} Template
+                BudgetPro {isYearly ? "Full Year" : "Monthly"} Smart Expense Tracker
               </div>
               <div style={{ color: DS.color.slateLight, fontSize: DS.type.sm, marginTop: 2 }}>
                 Excel (.xlsx) + Google Sheets link · {isYearly ? "~4.1 MB" : "~2.4 MB"}
@@ -2318,7 +2347,7 @@ const SuccessPage = memo(() => {
             onClick={handleDownload}
           >
             <Icon name="download" size={20} color="#fff" />
-            {downloaded ? "✓ Downloading... Check Your Folder" : "Download Your Dashboard Now"}
+            {downloaded ? "✓ Downloading... Check Your Folder" : "Download Instantly"}
           </Btn>
           <div style={{ textAlign: "center", marginTop: 10, color: DS.color.slateLight, fontSize: DS.type.xs }}>
             File size: {isYearly ? "4.1" : "2.4"} MB · Secure direct download
@@ -2383,7 +2412,7 @@ const SuccessPage = memo(() => {
               Upgrade to Full Year — Save More!
             </div>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: DS.type.sm, lineHeight: 1.7, marginBottom: 16 }}>
-              You bought the monthly template — great start! Upgrade to the Full Year bundle (all 12 months + yearly overview dashboard) for just <strong style={{ color: DS.color.gold }}>₹49</strong>. That's only ₹30 more for 12x the value.
+              You bought the monthly Smart Expense Tracker — great start! Upgrade to the Full Year bundle (all 12 months + yearly expense overview) for just <strong style={{ color: DS.color.gold }}>₹49</strong>. That's only ₹30 more for 12x the value.
             </p>
             <Btn
               size="md"
@@ -2412,7 +2441,7 @@ const SuccessPage = memo(() => {
 const TERMS_SECTIONS = [
   {
     title: "Use of BudgetPro",
-    body: "BudgetPro provides downloadable budgeting templates and related digital materials for personal finance tracking. By using this website or purchasing a product, you agree to use the templates lawfully and for your own personal or internal household purposes.",
+    body: "BudgetPro provides Smart Expense Tracker and related digital materials for personal finance tracking. By using this website or purchasing a product, you agree to use the files lawfully and for your own personal or internal household purposes.",
   },
   {
     title: "Digital Delivery",
@@ -2424,11 +2453,11 @@ const TERMS_SECTIONS = [
   },
   {
     title: "License Restrictions",
-    body: "Your purchase grants a limited, non-transferable license to use the template. You may not resell, redistribute, upload, sublicense, copy for commercial resale, or claim ownership of BudgetPro files or designs.",
+    body: "Your purchase grants a limited, non-transferable license to use Smart Expense Tracker. You may not resell, redistribute, upload, sublicense, copy for commercial resale, or claim ownership of BudgetPro files or designs.",
   },
   {
     title: "No Financial Advice",
-    body: "BudgetPro is a budgeting tool and educational template. It does not provide financial, investment, tax, legal, or accounting advice. You remain responsible for your financial decisions and should consult qualified professionals when needed.",
+    body: "BudgetPro Smart Expense Tracker is an educational personal finance tool. It does not provide financial, investment, tax, legal, or accounting advice. You remain responsible for your financial decisions and should consult qualified professionals when needed.",
   },
   {
     title: "Refunds and Failed Delivery",
@@ -2436,7 +2465,7 @@ const TERMS_SECTIONS = [
   },
   {
     title: "Limitation of Liability",
-    body: "BudgetPro is provided as is. To the maximum extent permitted by law, BudgetPro is not liable for indirect, incidental, special, consequential, or financial losses arising from use of the website or templates.",
+    body: "BudgetPro and Smart Expense Tracker are provided as is. To the maximum extent permitted by law, BudgetPro is not liable for indirect, incidental, special, consequential, or financial losses arising from use of the website or digital files.",
   },
   {
     title: "Contact",
@@ -2527,7 +2556,7 @@ const LegalPage = memo(({ title, intro, sections }) => (
 const TermsPage = memo(() => (
   <LegalPage
     title="Terms of Service"
-    intro="These terms govern your access to the BudgetPro website, checkout flow, downloads, and digital budgeting templates."
+    intro="These terms govern your access to the BudgetPro website, checkout flow, downloads, and Smart Expense Tracker digital files."
     sections={TERMS_SECTIONS}
   />
 ));
@@ -2786,7 +2815,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 800, color: "#fff", fontSize: DS.type.h4, marginBottom: 6 }}>Product Files</div>
                   <div style={{ color: "rgba(255,255,255,0.6)", fontSize: DS.type.sm, lineHeight: 1.7 }}>
-                    Your Monthly and Yearly templates are served from <code style={{ background: "rgba(255,255,255,0.12)", padding: "2px 6px", borderRadius: 4 }}>MONTHLY_FILE_URL</code> and{" "}
+                    Your Monthly and Yearly Smart Expense Tracker files are served from <code style={{ background: "rgba(255,255,255,0.12)", padding: "2px 6px", borderRadius: 4 }}>MONTHLY_FILE_URL</code> and{" "}
                     <code style={{ background: "rgba(255,255,255,0.12)", padding: "2px 6px", borderRadius: 4 }}>YEARLY_FILE_URL</code> environment variables. To change the file, upload a new one to your file host and update those env vars in Vercel — no code change needed.
                   </div>
                 </div>
@@ -2869,7 +2898,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
               {["monthly", "yearly"].map((plan) => (
                 <Card key={plan} style={{ boxShadow: DS.shadow.md }}>
                   <div style={{ fontWeight: 800, color: DS.color.navy, fontSize: DS.type.h4, marginBottom: 4, textTransform: "capitalize" }}>
-                    {plan} Template
+                    {plan} Smart Expense Tracker
                   </div>
                   <div style={{ color: DS.color.slateLight, fontSize: DS.type.sm, marginBottom: 18 }}>
                     Live price shown at checkout
@@ -3003,8 +3032,8 @@ const Nav = memo(() => {
 
           <div className="nav-desktop" style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <div style={{ width: 1, height: 24, background: DS.color.border, margin: "0 4px" }} />
-            <Btn size="sm" variant="outline" onClick={() => goTo("/checkout?plan=monthly")}>₹19</Btn>
-            <Btn size="sm" variant="gold" onClick={() => goTo("/checkout?plan=yearly")}>Full Year ₹49</Btn>
+            <Btn size="sm" variant="outline" onClick={() => goTo("/product")}>Product</Btn>
+            <Btn size="sm" variant="gold" onClick={() => goTo("/checkout?plan=monthly")}>Start for ₹19</Btn>
             <button
               onClick={() => goTo("/admin")}
               style={{ background: "none", border: "none", cursor: "pointer", padding: 8, color: DS.color.slateLight, marginLeft: 2 }}
@@ -3075,8 +3104,8 @@ const Nav = memo(() => {
             );
           })}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
-            <Btn variant="outline" onClick={() => goTo("/checkout?plan=monthly")} style={{ justifyContent: "center" }}>₹19 Monthly</Btn>
-            <Btn variant="gold"    onClick={() => goTo("/checkout?plan=yearly")}  style={{ justifyContent: "center" }}>₹49 Full Year</Btn>
+            <Btn variant="outline" onClick={() => goTo("/product")} style={{ justifyContent: "center" }}>View Product</Btn>
+            <Btn variant="gold"    onClick={() => goTo("/checkout?plan=monthly")}  style={{ justifyContent: "center" }}>Start for ₹19</Btn>
           </div>
         </div>
       )}
@@ -3123,11 +3152,11 @@ const Footer = memo(() => {
               </span>
             </div>
             <p style={{ fontSize: DS.type.sm, lineHeight: 1.8, marginBottom: 24, maxWidth: 260, color: "rgba(255,255,255,0.5)" }}>
-              A simple, beautiful budgeting template for every Indian. Take control of your money today.
+              BudgetPro Smart Expense Tracker helps Indians see every rupee clearly, save smarter, and take control of monthly spending.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
-              <Btn size="sm" variant="glass" onClick={() => goTo("/checkout?plan=monthly")}>₹19 Monthly</Btn>
-              <Btn size="sm" variant="gold"  onClick={() => goTo("/checkout?plan=yearly")}>₹49 Full Year</Btn>
+              <Btn size="sm" variant="glass" onClick={() => goTo("/checkout?plan=monthly")}>Start for ₹19</Btn>
+              <Btn size="sm" variant="gold"  onClick={() => goTo("/checkout?plan=yearly")}>Full Year ₹49</Btn>
             </div>
           </div>
 
@@ -3219,9 +3248,9 @@ const Footer = memo(() => {
               padding: 18,
               border: "1px solid rgba(255,255,255,0.07)",
             }}>
-              <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 2, letterSpacing: 0 }}>₹19</div>
-              <div style={{ fontSize: DS.type.xs, marginBottom: 14, color: "rgba(255,255,255,0.45)" }}>Monthly Template</div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: DS.color.gold, marginBottom: 2, letterSpacing: 0 }}>₹49</div>
+              <div className="price-font" style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 2, letterSpacing: 0 }}>₹19</div>
+              <div style={{ fontSize: DS.type.xs, marginBottom: 14, color: "rgba(255,255,255,0.45)" }}>Monthly Smart Expense Tracker</div>
+              <div className="price-font" style={{ fontSize: 26, fontWeight: 900, color: DS.color.gold, marginBottom: 2, letterSpacing: 0 }}>₹49</div>
               <div style={{ fontSize: DS.type.xs, color: "rgba(255,255,255,0.45)" }}>Full Year · Best Value ⭐</div>
             </div>
           </div>
@@ -3278,7 +3307,7 @@ const AppLayout = () => {
 
   return (
     <div style={{
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif",
+      fontFamily: DS.font.body,
       minHeight: "100vh",
       background: DS.color.bg,
     }}>
