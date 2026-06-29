@@ -9,40 +9,42 @@ import {
   Navigate,
 } from "react-router-dom";
 
+// VISUAL VARIANT: Option 2 - Apple-Style Liquid Glass. Frontend styling only; payment/backend/admin logic unchanged.
+
 // ═══════════════════════════════════════════════════════════════════
 //  DESIGN SYSTEM — Single source of truth for every visual decision
 // ═══════════════════════════════════════════════════════════════════
 const DS = {
-  // Liquid glass color palette
+  // Option 2: Apple-style liquid glass palette
   color: {
-    mint:        "#5FFFE1",
-    mintLight:   "rgba(95,255,225,0.12)",
-    mintDark:    "#A8FFF0",
-    mintGlow:    "rgba(95,255,225,0.22)",
-    emerald:     "#10D48A",
-    navy:        "#F7FAFC",
-    navyMid:     "#0B0B0E",
-    navyLight:   "#18181C",
-    navyGlass:   "rgba(5,5,6,0.82)",
-    slate:       "#D3D8E4",
-    slateLight:  "#8D95A7",
-    bg:          "#050506",
-    bgCard:      "rgba(17,17,20,0.76)",
-    bgGlass:     "rgba(255,255,255,0.08)",
-    border:      "rgba(255,255,255,0.12)",
-    borderGlow:  "rgba(95,255,225,0.34)",
-    gold:        "#E7C36A",
-    goldDark:    "#A97024",
-    bronze:      "#B67A43",
-    rose:        "#FF6B8A",
-    purple:      "#9B7CFF",
-    purpleLight: "rgba(155,124,255,0.14)",
-    blue:        "#6AB8FF",
-    text:        "#F7FAFC",
-    textMuted:   "#A1A8B8",
-    surface:     "#0A0A0C",
-    input:       "rgba(255,255,255,0.07)",
-    inputBorder: "rgba(255,255,255,0.14)",
+    mint:        "#A7F3FF",
+    mintLight:   "rgba(167,243,255,0.14)",
+    mintDark:    "#E9FBFF",
+    mintGlow:    "rgba(167,243,255,0.24)",
+    emerald:     "#7EE7C8",
+    navy:        "#F8FAFF",
+    navyMid:     "#101319",
+    navyLight:   "#1A1F29",
+    navyGlass:   "rgba(8,10,14,0.74)",
+    slate:       "#DCE3EF",
+    slateLight:  "#9DA8B8",
+    bg:          "#07080B",
+    bgCard:      "rgba(18,22,30,0.68)",
+    bgGlass:     "rgba(255,255,255,0.105)",
+    border:      "rgba(255,255,255,0.16)",
+    borderGlow:  "rgba(167,243,255,0.36)",
+    gold:        "#D8E3F2",
+    goldDark:    "#8F9CB2",
+    bronze:      "#B9C6D8",
+    rose:        "#FF7A9E",
+    purple:      "#9AA7FF",
+    purpleLight: "rgba(154,167,255,0.14)",
+    blue:        "#83B7FF",
+    text:        "#F8FAFF",
+    textMuted:   "#AAB4C4",
+    surface:     "#0B0D12",
+    input:       "rgba(255,255,255,0.08)",
+    inputBorder: "rgba(255,255,255,0.16)",
     white:       "#FFFFFF",
   },
 
@@ -59,9 +61,9 @@ const DS = {
   },
 
   font: {
-    body: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    heading: "'Sora', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    number: "'Space Grotesk', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    body: "'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    heading: "'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    number: "'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   },
 
   // Spacing scale (multiples of 4px)
@@ -73,36 +75,36 @@ const DS = {
 
   // Border radius scale
   radius: {
-    sm: "8px", md: "12px", lg: "16px", xl: "20px",
-    "2xl": "24px", "3xl": "32px", pill: "999px",
+    sm: "10px", md: "14px", lg: "18px", xl: "22px",
+    "2xl": "28px", "3xl": "34px", pill: "999px",
   },
 
   // Shadow scale
   shadow: {
-    xs:  "0 1px 3px rgba(0,0,0,0.24)",
-    sm:  "0 8px 24px rgba(0,0,0,0.24)",
-    md:  "0 16px 44px rgba(0,0,0,0.28)",
-    lg:  "0 24px 70px rgba(0,0,0,0.36)",
-    xl:  "0 32px 96px rgba(0,0,0,0.44)",
-    "2xl":"0 44px 120px rgba(0,0,0,0.56)",
-    glow: "0 0 28px rgba(95,255,225,0.22)",
-    glowLg: "0 0 54px rgba(95,255,225,0.30), 0 20px 60px rgba(0,0,0,0.36)",
-    gold: "0 0 44px rgba(231,195,106,0.28), 0 18px 48px rgba(0,0,0,0.32)",
-    navy: "0 18px 60px rgba(0,0,0,0.45)",
+    xs:  "0 1px 3px rgba(0,0,0,0.22)",
+    sm:  "0 10px 30px rgba(0,0,0,0.24)",
+    md:  "0 18px 52px rgba(0,0,0,0.30)",
+    lg:  "0 26px 80px rgba(0,0,0,0.38)",
+    xl:  "0 34px 104px rgba(0,0,0,0.46)",
+    "2xl":"0 46px 132px rgba(0,0,0,0.56)",
+    glow: "0 0 32px rgba(167,243,255,0.22)",
+    glowLg: "0 0 62px rgba(167,243,255,0.28), 0 24px 70px rgba(0,0,0,0.38)",
+    gold: "0 0 46px rgba(216,227,242,0.22), 0 20px 56px rgba(0,0,0,0.34)",
+    navy: "0 18px 66px rgba(0,0,0,0.48)",
   },
 
   // Gradient system
   grad: {
-    mint:   "linear-gradient(135deg, #5FFFE1 0%, #10D48A 58%, #0A8F72 100%)",
-    navy:   "linear-gradient(155deg, #050506 0%, #0A0A0C 48%, #141418 100%)",
-    navyMid:"linear-gradient(155deg, rgba(24,24,28,0.96) 0%, rgba(8,8,10,0.98) 100%)",
-    gold:   "linear-gradient(135deg, #F6E7A6 0%, #E7C36A 52%, #B67A43 100%)",
-    glass:  "linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.035))",
-    surface:"linear-gradient(155deg, #050506 0%, #0A0A0C 48%, #111114 100%)",
-    hero:   "radial-gradient(circle at 18% 18%, rgba(95,255,225,0.18), transparent 32%), radial-gradient(circle at 78% 20%, rgba(155,124,255,0.20), transparent 34%), radial-gradient(circle at 70% 78%, rgba(231,195,106,0.11), transparent 30%), linear-gradient(155deg, #050506 0%, #08080A 48%, #101014 100%)",
-    aurora: "linear-gradient(135deg, rgba(95,255,225,0.12) 0%, rgba(106,184,255,0.10) 38%, rgba(155,124,255,0.10) 68%, rgba(231,195,106,0.09) 100%)",
-    purple: "linear-gradient(135deg, #9B7CFF, #5A42D6)",
-    bronze: "linear-gradient(135deg, #E7C36A, #B67A43)",
+    mint:   "linear-gradient(135deg, #EAFBFF 0%, #A7F3FF 48%, #83B7FF 100%)",
+    navy:   "linear-gradient(155deg, #07080B 0%, #0B0D12 48%, #151A23 100%)",
+    navyMid:"linear-gradient(155deg, rgba(28,33,44,0.88) 0%, rgba(9,11,16,0.96) 100%)",
+    gold:   "linear-gradient(135deg, #FFFFFF 0%, #D8E3F2 52%, #91A0B8 100%)",
+    glass:  "linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.045))",
+    surface:"linear-gradient(155deg, #07080B 0%, #0B0D12 48%, #131722 100%)",
+    hero:   "radial-gradient(circle at 18% 18%, rgba(167,243,255,0.16), transparent 32%), radial-gradient(circle at 78% 20%, rgba(131,183,255,0.18), transparent 34%), radial-gradient(circle at 70% 78%, rgba(216,227,242,0.09), transparent 30%), linear-gradient(155deg, #07080B 0%, #0A0C11 48%, #141923 100%)",
+    aurora: "linear-gradient(135deg, rgba(167,243,255,0.13) 0%, rgba(131,183,255,0.12) 42%, rgba(154,167,255,0.10) 72%, rgba(216,227,242,0.08) 100%)",
+    purple: "linear-gradient(135deg, #9AA7FF, #6A78F0)",
+    bronze: "linear-gradient(135deg, #F7FAFF, #AEBBD0)",
   },
 
   // Animation timing
@@ -121,7 +123,7 @@ const SUPPORT_MAILTO = "mailto:theunseenworld2@gmail.com?subject=BudgetPro%20Sup
 // ═══════════════════════════════════════════════════════════════════
 const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -154,9 +156,9 @@ const GlobalStyles = () => (
       pointer-events: none;
       z-index: -2;
       background:
-        radial-gradient(circle at 12% 8%, rgba(95,255,225,0.12), transparent 32%),
-        radial-gradient(circle at 82% 12%, rgba(155,124,255,0.14), transparent 34%),
-        radial-gradient(circle at 72% 84%, rgba(231,195,106,0.08), transparent 30%),
+        radial-gradient(circle at 12% 8%, rgba(167,243,255,0.12), transparent 32%),
+        radial-gradient(circle at 82% 12%, rgba(131,183,255,0.14), transparent 34%),
+        radial-gradient(circle at 72% 84%, rgba(216,227,242,0.08), transparent 30%),
         ${DS.grad.surface};
     }
 
@@ -172,7 +174,7 @@ const GlobalStyles = () => (
     @keyframes fadeIn      { from { opacity:0; } to { opacity:1; } }
     @keyframes scaleIn     { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
     @keyframes slideDown   { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes pulse       { 0%,100% { box-shadow: 0 0 0 0 rgba(95,255,225,0.34); } 50% { box-shadow: 0 0 0 11px rgba(95,255,225,0); } }
+    @keyframes pulse       { 0%,100% { box-shadow: 0 0 0 0 rgba(167,243,255,0.34); } 50% { box-shadow: 0 0 0 11px rgba(167,243,255,0); } }
     @keyframes shimmer     { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
     @keyframes float       { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
     @keyframes floatSlow   { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-14px) rotate(1deg); } }
@@ -2243,7 +2245,7 @@ const CheckoutPage = memo(() => {
                 color: DS.color.gold,
                 fontWeight: 600,
                 textAlign: "center",
-                border: "1px solid rgba(231,195,106,0.28)",
+                border: "1px solid rgba(216,227,242,0.22)",
               }}>
                 ⚡ Limited-time pricing — don't miss out!
               </div>
