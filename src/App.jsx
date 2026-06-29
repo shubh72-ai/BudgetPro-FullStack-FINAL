@@ -13,31 +13,36 @@ import {
 //  DESIGN SYSTEM — Single source of truth for every visual decision
 // ═══════════════════════════════════════════════════════════════════
 const DS = {
-  // Color palette
+  // Liquid glass color palette
   color: {
-    mint:        "#00C896",
-    mintLight:   "#E6FAF4",
-    mintDark:    "#008F6B",
-    mintGlow:    "rgba(0,200,150,0.18)",
-    navy:        "#0A1628",
-    navyMid:     "#0F1E3C",
-    navyLight:   "#1A2E50",
-    navyGlass:   "rgba(10,22,40,0.82)",
-    slate:       "#4A5568",
-    slateLight:  "#718096",
-    bg:          "#F7FAFC",
-    bgCard:      "#FFFFFF",
-    bgGlass:     "rgba(255,255,255,0.72)",
-    border:      "#E2E8F0",
-    borderGlow:  "rgba(0,200,150,0.35)",
-    gold:        "#F6AD55",
-    goldDark:    "#C97D10",
-    rose:        "#FC8181",
-    purple:      "#7C3AED",
-    purpleLight: "#EDE9FE",
-    text:        "#0A1628",
-    textMuted:   "#718096",
-    surface:     "#F0F4F8",
+    mint:        "#5FFFE1",
+    mintLight:   "rgba(95,255,225,0.12)",
+    mintDark:    "#A8FFF0",
+    mintGlow:    "rgba(95,255,225,0.22)",
+    emerald:     "#10D48A",
+    navy:        "#F7FAFC",
+    navyMid:     "#0B0B0E",
+    navyLight:   "#18181C",
+    navyGlass:   "rgba(5,5,6,0.82)",
+    slate:       "#D3D8E4",
+    slateLight:  "#8D95A7",
+    bg:          "#050506",
+    bgCard:      "rgba(17,17,20,0.76)",
+    bgGlass:     "rgba(255,255,255,0.08)",
+    border:      "rgba(255,255,255,0.12)",
+    borderGlow:  "rgba(95,255,225,0.34)",
+    gold:        "#E7C36A",
+    goldDark:    "#A97024",
+    bronze:      "#B67A43",
+    rose:        "#FF6B8A",
+    purple:      "#9B7CFF",
+    purpleLight: "rgba(155,124,255,0.14)",
+    blue:        "#6AB8FF",
+    text:        "#F7FAFC",
+    textMuted:   "#A1A8B8",
+    surface:     "#0A0A0C",
+    input:       "rgba(255,255,255,0.07)",
+    inputBorder: "rgba(255,255,255,0.14)",
     white:       "#FFFFFF",
   },
 
@@ -68,29 +73,30 @@ const DS = {
 
   // Shadow scale
   shadow: {
-    xs:  "0 1px 3px rgba(10,22,40,0.06)",
-    sm:  "0 2px 8px rgba(10,22,40,0.08)",
-    md:  "0 4px 20px rgba(10,22,40,0.10)",
-    lg:  "0 8px 32px rgba(10,22,40,0.12)",
-    xl:  "0 16px 48px rgba(10,22,40,0.16)",
-    "2xl":"0 32px 80px rgba(10,22,40,0.22)",
-    glow: "0 8px 32px rgba(0,200,150,0.35)",
-    glowLg: "0 16px 64px rgba(0,200,150,0.4)",
-    gold: "0 8px 32px rgba(246,173,85,0.4)",
-    navy: "0 8px 32px rgba(10,22,40,0.35)",
+    xs:  "0 1px 3px rgba(0,0,0,0.24)",
+    sm:  "0 8px 24px rgba(0,0,0,0.24)",
+    md:  "0 16px 44px rgba(0,0,0,0.28)",
+    lg:  "0 24px 70px rgba(0,0,0,0.36)",
+    xl:  "0 32px 96px rgba(0,0,0,0.44)",
+    "2xl":"0 44px 120px rgba(0,0,0,0.56)",
+    glow: "0 0 28px rgba(95,255,225,0.22)",
+    glowLg: "0 0 54px rgba(95,255,225,0.30), 0 20px 60px rgba(0,0,0,0.36)",
+    gold: "0 0 44px rgba(231,195,106,0.28), 0 18px 48px rgba(0,0,0,0.32)",
+    navy: "0 18px 60px rgba(0,0,0,0.45)",
   },
 
   // Gradient system
   grad: {
-    mint:   "linear-gradient(135deg, #00C896, #008F6B)",
-    navy:   "linear-gradient(155deg, #0A1628 0%, #1A2E50 60%, #0d2444 100%)",
-    navyMid:"linear-gradient(155deg, #0F1E3C 0%, #1e3a6e 100%)",
-    gold:   "linear-gradient(135deg, #F6AD55, #ED8936)",
-    glass:  "linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04))",
-    surface:"linear-gradient(155deg, #F7FAFC, #EEF2F7)",
-    hero:   "linear-gradient(155deg, #0A1628 0%, #1A2E50 55%, #0d2444 100%)",
-    aurora: "linear-gradient(135deg, rgba(0,200,150,0.08) 0%, rgba(124,58,237,0.06) 50%, rgba(246,173,85,0.05) 100%)",
-    purple: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+    mint:   "linear-gradient(135deg, #5FFFE1 0%, #10D48A 58%, #0A8F72 100%)",
+    navy:   "linear-gradient(155deg, #050506 0%, #0A0A0C 48%, #141418 100%)",
+    navyMid:"linear-gradient(155deg, rgba(24,24,28,0.96) 0%, rgba(8,8,10,0.98) 100%)",
+    gold:   "linear-gradient(135deg, #F6E7A6 0%, #E7C36A 52%, #B67A43 100%)",
+    glass:  "linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.035))",
+    surface:"linear-gradient(155deg, #050506 0%, #0A0A0C 48%, #111114 100%)",
+    hero:   "radial-gradient(circle at 18% 18%, rgba(95,255,225,0.18), transparent 32%), radial-gradient(circle at 78% 20%, rgba(155,124,255,0.20), transparent 34%), radial-gradient(circle at 70% 78%, rgba(231,195,106,0.11), transparent 30%), linear-gradient(155deg, #050506 0%, #08080A 48%, #101014 100%)",
+    aurora: "linear-gradient(135deg, rgba(95,255,225,0.12) 0%, rgba(106,184,255,0.10) 38%, rgba(155,124,255,0.10) 68%, rgba(231,195,106,0.09) 100%)",
+    purple: "linear-gradient(135deg, #9B7CFF, #5A42D6)",
+    bronze: "linear-gradient(135deg, #E7C36A, #B67A43)",
   },
 
   // Animation timing
@@ -111,7 +117,7 @@ const GlobalStyles = () => (
   <style>{`
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; background: ${DS.color.bg}; }
 
     body {
       background: ${DS.color.bg};
@@ -119,6 +125,26 @@ const GlobalStyles = () => (
       color: ${DS.color.text};
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(95,255,225,0.12), transparent 32%),
+        radial-gradient(circle at 82% 12%, rgba(155,124,255,0.14), transparent 34%),
+        radial-gradient(circle at 72% 84%, rgba(231,195,106,0.08), transparent 30%),
+        ${DS.grad.surface};
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid ${DS.color.mint};
+      outline-offset: 3px;
     }
 
     /* ── Keyframes ── */
@@ -127,7 +153,7 @@ const GlobalStyles = () => (
     @keyframes fadeIn      { from { opacity:0; } to { opacity:1; } }
     @keyframes scaleIn     { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
     @keyframes slideDown   { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes pulse       { 0%,100% { box-shadow: 0 0 0 0 rgba(0,200,150,0.5); } 50% { box-shadow: 0 0 0 10px rgba(0,200,150,0); } }
+    @keyframes pulse       { 0%,100% { box-shadow: 0 0 0 0 rgba(95,255,225,0.34); } 50% { box-shadow: 0 0 0 11px rgba(95,255,225,0); } }
     @keyframes shimmer     { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
     @keyframes float       { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
     @keyframes floatSlow   { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-14px) rotate(1deg); } }
@@ -135,16 +161,85 @@ const GlobalStyles = () => (
     @keyframes orb         { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(30px,-20px) scale(1.05); } 66% { transform:translate(-20px,15px) scale(0.97); } }
     @keyframes gradShift   { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
     @keyframes barGrow     { from { height:0; } to { height:var(--h); } }
+    @keyframes shine       { from { transform:translateX(-130%) rotate(12deg); } to { transform:translateX(170%) rotate(12deg); } }
+    @keyframes chartReveal { from { transform:scaleY(0.2); opacity:0.25; } to { transform:scaleY(1); opacity:1; } }
 
     /* ── Utility classes ── */
     .fade-in-up   { animation: fadeInUp 0.6s ${DS.ease.out} both; }
     .fade-in      { animation: fadeIn 0.5s ${DS.ease.out} both; }
     .scale-in     { animation: scaleIn 0.45s ${DS.ease.spring} both; }
     .skeleton     {
-      background: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.13) 50%, rgba(255,255,255,0.06) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.6s infinite;
       border-radius: ${DS.radius.md};
+    }
+
+    .liquid-card,
+    .glass-panel,
+    .dashboard-glass {
+      position: relative;
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045));
+      border: 1px solid ${DS.color.border};
+      box-shadow: ${DS.shadow.md};
+      backdrop-filter: blur(26px) saturate(150%);
+      -webkit-backdrop-filter: blur(26px) saturate(150%);
+    }
+
+    .liquid-card::after,
+    .glass-panel::after,
+    .dashboard-glass::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,0.18), transparent 28%),
+        radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 34%);
+      opacity: 0.32;
+      mix-blend-mode: screen;
+    }
+
+    .premium-button {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .premium-button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      bottom: -50%;
+      width: 42%;
+      left: -55%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.34), transparent);
+      transform: rotate(12deg);
+      opacity: 0;
+      transition: opacity 0.24s ${DS.ease.smooth};
+      z-index: -1;
+    }
+
+    .premium-button:hover::before { opacity: 1; animation: shine 0.9s ${DS.ease.out}; }
+    .floating-card { animation: floatSlow 10s ease-in-out infinite; }
+    .chart-bar { transform-origin: bottom; animation: chartReveal 0.7s ${DS.ease.spring} both; }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(4px);
+      pointer-events: none;
+      opacity: 0.5;
+      animation: orb 15s ease-in-out infinite;
+    }
+
+    .noise-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.36;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
     }
 
     /* ── Interactive states ── */
@@ -193,7 +288,7 @@ const GlobalStyles = () => (
     .nav-item.active::after {
       left: 8px; right: 8px;
     }
-    .nav-item:hover { color: ${DS.color.navy} !important; background: ${DS.color.mintLight} !important; }
+    .nav-item:hover { color: ${DS.color.navy} !important; background: ${DS.color.bgGlass} !important; }
     .nav-item.active { color: ${DS.color.mintDark} !important; background: ${DS.color.mintLight} !important; }
 
     /* ── Form focus ── */
@@ -202,6 +297,8 @@ const GlobalStyles = () => (
       outline: none;
       box-shadow: 0 0 0 3px ${DS.color.mintGlow} !important;
     }
+
+    input::placeholder, textarea::placeholder { color: rgba(211,216,228,0.42); }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
@@ -215,10 +312,20 @@ const GlobalStyles = () => (
       .mobile-hide     { display: none !important; }
       .nav-desktop     { display: none !important; }
       .mobile-nav-btn  { display: flex !important; }
+      .product-grid    { grid-template-columns: 1fr !important; }
+      .admin-pricing-grid { grid-template-columns: 1fr !important; }
+      .admin-nav       { flex-direction: column !important; height: auto !important; align-items: stretch !important; gap: 14px !important; padding: 16px 20px !important; }
+      .admin-tabs      { overflow-x: auto; padding-bottom: 4px; }
+      .hero-actions    { width: 100%; }
+      .hero-actions button { width: 100%; }
     }
     @media (max-width: 480px) {
       .benefits-grid   { grid-template-columns: 1fr !important; }
       .footer-grid     { grid-template-columns: 1fr !important; }
+      .checkout-grid   { gap: 18px !important; }
+      .stats-row       { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+      .sticky-cta      { padding: 12px !important; gap: 10px !important; }
+      .sticky-cta button { padding-left: 12px !important; padding-right: 12px !important; }
     }
 
     /* ── Reduced motion ── */
@@ -232,7 +339,7 @@ const GlobalStyles = () => (
     /* ── Custom scrollbar ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: ${DS.color.bg}; }
-    ::-webkit-scrollbar-thumb { background: ${DS.color.border}; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: ${DS.color.slateLight}; }
 
     /* ── Noise texture overlay for cards ── */
@@ -255,12 +362,13 @@ const GlobalStyles = () => (
       position: absolute;
       inset: -1px;
       border-radius: inherit;
-      background: linear-gradient(135deg, ${DS.color.mint}55, ${DS.color.purple}33, ${DS.color.gold}22);
+      background: linear-gradient(135deg, ${DS.color.mint}77, ${DS.color.blue}44, ${DS.color.purple}44, ${DS.color.gold}33);
       z-index: -1;
-      opacity: 0;
+      opacity: 0.18;
       transition: opacity 0.3s ease;
+      filter: blur(2px);
     }
-    .glow-border:hover::before { opacity: 1; }
+    .glow-border:hover::before { opacity: 0.85; }
   `}</style>
 );
 
@@ -322,23 +430,24 @@ const Icon = memo(({ name, size = 20, color = "currentColor", style = {}, filled
 const BUTTON_VARIANTS = {
   primary: {
     background: DS.grad.mint,
-    color: "#fff",
+    color: "#041210",
     border: "none",
     boxShadow: DS.shadow.glow,
-    className: "btn-primary",
+    className: "btn-primary premium-button",
   },
   outline: {
-    background: "transparent",
+    background: "rgba(255,255,255,0.035)",
     color: DS.color.mint,
-    border: `2px solid ${DS.color.mint}`,
-    className: "btn-primary",
+    border: `1px solid ${DS.color.borderGlow}`,
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+    className: "btn-primary premium-button",
   },
   navy: {
     background: DS.grad.navyMid,
     color: "#fff",
-    border: "none",
+    border: `1px solid ${DS.color.border}`,
     boxShadow: DS.shadow.navy,
-    className: "btn-primary",
+    className: "btn-primary premium-button",
   },
   ghost: {
     background: "transparent",
@@ -350,21 +459,23 @@ const BUTTON_VARIANTS = {
     background: "linear-gradient(135deg, #E53E3E, #C53030)",
     color: "#fff",
     border: "none",
-    className: "btn-primary",
+    className: "btn-primary premium-button",
   },
   gold: {
     background: DS.grad.gold,
-    color: "#fff",
+    color: "#1A1203",
     border: "none",
     boxShadow: DS.shadow.gold,
-    className: "btn-gold",
+    className: "btn-gold premium-button",
   },
   glass: {
-    background: "rgba(255,255,255,0.12)",
-    backdropFilter: "blur(12px)",
+    background: "rgba(255,255,255,0.08)",
+    backdropFilter: "blur(18px) saturate(140%)",
+    WebkitBackdropFilter: "blur(18px) saturate(140%)",
     color: "#fff",
-    border: "1px solid rgba(255,255,255,0.22)",
-    className: "btn-primary",
+    border: "1px solid rgba(255,255,255,0.16)",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.16), 0 14px 42px rgba(0,0,0,0.28)",
+    className: "btn-primary premium-button",
   },
 };
 
@@ -388,8 +499,8 @@ const Btn = memo(({ children, onClick, variant = "primary", size = "md", style =
         alignItems: "center",
         justifyContent: "center",
         gap: s.gap,
-        fontWeight: 700,
-        letterSpacing: "0.01em",
+        fontWeight: 800,
+        letterSpacing: 0,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.6 : 1,
         transition: `all 0.22s ${DS.ease.smooth}`,
@@ -409,13 +520,15 @@ const Badge = memo(({ children, color = DS.color.mintLight, text = DS.color.mint
     background: color,
     color: text,
     borderRadius: DS.radius.pill,
-    padding: "4px 14px",
+    padding: "5px 14px",
     fontSize: DS.type.xs,
-    fontWeight: 700,
-    letterSpacing: "0.04em",
+    fontWeight: 800,
+    letterSpacing: 0,
     display: "inline-flex",
     alignItems: "center",
     gap: "4px",
+    border: `1px solid ${DS.color.border}`,
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10)",
     ...style,
   }}>
     {children}
@@ -425,18 +538,20 @@ const Badge = memo(({ children, color = DS.color.mintLight, text = DS.color.mint
 // ── Card ─────────────────────────────────────────────────────────────
 const Card = memo(({ children, style = {}, className = "", glass = false }) => (
   <div
-    className={className}
+    className={`liquid-card ${className}`.trim()}
     style={{
       background: glass
-        ? "rgba(255,255,255,0.72)"
+        ? DS.color.bgGlass
         : DS.color.bgCard,
-      backdropFilter: glass ? "blur(20px)" : undefined,
+      backdropFilter: "blur(24px) saturate(150%)",
+      WebkitBackdropFilter: "blur(24px) saturate(150%)",
       border: glass
-        ? "1px solid rgba(255,255,255,0.45)"
+        ? "1px solid rgba(255,255,255,0.18)"
         : `1px solid ${DS.color.border}`,
       borderRadius: DS.radius["2xl"],
       padding: DS.space[6],
-      boxShadow: DS.shadow.sm,
+      boxShadow: DS.shadow.md,
+      overflow: "hidden",
       ...style,
     }}
   >
@@ -475,14 +590,14 @@ const CHART_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "S
 const CAT_COLORS   = [DS.color.purple, DS.color.gold, DS.color.mint, DS.color.rose];
 
 const DashboardSkeleton = () => (
-  <div style={{ padding: 20, background: DS.color.surface, borderRadius: DS.radius.xl }}>
+  <div className="dashboard-glass" style={{ padding: 20, background: DS.color.bgCard, borderRadius: DS.radius.xl, border: `1px solid ${DS.color.border}` }}>
     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
       <div><Skeleton width={160} height={22} style={{ marginBottom: 8 }} /><Skeleton width={80} height={14} /></div>
       <Skeleton width={90} height={28} style={{ borderRadius: DS.radius.pill }} />
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
       {[1,2,3].map(i => (
-        <div key={i} style={{ background: "#fff", borderRadius: DS.radius.lg, padding: 14 }}>
+        <div key={i} style={{ background: DS.color.bgGlass, borderRadius: DS.radius.lg, padding: 14, border: `1px solid ${DS.color.border}` }}>
           <Skeleton height={12} style={{ marginBottom: 8 }} /><Skeleton height={28} />
         </div>
       ))}
@@ -499,6 +614,11 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
   const maxVal    = 75000;
   const [animated, setAnimated] = useState(false);
   const fmt = (v) => `₹${v.toLocaleString("en-IN")}`;
+  const activity = [
+    { label: "Salary credited", value: `+${fmt(Math.round(data.income * 0.74))}`, color: DS.color.mint },
+    { label: "Groceries budget", value: `${data.cats[1].pct}% used`, color: DS.color.gold },
+    { label: "Savings runway", value: `${savingsPct}% saved`, color: DS.color.purple },
+  ];
 
   useEffect(() => {
     setAnimated(false);
@@ -507,27 +627,35 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
   }, [selectedMonth]);
 
   return (
-    <div style={{
-      background: DS.color.surface,
-      borderRadius: DS.radius.xl,
-      padding: 20,
+    <div className="dashboard-glass" style={{
+      background: "linear-gradient(145deg, rgba(17,17,20,0.92), rgba(8,8,10,0.98))",
+      borderRadius: DS.radius["2xl"],
+      padding: 18,
       fontFamily: "system-ui, sans-serif",
       transition: `all 0.3s ${DS.ease.smooth}`,
+      border: `1px solid ${DS.color.border}`,
+      boxShadow: `${DS.shadow["2xl"]}, inset 0 1px 0 rgba(255,255,255,0.10)`,
+      position: "relative",
+      overflow: "hidden",
+      isolation: "isolate",
     }}>
+      <div style={{ position: "absolute", inset: 0, background: DS.grad.aurora, opacity: 0.42, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: 220, height: 220, borderRadius: "50%", right: -90, top: -100, background: DS.color.mint, opacity: 0.10, filter: "blur(32px)", pointerEvents: "none" }} />
+      <div style={{ position: "relative", zIndex: 1 }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: DS.color.navy, letterSpacing: "-0.02em" }}>Budget Dashboard</div>
-          <div style={{ fontSize: 11, color: DS.color.slateLight, marginTop: 2 }}>{selectedMonth} 2026 · Personal Finance</div>
+          <div style={{ fontSize: 15, fontWeight: 900, color: DS.color.navy, letterSpacing: 0 }}>BudgetPro Command Center</div>
+          <div style={{ fontSize: 11, color: DS.color.slateLight, marginTop: 2 }}>{selectedMonth} 2026 · Income, expenses, savings</div>
         </div>
         {onMonthChange ? (
           <select
             value={selectedMonth}
             onChange={(e) => onMonthChange(e.target.value)}
             style={{
-              background: DS.grad.mint,
-              color: "#fff",
-              border: "none",
+              background: "rgba(255,255,255,0.08)",
+              color: DS.color.navy,
+              border: `1px solid ${DS.color.border}`,
               borderRadius: DS.radius.pill,
               padding: "5px 14px",
               fontSize: DS.type.xs,
@@ -535,7 +663,7 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
               cursor: "pointer",
               appearance: "none",
               WebkitAppearance: "none",
-              boxShadow: DS.shadow.glow,
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10)",
             }}
           >
             {CHART_MONTHS.map(m => <option key={m} value={m}>{m} 2026</option>)}
@@ -549,14 +677,15 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 14 }}>
         {[
           { l: "Income",   v: fmt(data.income),   c: DS.color.mint,   icon: "↑", bg: DS.color.mintLight },
-          { l: "Expenses", v: fmt(data.expenses),  c: DS.color.rose,   icon: "↓", bg: "#FFF5F5" },
+          { l: "Expenses", v: fmt(data.expenses),  c: DS.color.rose,   icon: "↓", bg: "rgba(255,107,138,0.12)" },
           { l: "Savings",  v: fmt(savings),        c: DS.color.purple, icon: `${savingsPct}%`, bg: DS.color.purpleLight },
         ].map((m) => (
           <div key={m.l} style={{
-            background: "#fff",
+            background: DS.color.bgGlass,
             borderRadius: DS.radius.lg,
             padding: "12px 10px",
             border: `1px solid ${DS.color.border}`,
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
             transition: `all 0.3s ${DS.ease.smooth}`,
             animation: animated ? "countUp 0.4s ease" : "none",
           }}>
@@ -572,20 +701,21 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
               <span style={{ fontSize: 10, fontWeight: 800, color: m.c }}>{m.icon}</span>
             </div>
             <div style={{ fontSize: 10, color: DS.color.slateLight, fontWeight: 600 }}>{m.l}</div>
-            <div style={{ fontSize: 15, fontWeight: 900, color: m.c, marginTop: 2, letterSpacing: "-0.02em" }}>{m.v}</div>
+            <div style={{ fontSize: 15, fontWeight: 900, color: m.c, marginTop: 2, letterSpacing: 0 }}>{m.v}</div>
           </div>
         ))}
       </div>
 
       {/* Bar Chart */}
       <div style={{
-        background: "#fff",
+        background: DS.color.bgGlass,
         borderRadius: DS.radius.lg,
         padding: "14px 12px",
         border: `1px solid ${DS.color.border}`,
         marginBottom: 10,
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
       }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: DS.color.slate, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: DS.color.slate, marginBottom: 10, letterSpacing: 0, textTransform: "uppercase" }}>
           Income vs Expenses · All Months
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 72 }}>
@@ -596,8 +726,8 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
             const isSel = m === selectedMonth;
             return (
               <div key={m} style={{ flex: 1, display: "flex", gap: 1.5, alignItems: "flex-end", cursor: "pointer" }} onClick={() => onMonthChange && onMonthChange(m)}>
-                <div style={{ flex: 1, background: isSel ? DS.color.mint : `${DS.color.mint}55`, borderRadius: "3px 3px 0 0", height: iH, transition: `height 0.55s ${DS.ease.spring}`, minHeight: 2 }} />
-                <div style={{ flex: 1, background: isSel ? DS.color.rose : `${DS.color.rose}55`, borderRadius: "3px 3px 0 0", height: eH, transition: `height 0.55s ${DS.ease.spring} 0.1s`, minHeight: 2 }} />
+                <div className="chart-bar" style={{ flex: 1, background: isSel ? DS.color.mint : `${DS.color.mint}55`, borderRadius: "3px 3px 0 0", height: iH, transition: `height 0.55s ${DS.ease.spring}`, minHeight: 2, boxShadow: isSel ? `0 0 16px ${DS.color.mintGlow}` : "none" }} />
+                <div className="chart-bar" style={{ flex: 1, background: isSel ? DS.color.rose : `${DS.color.rose}55`, borderRadius: "3px 3px 0 0", height: eH, transition: `height 0.55s ${DS.ease.spring} 0.1s`, minHeight: 2, boxShadow: isSel ? "0 0 16px rgba(255,107,138,0.28)" : "none" }} />
               </div>
             );
           })}
@@ -620,8 +750,8 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
       </div>
 
       {/* Category Breakdown */}
-      <div style={{ background: "#fff", borderRadius: DS.radius.lg, padding: "14px 12px", border: `1px solid ${DS.color.border}` }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: DS.color.slate, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>Spending Breakdown</div>
+      <div style={{ background: DS.color.bgGlass, borderRadius: DS.radius.lg, padding: "14px 12px", border: `1px solid ${DS.color.border}`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: DS.color.slate, marginBottom: 10, letterSpacing: 0, textTransform: "uppercase" }}>Spending Breakdown</div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {/* Mini donut visualization */}
           <div style={{ width: 48, height: 48, borderRadius: "50%", background: `conic-gradient(${data.cats.map((c, i) => `${CAT_COLORS[i]} ${i === 0 ? 0 : data.cats.slice(0, i).reduce((a, b) => a + b.pct, 0)}% ${data.cats.slice(0, i + 1).reduce((a, b) => a + b.pct, 0)}%`).join(", ")})`, flexShrink: 0 }} />
@@ -637,6 +767,28 @@ const DashboardPreview = memo(({ selectedMonth = "Jun", onMonthChange }) => {
             ))}
           </div>
         </div>
+      </div>
+      <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+        {activity.map((item, index) => (
+          <div key={item.label} style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+            padding: "9px 11px",
+            borderRadius: DS.radius.md,
+            background: "rgba(255,255,255,0.055)",
+            border: `1px solid ${DS.color.border}`,
+            animation: animated ? `fadeInUp 0.45s ${DS.ease.out} ${index * 0.06}s both` : "none",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: item.color, boxShadow: `0 0 14px ${item.color}` }} />
+              <span style={{ fontSize: 10, color: DS.color.slateLight, fontWeight: 700 }}>{item.label}</span>
+            </div>
+            <span style={{ fontSize: 11, color: item.color, fontWeight: 900 }}>{item.value}</span>
+          </div>
+        ))}
+      </div>
       </div>
     </div>
   );
@@ -664,7 +816,7 @@ const StickyCTA = memo(({ visible }) => {
       animation: "slideDown 0.3s ease",
     }}>
       <div>
-        <div style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: "-0.01em" }}>🎯 BudgetPro Template</div>
+        <div style={{ color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: 0 }}>🎯 BudgetPro Template</div>
         <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2 }}>Starting at just ₹19 · One-time purchase</div>
       </div>
       <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
@@ -689,8 +841,8 @@ const PricingCard = memo(({ plan }) => {
     <div
       className={`card-lift glow-border ${isHighlighted ? "scale-in" : ""}`}
       style={{
-        background: isHighlighted ? DS.grad.navyMid : "#fff",
-        border: isHighlighted ? `2px solid ${DS.color.mint}` : `2px solid ${DS.color.border}`,
+        background: isHighlighted ? DS.grad.navyMid : DS.color.bgCard,
+        border: isHighlighted ? `2px solid ${DS.color.mint}` : `1px solid ${DS.color.border}`,
         borderRadius: DS.radius["3xl"],
         padding: "40px 36px",
         position: "relative",
@@ -719,7 +871,7 @@ const PricingCard = memo(({ plan }) => {
           padding: "5px 16px 9px",
           borderRadius: "0 0 14px 14px",
           boxShadow: DS.shadow.gold,
-          letterSpacing: "0.06em",
+          letterSpacing: 0,
         }}>
           ⭐ BEST VALUE
         </div>
@@ -739,7 +891,7 @@ const PricingCard = memo(({ plan }) => {
           color: isHighlighted ? "#fff" : DS.color.navy,
           marginTop: 14,
           marginBottom: 4,
-          letterSpacing: "-0.02em",
+          letterSpacing: 0,
         }}>
           {plan.name}
         </h3>
@@ -758,7 +910,7 @@ const PricingCard = memo(({ plan }) => {
             fontWeight: 900,
             color: isHighlighted ? "#fff" : DS.color.navy,
             lineHeight: 1,
-            letterSpacing: "-0.04em",
+            letterSpacing: 0,
           }}>
             ₹{plan.price}
           </span>
@@ -779,7 +931,7 @@ const PricingCard = memo(({ plan }) => {
           fontSize: DS.type.xs,
           color: isHighlighted ? "rgba(255,255,255,0.45)" : DS.color.slateLight,
           marginBottom: 28,
-          letterSpacing: "0.02em",
+          letterSpacing: 0,
         }}>
           One-time payment · Instant download
         </div>
@@ -975,10 +1127,10 @@ const HomePage = memo(() => {
                 color: "#fff",
                 lineHeight: 1.1,
                 marginBottom: 22,
-                letterSpacing: "-0.03em",
+                letterSpacing: 0,
               }}>
-                Stop wondering<br />where your money<br />
-                <span style={{ color: DS.color.mint }}>goes every month.</span>
+                Budget smarter with a<br />
+                <span style={{ color: DS.color.mint }}>liquid-glass finance dashboard.</span>
               </h1>
 
               <p style={{
@@ -988,15 +1140,15 @@ const HomePage = memo(() => {
                 lineHeight: 1.8,
                 maxWidth: 480,
               }}>
-                A beautiful Excel dashboard that tracks your income, expenses, and savings — automatically. No subscriptions. No complexity. Just clarity.
+                BudgetPro helps you track expenses, savings, income, monthly budgets, and yearly goals in one polished Excel and Google Sheets dashboard.
               </p>
 
               {/* Reasons grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 36 }}>
                 {[
-                  { emoji: "❓", text: "Stop wondering where your money goes" },
-                  { emoji: "₹",  text: "Track every rupee effortlessly" },
-                  { emoji: "📈", text: "Build a savings habit in 30 days" },
+                  { emoji: "₹", text: "Track every rupee with clarity" },
+                  { emoji: "📊", text: "Monthly and yearly budget views" },
+                  { emoji: "💎", text: "Premium dashboard visuals" },
                   { emoji: "♾️", text: "One-time purchase, lifetime use" },
                 ].map((r) => (
                   <div key={r.text} style={{
@@ -1014,7 +1166,7 @@ const HomePage = memo(() => {
               </div>
 
               {/* CTA buttons */}
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 40 }}>
+              <div className="hero-actions" style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 40 }}>
                 <Btn size="lg" onClick={() => goTo("/checkout?plan=monthly")} style={{ boxShadow: DS.shadow.glowLg }}>
                   <Icon name="download" size={20} color="#fff" />
                   Get Monthly — ₹19
@@ -1033,8 +1185,8 @@ const HomePage = memo(() => {
                   { v: "< 2min", l: "Setup Time" },
                 ].map((s) => (
                   <div key={s.l}>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>{s.v}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>{s.l}</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: 0 }}>{s.v}</div>
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, fontWeight: 500, letterSpacing: 0, textTransform: "uppercase" }}>{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -1119,7 +1271,7 @@ const HomePage = memo(() => {
               color: DS.color.navy,
               lineHeight: 1.12,
               marginBottom: 16,
-              letterSpacing: "-0.03em",
+              letterSpacing: 0,
             }}>
               Feels like a <span style={{ color: DS.color.mint }}>₹999 product.</span><br />
               Priced for everyone.
@@ -1148,11 +1300,11 @@ const HomePage = memo(() => {
       {/* ══════════════════════════════════════════════════════════
           LIVE DEMO SECTION
       ══════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "80px 20px", background: "#fff" }}>
+      <section style={{ padding: "80px 20px", background: DS.color.bgCard }}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <Badge style={{ marginBottom: 16 }}>Live Demo</Badge>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 12, letterSpacing: "-0.03em" }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 12, letterSpacing: 0 }}>
               See It In Action
             </h2>
             <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7 }}>
@@ -1168,7 +1320,7 @@ const HomePage = memo(() => {
           }}>
             {/* Browser chrome */}
             <div style={{
-              background: "#E5E7EB",
+              background: DS.color.bgCard,
               padding: "12px 18px",
               display: "flex",
               gap: 8, alignItems: "center",
@@ -1177,7 +1329,7 @@ const HomePage = memo(() => {
               {["#FC8181","#F6AD55","#68D391"].map((c) => (
                 <div key={c} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />
               ))}
-              <div style={{ background: "#D1D5DB", borderRadius: DS.radius.md, padding: "4px 22px", fontSize: 11, color: "#6B7280", marginLeft: 8 }}>
+              <div style={{ background: DS.color.bgGlass, borderRadius: DS.radius.md, padding: "4px 22px", fontSize: 11, color: DS.color.slateLight, marginLeft: 8 }}>
                 budgetpro-dashboard.xlsx
               </div>
               <div style={{ marginLeft: "auto", display: "flex", gap: 5, flexWrap: "wrap" }}>
@@ -1212,7 +1364,7 @@ const HomePage = memo(() => {
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <Badge style={{ marginBottom: 16 }}>Why BudgetPro</Badge>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, letterSpacing: "-0.03em", marginBottom: 12 }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, letterSpacing: 0, marginBottom: 12 }}>
               Everything You Need to Win With Money
             </h2>
             <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7 }}>
@@ -1236,7 +1388,7 @@ const HomePage = memo(() => {
                   <Icon name={b.icon} size={22} color={DS.color.mint} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 6, fontSize: 15, letterSpacing: "-0.01em" }}>
+                  <div style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 6, fontSize: 15, letterSpacing: 0 }}>
                     {b.title}
                   </div>
                   <div style={{ color: DS.color.slateLight, fontSize: DS.type.sm, lineHeight: 1.7 }}>
@@ -1252,11 +1404,11 @@ const HomePage = memo(() => {
       {/* ══════════════════════════════════════════════════════════
           TESTIMONIALS
       ══════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "80px 20px", background: "#fff" }}>
+      <section style={{ padding: "80px 20px", background: DS.color.bgCard }}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <Badge style={{ marginBottom: 16 }}>Real Reviews</Badge>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, letterSpacing: "-0.03em", marginBottom: 8 }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, letterSpacing: 0, marginBottom: 8 }}>
               Loved by Thousands of Indians
             </h2>
             <p style={{ color: DS.color.slateLight, fontSize: 16 }}>
@@ -1290,7 +1442,7 @@ const HomePage = memo(() => {
             fontWeight: 900,
             color: "#fff",
             marginBottom: 18,
-            letterSpacing: "-0.03em",
+            letterSpacing: 0,
             lineHeight: 1.15,
           }}>
             Ready to <span style={{ color: DS.color.mint }}>transform your finances</span>?
@@ -1347,7 +1499,7 @@ const ProductPage = memo(() => {
   return (
     <div style={{ background: DS.color.bg, minHeight: "100vh", padding: "60px 20px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 52, alignItems: "start" }}>
+        <div className="product-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 52, alignItems: "start" }}>
 
           {/* Left: Preview */}
           <div>
@@ -1357,11 +1509,11 @@ const ProductPage = memo(() => {
               overflow: "hidden",
               border: `1px solid ${DS.color.border}`,
             }}>
-              <div style={{ background: "#E5E7EB", padding: "12px 18px", display: "flex", gap: 8, alignItems: "center" }}>
+              <div style={{ background: DS.color.bgCard, padding: "12px 18px", display: "flex", gap: 8, alignItems: "center" }}>
                 {["#FC8181","#F6AD55","#68D391"].map((c) => (
                   <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
                 ))}
-                <div style={{ background: "#D1D5DB", borderRadius: DS.radius.md, padding: "4px 16px", fontSize: 11, color: "#6B7280", marginLeft: 6 }}>
+                <div style={{ background: DS.color.bgGlass, borderRadius: DS.radius.md, padding: "4px 16px", fontSize: 11, color: DS.color.slateLight, marginLeft: 6 }}>
                   Live Preview
                 </div>
               </div>
@@ -1377,7 +1529,7 @@ const ProductPage = memo(() => {
                 { icon: "check",    text: "Lifetime Access" },
               ].map((b) => (
                 <div key={b.text} style={{
-                  background: "#fff",
+                  background: DS.color.bgCard,
                   border: `1px solid ${DS.color.border}`,
                   borderRadius: DS.radius.lg,
                   padding: "14px 10px",
@@ -1400,7 +1552,7 @@ const ProductPage = memo(() => {
               color: DS.color.navy,
               margin: "14px 0 10px",
               lineHeight: 1.15,
-              letterSpacing: "-0.03em",
+              letterSpacing: 0,
             }}>
               Ultimate Budget Dashboard Template
             </h1>
@@ -1434,11 +1586,11 @@ const ProductPage = memo(() => {
                   style={{
                     flex: 1, padding: "12px 16px",
                     borderRadius: DS.radius.lg,
-                    border: "none",
                     cursor: "pointer",
                     fontWeight: 700,
                     fontSize: 14,
-                    background: selectedPlan === p.id ? "#fff" : "transparent",
+                    background: selectedPlan === p.id ? DS.color.bgGlass : "transparent",
+                    border: selectedPlan === p.id ? `1px solid ${DS.color.border}` : "1px solid transparent",
                     color: selectedPlan === p.id ? DS.color.navy : DS.color.slateLight,
                     boxShadow: selectedPlan === p.id ? DS.shadow.md : "none",
                     transition: `all 0.2s ${DS.ease.smooth}`,
@@ -1466,7 +1618,7 @@ const ProductPage = memo(() => {
               boxShadow: `${DS.shadow.xl}, 0 0 40px rgba(0,200,150,0.1)`,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 22 }}>
-                <div style={{ fontSize: 58, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: "-0.04em" }}>
+                <div style={{ fontSize: 58, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: 0 }}>
                   {selectedPlan === "monthly" ? "₹19" : "₹49"}
                 </div>
                 <div>
@@ -1510,11 +1662,11 @@ const ProductPage = memo(() => {
                   style={{
                     flex: 1, padding: "10px 16px",
                     borderRadius: DS.radius.md,
-                    border: "none",
                     cursor: "pointer",
                     fontWeight: 700,
                     fontSize: 14,
-                    background: activeTab === t ? "#fff" : "transparent",
+                    background: activeTab === t ? DS.color.bgGlass : "transparent",
+                    border: activeTab === t ? `1px solid ${DS.color.border}` : "1px solid transparent",
                     color: activeTab === t ? DS.color.navy : DS.color.slateLight,
                     boxShadow: activeTab === t ? DS.shadow.sm : "none",
                     transition: `all 0.2s ${DS.ease.smooth}`,
@@ -1735,7 +1887,7 @@ const CheckoutPage = memo(() => {
     border: `1.5px solid ${errors[field] ? "#E53E3E" : DS.color.border}`,
     fontSize: DS.type.body,
     color: DS.color.navy,
-    background: "#fff",
+    background: DS.color.bgCard,
     transition: `all 0.2s ${DS.ease.smooth}`,
     fontFamily: "inherit",
   });
@@ -1764,7 +1916,7 @@ const CheckoutPage = memo(() => {
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22 }}>📊</span>
-            <span style={{ fontWeight: 900, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>
+            <span style={{ fontWeight: 900, fontSize: 18, color: "#fff", letterSpacing: 0 }}>
               Budget<span style={{ color: DS.color.mint }}>Pro</span>
             </span>
           </div>
@@ -1777,7 +1929,7 @@ const CheckoutPage = memo(() => {
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 20px" }}>
         {/* Plan Toggle */}
-        <div style={{ background: "#fff", borderRadius: DS.radius.xl, padding: 4, display: "flex", gap: 4, marginBottom: 32, maxWidth: 400, border: `1px solid ${DS.color.border}` }}>
+        <div style={{ background: DS.color.bgCard, borderRadius: DS.radius.xl, padding: 4, display: "flex", gap: 4, marginBottom: 32, maxWidth: 400, border: `1px solid ${DS.color.border}` }}>
           {[
             { id: "monthly", label: "Monthly Template", price: "₹19" },
             { id: "yearly",  label: "Full Year",         price: "₹49" },
@@ -1812,7 +1964,7 @@ const CheckoutPage = memo(() => {
           <div style={{ display: "grid", gap: 20 }}>
             {/* Personal Info */}
             <Card style={{ boxShadow: DS.shadow.md }}>
-              <h3 style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 20, fontSize: DS.type.h4, letterSpacing: "-0.01em" }}>
+              <h3 style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 20, fontSize: DS.type.h4, letterSpacing: 0 }}>
                 Personal Information
               </h3>
               <div style={{ display: "grid", gap: 18 }}>
@@ -1845,7 +1997,7 @@ const CheckoutPage = memo(() => {
 
             {/* Payment Method */}
             <Card style={{ boxShadow: DS.shadow.md }}>
-              <h3 style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 20, fontSize: DS.type.h4, letterSpacing: "-0.01em" }}>
+              <h3 style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 20, fontSize: DS.type.h4, letterSpacing: 0 }}>
                 Payment Method
               </h3>
               <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
@@ -1857,7 +2009,7 @@ const CheckoutPage = memo(() => {
                       flex: 1, padding: "14px 10px",
                       borderRadius: DS.radius.lg,
                       border: `2px solid ${payMethod === m.id ? DS.color.mint : DS.color.border}`,
-                      background: payMethod === m.id ? DS.color.mintLight : "#fff",
+                      background: payMethod === m.id ? DS.color.mintLight : DS.color.bgGlass,
                       cursor: "pointer",
                       display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
                       transition: `all 0.2s ${DS.ease.smooth}`,
@@ -1885,7 +2037,7 @@ const CheckoutPage = memo(() => {
                           padding: "12px 16px",
                           borderRadius: DS.radius.lg,
                           border: `1.5px solid ${upiApp === a.id ? DS.color.mint : DS.color.border}`,
-                          background: upiApp === a.id ? DS.color.mintLight : "#fff",
+                          background: upiApp === a.id ? DS.color.mintLight : DS.color.bgGlass,
                           cursor: "pointer",
                           fontWeight: 700,
                           fontSize: DS.type.sm,
@@ -2000,7 +2152,7 @@ const CheckoutPage = memo(() => {
                   paddingTop: 14, marginTop: 8,
                 }}>
                   <span style={{ fontWeight: 800, color: DS.color.navy, fontSize: DS.type.h4 }}>Total</span>
-                  <span style={{ fontWeight: 900, color: DS.color.mint, fontSize: 28, letterSpacing: "-0.03em" }}>₹{plan.price}</span>
+                  <span style={{ fontWeight: 900, color: DS.color.mint, fontSize: 28, letterSpacing: 0 }}>₹{plan.price}</span>
                 </div>
               </div>
 
@@ -2055,14 +2207,14 @@ const CheckoutPage = memo(() => {
 
               <div style={{
                 marginTop: 16,
-                background: "#FFFBF0",
+                background: "rgba(231,195,106,0.10)",
                 borderRadius: DS.radius.lg,
                 padding: "10px 14px",
                 fontSize: DS.type.xs,
-                color: "#B45309",
+                color: DS.color.gold,
                 fontWeight: 600,
                 textAlign: "center",
-                border: "1px solid #FDE68A",
+                border: "1px solid rgba(231,195,106,0.28)",
               }}>
                 ⚡ Limited-time pricing — don't miss out!
               </div>
@@ -2125,7 +2277,7 @@ const SuccessPage = memo(() => {
             fontWeight: 900,
             color: DS.color.navy,
             marginBottom: 12,
-            letterSpacing: "-0.03em",
+            letterSpacing: 0,
           }}>
             Payment Successful!
           </h1>
@@ -2176,7 +2328,7 @@ const SuccessPage = memo(() => {
         {/* Email confirmation */}
         <Card className="fade-in-up" style={{
           marginBottom: 20,
-          background: "#FFFBF0",
+          background: "rgba(231,195,106,0.10)",
           border: `1px solid rgba(246,173,85,0.3)`,
           animationDelay: "0.2s",
         }}>
@@ -2193,7 +2345,7 @@ const SuccessPage = memo(() => {
 
         {/* Getting Started */}
         <Card className="fade-in-up" style={{ marginBottom: 20, animationDelay: "0.3s" }}>
-          <div style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 18, fontSize: 16, letterSpacing: "-0.01em" }}>
+          <div style={{ fontWeight: 800, color: DS.color.navy, marginBottom: 18, fontSize: 16, letterSpacing: 0 }}>
             🚀 Getting Started — 5 Simple Steps
           </div>
           {steps.map((step, i) => (
@@ -2336,7 +2488,7 @@ const LegalPage = memo(({ title, intro, sections }) => (
     <div style={{ maxWidth: 880, margin: "0 auto" }}>
       <div style={{ textAlign: "center", marginBottom: 32 }}>
         <Badge style={{ marginBottom: 16 }}>Legal</Badge>
-        <h1 style={{ fontSize: DS.type.h1, fontWeight: 900, color: DS.color.navy, marginBottom: 14, letterSpacing: "-0.03em" }}>
+        <h1 style={{ fontSize: DS.type.h1, fontWeight: 900, color: DS.color.navy, marginBottom: 14, letterSpacing: 0 }}>
           {title}
         </h1>
         <p style={{ color: DS.color.slateLight, fontSize: 16, lineHeight: 1.7, maxWidth: 680, margin: "0 auto" }}>
@@ -2444,7 +2596,7 @@ const AdminLogin = memo(({ onLogin }) => {
       <Card className="scale-in" style={{ width: "100%", maxWidth: 400, boxShadow: DS.shadow["2xl"] }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 42, marginBottom: 12 }}>🔐</div>
-          <h2 style={{ fontSize: DS.type.h3, fontWeight: 900, color: DS.color.navy, marginBottom: 6, letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: DS.type.h3, fontWeight: 900, color: DS.color.navy, marginBottom: 6, letterSpacing: 0 }}>
             Admin Login
           </h2>
           <p style={{ color: DS.color.slateLight, fontSize: DS.type.sm }}>Access BudgetPro dashboard</p>
@@ -2545,8 +2697,8 @@ const AdminDashboard = memo(({ onLogout, token }) => {
   return (
     <div style={{ background: DS.color.bg, minHeight: "100vh" }}>
       {/* Admin Nav */}
-      <div style={{
-        background: DS.color.navy,
+      <div className="admin-nav" style={{
+        background: DS.grad.navyMid,
         padding: "0 24px",
         display: "flex",
         alignItems: "center",
@@ -2556,11 +2708,11 @@ const AdminDashboard = memo(({ onLogout, token }) => {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>📊</span>
-          <span style={{ fontWeight: 800, fontSize: 17, color: "#fff", letterSpacing: "-0.02em" }}>
+          <span style={{ fontWeight: 800, fontSize: 17, color: "#fff", letterSpacing: 0 }}>
             BudgetPro <span style={{ color: DS.color.mint }}>Admin</span>
           </span>
         </div>
-        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        <div className="admin-tabs" style={{ display: "flex", gap: 4, alignItems: "center" }}>
           {adminTabs.map((t) => (
             <button
               key={t}
@@ -2604,7 +2756,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
         {/* ── Overview ── */}
         {!loadingData && activeTab === "overview" && (
           <div>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: 0 }}>
               Dashboard Overview
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 20, marginBottom: 32 }}>
@@ -2619,7 +2771,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
                     <Icon name={s.icon} size={22} color={s.color} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 26, fontWeight: 900, color: DS.color.navy, letterSpacing: "-0.03em" }}>{s.value}</div>
+                    <div style={{ fontSize: 26, fontWeight: 900, color: DS.color.navy, letterSpacing: 0 }}>{s.value}</div>
                     <div style={{ fontSize: DS.type.xs, color: DS.color.slateLight, fontWeight: 600, marginTop: 2 }}>{s.label}</div>
                   </div>
                 </Card>
@@ -2646,7 +2798,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
         {/* ── Orders ── */}
         {!loadingData && activeTab === "orders" && (
           <div>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: 0 }}>
               Recent Orders
             </h2>
             <div style={{ display: "grid", gap: 14 }}>
@@ -2685,8 +2837,8 @@ const AdminDashboard = memo(({ onLogout, token }) => {
                     >
                       {o.plan}
                     </Badge>
-                    <span style={{ fontWeight: 900, color: DS.color.navy, fontSize: 17, letterSpacing: "-0.02em" }}>₹{o.amount}</span>
-                    <Badge color="#F0FFF4" text="#276749">✓ {o.downloads} download{o.downloads === 1 ? "" : "s"}</Badge>
+                    <span style={{ fontWeight: 900, color: DS.color.navy, fontSize: 17, letterSpacing: 0 }}>₹{o.amount}</span>
+                    <Badge color={DS.color.mintLight} text={DS.color.mintDark}>✓ {o.downloads} download{o.downloads === 1 ? "" : "s"}</Badge>
                     <Btn size="sm" variant="ghost" onClick={async () => {
                       try {
                         const r = await authedFetch("/api/admin-resend", {
@@ -2710,10 +2862,10 @@ const AdminDashboard = memo(({ onLogout, token }) => {
         {/* ── Pricing ── */}
         {!loadingData && activeTab === "pricing" && (
           <div>
-            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: DS.type.h2, fontWeight: 900, color: DS.color.navy, marginBottom: 30, letterSpacing: 0 }}>
               Pricing
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <div className="admin-pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
               {["monthly", "yearly"].map((plan) => (
                 <Card key={plan} style={{ boxShadow: DS.shadow.md }}>
                   <div style={{ fontWeight: 800, color: DS.color.navy, fontSize: DS.type.h4, marginBottom: 4, textTransform: "capitalize" }}>
@@ -2786,14 +2938,14 @@ const Nav = memo(() => {
   return (
     <>
       <nav style={{
-        background: scrolled ? "rgba(255,255,255,0.97)" : "#fff",
-        borderBottom: `1px solid ${scrolled ? "transparent" : DS.color.border}`,
+        background: scrolled ? "rgba(5,5,6,0.86)" : "rgba(5,5,6,0.62)",
+        borderBottom: `1px solid ${DS.color.border}`,
         position: "sticky",
         top: 0,
         zIndex: 150,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        boxShadow: scrolled ? "0 4px 32px rgba(10,22,40,0.1)" : "none",
+        boxShadow: scrolled ? "0 18px 56px rgba(0,0,0,0.36)" : "none",
         transition: `all 0.3s ${DS.ease.smooth}`,
       }}>
         <div style={{
@@ -2817,7 +2969,7 @@ const Nav = memo(() => {
             }}>
               📊
             </div>
-            <span style={{ fontWeight: 900, fontSize: 20, color: DS.color.navy, letterSpacing: "-0.03em" }}>
+            <span style={{ fontWeight: 900, fontSize: 20, color: DS.color.navy, letterSpacing: 0 }}>
               Budget<span style={{ color: DS.color.mint }}>Pro</span>
             </span>
           </button>
@@ -2888,7 +3040,7 @@ const Nav = memo(() => {
           position: "fixed",
           top: 66,
           left: 0, right: 0,
-          background: "rgba(255,255,255,0.98)",
+          background: "rgba(5,5,6,0.94)",
           backdropFilter: "blur(20px)",
           zIndex: 149,
           borderBottom: `1px solid ${DS.color.border}`,
@@ -2966,7 +3118,7 @@ const Footer = memo(() => {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
               <span style={{ fontSize: 24 }}>📊</span>
-              <span style={{ fontWeight: 900, fontSize: 20, color: "#fff", letterSpacing: "-0.03em" }}>
+              <span style={{ fontWeight: 900, fontSize: 20, color: "#fff", letterSpacing: 0 }}>
                 Budget<span style={{ color: DS.color.mint }}>Pro</span>
               </span>
             </div>
@@ -2981,7 +3133,7 @@ const Footer = memo(() => {
 
           {/* Product links */}
           <div>
-            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: 0, textTransform: "uppercase" }}>
               Product
             </div>
             {[["/","Home"],["/#pricing","Pricing"],["/product","Product"]].map(([path,label]) => (
@@ -3010,7 +3162,7 @@ const Footer = memo(() => {
 
           {/* Support */}
           <div>
-            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: 0, textTransform: "uppercase" }}>
               Support
             </div>
             {[["/terms", "Terms of Service"], ["/privacy", "Privacy Policy"]].map(([path, label]) => (
@@ -3058,7 +3210,7 @@ const Footer = memo(() => {
 
           {/* Pricing */}
           <div>
-            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+            <div style={{ fontWeight: 800, color: "#fff", marginBottom: 18, fontSize: 13, letterSpacing: 0, textTransform: "uppercase" }}>
               Pricing
             </div>
             <div style={{
@@ -3067,9 +3219,9 @@ const Footer = memo(() => {
               padding: 18,
               border: "1px solid rgba(255,255,255,0.07)",
             }}>
-              <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 2, letterSpacing: "-0.03em" }}>₹19</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", marginBottom: 2, letterSpacing: 0 }}>₹19</div>
               <div style={{ fontSize: DS.type.xs, marginBottom: 14, color: "rgba(255,255,255,0.45)" }}>Monthly Template</div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: DS.color.gold, marginBottom: 2, letterSpacing: "-0.03em" }}>₹49</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: DS.color.gold, marginBottom: 2, letterSpacing: 0 }}>₹49</div>
               <div style={{ fontSize: DS.type.xs, color: "rgba(255,255,255,0.45)" }}>Full Year · Best Value ⭐</div>
             </div>
           </div>
