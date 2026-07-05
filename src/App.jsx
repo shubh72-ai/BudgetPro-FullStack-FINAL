@@ -371,17 +371,6 @@ const Icon = memo(({ name, size=20, color="currentColor", style={}, filled=false
 //  PRIMITIVE COMPONENTS
 // ═══════════════════════════════════════════════════════════════════
 
-// Glass Card — the site-wide primitive
-const GlassCard = memo(({ children, style={}, className="", hero=false }) => (
-  <div className={`glass-card ${hero?"glass-card-hero":""} ${className}`}
-    style={{ borderRadius:DS.radius["2xl"], padding:DS.space[6], ...style }}>
-    {children}
-  </div>
-));
-
-// Legacy alias
-const Card = GlassCard;
-
 // Badge
 const Badge = memo(({ children, color="rgba(99,102,241,0.10)", text="#4338ca", style={} }) => (
   <span style={{
@@ -395,11 +384,6 @@ const Badge = memo(({ children, color="rgba(99,102,241,0.10)", text="#4338ca", s
     ...style,
   }}>{children}</span>
 ));
-
-// Skeleton
-const Skeleton = ({ width="100%", height=20, style={} }) => (
-  <div className="skeleton" style={{ width, height, borderRadius:DS.radius.md, ...style }} />
-);
 
 // Divider
 const Divider = ({ style={} }) => (
@@ -471,9 +455,6 @@ const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={},
     >{children}</button>
   );
 });
-
-// Legacy alias used throughout
-const Btn = LiquidBtn;
 
 // ═══════════════════════════════════════════════════════════════════
 //  TRACKER SCREENSHOT COMPONENT
