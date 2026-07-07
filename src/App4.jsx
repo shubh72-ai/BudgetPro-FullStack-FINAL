@@ -856,76 +856,65 @@ const Nav = memo(() => {
 
   return (
     <>
-      {/* Outer sticky wrapper — lets the page's own background show at the
-          edges so the nav reads as one floating glass capsule, matching
-          the reference image, instead of a full-bleed bar. */}
-      <div style={{
+      <nav style={{
         position:"sticky",top:0,zIndex:200,
-        padding:scrolled?"10px 16px":"18px 16px",
-        transition:`padding 0.3s ${DS.ease.smooth}`,
-        pointerEvents:"none",
+        background:scrolled?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.72)",
+        backdropFilter:"blur(24px) saturate(180%)",
+        WebkitBackdropFilter:"blur(24px) saturate(180%)",
+        borderBottom:`1px solid ${scrolled?"rgba(15,23,42,0.08)":"rgba(255,255,255,0.60)"}`,
+        boxShadow:scrolled?DS.shadow.sm:"none",
+        transition:`all 0.3s ${DS.ease.smooth}`,
       }}>
-        <nav style={{
-          maxWidth:1180,margin:"0 auto",pointerEvents:"auto",
-          background:scrolled?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.76)",
-          border:"1px solid rgba(255,255,255,0.85)",
-          borderRadius:DS.radius.pill,
-          backdropFilter:"blur(24px) saturate(180%)",
-          WebkitBackdropFilter:"blur(24px) saturate(180%)",
-          boxShadow:scrolled?DS.shadow.lg:DS.shadow.sm,
-          transition:`all 0.3s ${DS.ease.smooth}`,
-        }}>
-          <div style={{padding:"0 12px 0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:62}}>
-            {/* Logo */}
-            <button onClick={()=>goTo("/")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:10,padding:0}}>
-              <div style={{
-                background:DS.grad.cta,
-                borderRadius:DS.radius.lg,
-                padding:"8px 12px",
-                color:"#fff",
-                fontSize:17,
-                boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
-              }}>📊</div>
-              <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:19,color:DS.color.navy,letterSpacing:"-0.02em"}}>
-                Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span>
-              </span>
-            </button>
+        <div style={{maxWidth:1180,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:66}}>
+          {/* Logo */}
+          <button onClick={()=>goTo("/")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:10,padding:0}}>
+            <div style={{
+              background:DS.grad.cta,
+              borderRadius:DS.radius.lg,
+              padding:"8px 12px",
+              color:"#fff",
+              fontSize:17,
+              boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
+            }}>📊</div>
+            <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:"-0.02em"}}>
+              Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span>
+            </span>
+          </button>
 
-            {/* Center nav pills — sits in its own soft-tinted capsule track */}
-            <div className="nav-desktop" style={{display:"flex",gap:2,alignItems:"center",background:"rgba(248,251,255,0.75)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.06)"}}>
-              {navLinks.map(l=>{
-                const isActive = l.id==="/"?path==="/":path.startsWith(l.id.split("#")[0]);
-                return (
-                  <button key={l.id} onClick={()=>goTo(l.id)} className={`nav-item ${isActive?"active":""}`}
-                    style={{background:"transparent",border:"none",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:13.5,fontFamily:"inherit"}}>
-                    {l.label}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Center nav pills */}
+          <div className="nav-desktop" style={{display:"flex",gap:2,alignItems:"center",background:"rgba(248,251,255,0.80)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.07)",backdropFilter:"blur(12px)"}}>
+            {navLinks.map(l=>{
+              const isActive = l.id==="/"?path==="/":path.startsWith(l.id.split("#")[0]);
+              return (
+                <button key={l.id} onClick={()=>goTo(l.id)} className={`nav-item ${isActive?"active":""}`}
+                  style={{background:"transparent",border:"none",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:14,fontFamily:"inherit"}}>
+                  {l.label}
+                </button>
+              );
+            })}
+          </div>
 
-            {/* Right CTAs */}
-            <div className="nav-desktop" style={{display:"flex",gap:8,alignItems:"center"}}>
-              <LiquidBtn variant="white" size="sm" onClick={()=>goTo("/checkout?plan=monthly")}>Monthly ₹19</LiquidBtn>
-              <LiquidBtn variant="cta" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
-                style={{boxShadow:"0 4px 16px rgba(99,102,241,0.35)"}}>Full Year ₹49</LiquidBtn>
-              <button onClick={()=>goTo("/admin")} style={{background:"rgba(248,251,255,0.90)",border:"1px solid rgba(15,23,42,0.08)",borderRadius:"50%",cursor:"pointer",padding:"9px",color:DS.color.slate,display:"flex",alignItems:"center"}}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              </button>
-            </div>
-
-            {/* Hamburger */}
-            <button className="mobile-nav-btn" onClick={()=>setMobileOpen(!mobileOpen)}
-              style={{display:"none",background:"none",border:"none",cursor:"pointer",padding:8}} aria-label="Toggle nav">
-              <Icon name={mobileOpen?"close":"menu"} size={22} color={DS.color.navy}/>
+          {/* Right CTAs */}
+          <div className="nav-desktop" style={{display:"flex",gap:10,alignItems:"center"}}>
+            <LiquidBtn variant="white" size="sm" onClick={()=>goTo("/checkout?plan=monthly")}>Monthly ₹19</LiquidBtn>
+            <LiquidBtn variant="cta" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
+              style={{boxShadow:"0 4px 16px rgba(99,102,241,0.35)"}}>Full Year ₹49</LiquidBtn>
+            <button onClick={()=>goTo("/admin")} style={{background:"rgba(248,251,255,0.80)",border:"1px solid rgba(15,23,42,0.08)",borderRadius:"50%",cursor:"pointer",padding:"9px",color:DS.color.slate,display:"flex",alignItems:"center",backdropFilter:"blur(12px)"}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </button>
           </div>
-        </nav>
-      </div>
 
-      {/* Mobile menu — unchanged logic, repositioned for the floating pill */}
+          {/* Hamburger */}
+          <button className="mobile-nav-btn" onClick={()=>setMobileOpen(!mobileOpen)}
+            style={{display:"none",background:"none",border:"none",cursor:"pointer",padding:8}} aria-label="Toggle nav">
+            <Icon name={mobileOpen?"close":"menu"} size={22} color={DS.color.navy}/>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile menu */}
       {mobileOpen&&(
-        <div style={{position:"fixed",top:80,left:16,right:16,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",zIndex:199,border:"1px solid rgba(255,255,255,0.9)",borderRadius:DS.radius["2xl"],padding:"16px 20px",animation:"slideDown 0.22s ease",boxShadow:DS.shadow.lg}}>
+        <div style={{position:"fixed",top:66,left:0,right:0,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",zIndex:199,borderBottom:`1px solid ${DS.color.border}`,padding:"16px 20px",animation:"slideDown 0.22s ease",boxShadow:DS.shadow.lg}}>
           {navLinks.map(l=>(
             <button key={l.id} onClick={()=>goTo(l.id)}
               style={{display:"block",width:"100%",textAlign:"left",background:path===l.id?"rgba(99,102,241,0.08)":"transparent",border:"none",cursor:"pointer",padding:"12px 16px",borderRadius:DS.radius.lg,fontWeight:600,color:path===l.id?DS.color.mintText:DS.color.slate,fontSize:15,marginBottom:3,fontFamily:"inherit"}}>

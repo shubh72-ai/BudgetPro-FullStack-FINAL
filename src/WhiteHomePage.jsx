@@ -19,6 +19,138 @@ const scrollToId = (id) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════
+//  ANNUAL DASHBOARD PREVIEW IMAGE — used by the new Product section below
+// ═══════════════════════════════════════════════════════════════════
+const AnnualDashboardPreview = () => {
+  const [errored, setErrored] = useState(false);
+  if (errored) {
+    return (
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, color: Theme.textMuted, fontSize: 12, fontWeight: 600, background: "linear-gradient(135deg,#f8fbff,#f3f0ff)" }}>
+        <span style={{ fontSize: 30 }}>📈</span>
+        <span>Add <code style={{ background: "#fff", padding: "2px 6px", borderRadius: 6, border: `1px solid ${Theme.border}` }}>annual-dashboard-preview.png</code> to /public</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src="/annual-dashboard-preview.png"
+      alt="Annual Expenses Dashboard preview"
+      loading="lazy"
+      onError={() => setErrored(true)}
+      style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top", display: "block" }}
+    />
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  PRODUCT SHOWCASE — "One Dashboard. Complete Financial Control."
+//  New section: left copy + 6 glass feature cards, right = annual
+//  dashboard preview in a large glass frame. This is the section the
+//  Nav's "Product" link and "See It In Action" language refer to.
+// ═══════════════════════════════════════════════════════════════════
+const ProductShowcase = () => {
+  const navigate = useNavigate();
+  const goTo = (path) => { navigate(path); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  const cards = [
+    { i: "📈", t: "Annual Dashboard", d: "12-month overview with powerful insights" },
+    { i: "📊", t: "Smart Charts", d: "Auto-updating charts that make sense" },
+    { i: "🧾", t: "Expense Tracking", d: "Track every rupee and stay on budget" },
+    { i: "🎯", t: "Budget Planning", d: "Plan better and achieve financial goals" },
+    { i: "💳", t: "Debt Management", d: "Track EMIs, loans, and debt reduction" },
+    { i: "🐷", t: "Savings Goals", d: "Set goals and grow money consistently" },
+  ];
+
+  return (
+    <section id="product" style={{ padding: "104px 20px", background: Theme.bg, position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: "10%", right: "-8%", width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div className="product-flex" style={{ display: "flex", gap: 56, alignItems: "center" }}>
+
+          {/* Left — copy + 6 feature cards */}
+          <div style={{ flex: "0 0 44%", minWidth: 0 }}>
+            <span style={{ display: "inline-block", background: "rgba(59,130,246,0.10)", color: Theme.accentBlue, border: "1px solid rgba(59,130,246,0.18)", borderRadius: 999, padding: "6px 16px", fontSize: 12, fontWeight: 800, letterSpacing: "0.4px", marginBottom: 18 }}>
+              PRODUCT
+            </span>
+            <h2 style={{ fontFamily: Theme.fontHeading, fontSize: "clamp(30px, 3.6vw, 44px)", fontWeight: 900, color: Theme.textPrimary, lineHeight: 1.14, letterSpacing: "-0.02em", marginBottom: 18 }}>
+              One Dashboard.<br />Complete Financial Control.
+            </h2>
+            <p style={{ fontSize: 16, color: Theme.textSecondary, lineHeight: 1.75, marginBottom: 32, maxWidth: 480 }}>
+              Smart Expense Tracker gives you a complete view of your finances — monthly tracking, yearly insights, savings goals, bills, debt, and spending patterns in one beautiful Excel dashboard.
+            </p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 32 }}>
+              {cards.map((c) => (
+                <div key={c.t} style={{ ...GlassStyle, borderRadius: 18, padding: "18px 16px", display: "flex", flexDirection: "column", gap: 10, transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+                  onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 20px 50px rgba(99,102,241,0.16)"; }}
+                  onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = GlassStyle.boxShadow; }}
+                >
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: "radial-gradient(circle at 32% 28%, #ffffff, #e0e7ff 55%, #c7d2fe 100%)", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }}>{c.i}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: Theme.textPrimary }}>{c.t}</div>
+                  <div style={{ fontSize: 12.5, color: Theme.textSecondary, lineHeight: 1.5 }}>{c.d}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <button onClick={() => scrollToId("inside")} style={{ background: "#fff", color: Theme.textPrimary, border: `2px solid #e2e8f0`, padding: "14px 26px", borderRadius: 999, fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
+                Explore All Features
+              </button>
+              <button onClick={() => goTo("/checkout?plan=yearly")} style={{ background: Theme.gradPremium, color: "#fff", border: "none", padding: "14px 26px", borderRadius: 999, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 12px 30px rgba(99,102,241,0.32)" }}>
+                Get Full Year for ₹49
+              </button>
+            </div>
+          </div>
+
+          {/* Right — annual dashboard, large glass frame */}
+          <div style={{ flex: "1 1 56%", position: "relative", display: "flex", justifyContent: "center" }}>
+            <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 10, background: "rgba(255,255,255,0.95)", border: "1px solid rgba(255,255,255,0.98)", padding: "7px 18px", borderRadius: 999, fontSize: 12.5, fontWeight: 700, color: Theme.accentPurple, boxShadow: "0 8px 24px rgba(15,23,42,0.10)", whiteSpace: "nowrap" }}>
+              📊 Annual Dashboard Preview
+            </div>
+            <div className="annual-preview-frame">
+              <div className="annual-preview-inner">
+                <AnnualDashboardPreview />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .annual-preview-frame {
+          position: relative;
+          width: 100%;
+          max-width: 760px;
+          padding: 18px;
+          border-radius: 32px;
+          background: linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.42));
+          border: 1px solid rgba(255,255,255,0.82);
+          box-shadow: 0 30px 90px rgba(139,92,246,0.16), 0 12px 36px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.95);
+          backdrop-filter: blur(26px) saturate(180%);
+          -webkit-backdrop-filter: blur(26px) saturate(180%);
+          animation: floatSlow2 9s ease-in-out infinite;
+        }
+        .annual-preview-inner {
+          overflow: hidden;
+          border-radius: 22px;
+          background: #fff;
+          border: 1px solid rgba(139,92,246,0.16);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 16px 50px rgba(15,23,42,0.08);
+          aspect-ratio: 1536 / 1024;
+        }
+        @keyframes floatSlow2 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @media (max-width: 980px) {
+          .product-flex { flex-direction: column !important; }
+          .product-flex > div { flex-basis: 100% !important; }
+          .annual-preview-frame { max-width: 100%; margin-top: 40px; }
+        }
+      `}</style>
+    </section>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
 //  PRODUCT PRICING — the ₹19 monthly / ₹49 annual two-tier cards
 // ═══════════════════════════════════════════════════════════════════
 const ProductPricing = () => {
@@ -75,7 +207,11 @@ const ProductPricing = () => {
         <div className="pricing-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.08fr", gap: "28px", alignItems: "stretch", marginTop: "48px" }}>
 
           {/* Monthly card */}
-          <div style={{ ...GlassStyle, padding: "36px 30px", display: "flex", flexDirection: "column" }}>
+          <div
+            style={{ ...GlassStyle, padding: "36px 30px", display: "flex", flexDirection: "column", transition: "transform 0.28s ease, box-shadow 0.28s ease" }}
+            onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 30px 80px rgba(15,23,42,0.12)"; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = GlassStyle.boxShadow; }}
+          >
             <div style={{ fontSize: "13px", fontWeight: 800, color: Theme.textSecondary, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>Monthly</div>
             <h3 style={{ fontSize: "22px", fontWeight: 800, color: Theme.textPrimary, marginBottom: "6px" }}>{monthly.name}</h3>
             <p style={{ fontSize: "14px", color: Theme.textSecondary, marginBottom: "20px", lineHeight: 1.5 }}>{monthly.subtitle}</p>
@@ -90,14 +226,18 @@ const ProductPricing = () => {
                 </li>
               ))}
             </ul>
-            <button onClick={() => navigate(monthly.path)} style={{ background: "#fff", color: Theme.textPrimary, border: `2px solid #e2e8f0`, padding: "15px", borderRadius: "100px", fontSize: "15px", fontWeight: 800, cursor: "pointer", width: "100%" }}>
+            <button onClick={() => navigate(monthly.path)} className="liquid-btn-white" style={{ background: "#fff", color: Theme.textPrimary, border: `2px solid #e2e8f0`, padding: "15px", borderRadius: "100px", fontSize: "15px", fontWeight: 800, cursor: "pointer", width: "100%" }}>
               {monthly.cta}
             </button>
           </div>
 
           {/* Annual card — highlighted / recommended */}
-          <div style={{ ...GlassStyleElevated, padding: "42px 34px 34px", display: "flex", flexDirection: "column", position: "relative", transform: "translateY(-8px)" }}>
-            <div style={{ position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%)", background: Theme.gradAccent, color: "#fff", padding: "7px 20px", borderRadius: "100px", fontSize: "13px", fontWeight: 800, letterSpacing: "0.3px", boxShadow: "0 8px 20px rgba(59,130,246,0.35)", whiteSpace: "nowrap" }}>
+          <div
+            style={{ ...GlassStyleElevated, padding: "42px 34px 34px", display: "flex", flexDirection: "column", position: "relative", transform: "translateY(-8px)", transition: "transform 0.28s ease, box-shadow 0.28s ease" }}
+            onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-12px)"; e.currentTarget.style.boxShadow = "0 36px 100px rgba(99,102,241,0.22), 0 24px 80px rgba(15,23,42,0.10)"; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(-8px)"; e.currentTarget.style.boxShadow = GlassStyleElevated.boxShadow; }}
+          >
+            <div style={{ position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%)", background: Theme.gradPremium, color: "#fff", padding: "7px 20px", borderRadius: "100px", fontSize: "13px", fontWeight: 800, letterSpacing: "0.3px", boxShadow: "0 8px 20px rgba(99,102,241,0.35)", whiteSpace: "nowrap" }}>
               ⭐ {yearly.badge}
             </div>
             <div style={{ fontSize: "13px", fontWeight: 800, color: Theme.accentBlue, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px", marginTop: 10 }}>Annual</div>
@@ -112,12 +252,12 @@ const ProductPricing = () => {
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: "12px", flex: 1 }}>
               {yearly.benefits.map((b, i) => (
                 <li key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: Theme.textPrimary, fontWeight: 600 }}>
-                  <span style={{ width: 18, height: 18, flexShrink: 0, borderRadius: "50%", background: Theme.gradAccent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, marginTop: 2 }}>✓</span>
+                  <span style={{ width: 18, height: 18, flexShrink: 0, borderRadius: "50%", background: Theme.gradPremium, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, marginTop: 2 }}>✓</span>
                   {b}
                 </li>
               ))}
             </ul>
-            <button onClick={() => navigate(yearly.path)} style={{ background: Theme.gradAccent, color: "#fff", border: "none", padding: "17px", borderRadius: "100px", fontSize: "16px", fontWeight: 800, cursor: "pointer", width: "100%", boxShadow: "0 14px 34px rgba(59,130,246,0.32)" }}>
+            <button onClick={() => navigate(yearly.path)} className="liquid-btn-premium" style={{ background: Theme.gradPremium, color: "#fff", border: "none", padding: "17px", borderRadius: "100px", fontSize: "16px", fontWeight: 800, cursor: "pointer", width: "100%", boxShadow: "0 14px 34px rgba(99,102,241,0.32)" }}>
               {yearly.cta}
             </button>
           </div>
@@ -161,8 +301,13 @@ const ExcelPrivacy = () => {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "24px" }}>
           {cards.map((c, i) => (
-            <div key={i} style={{ ...GlassStyle, padding: "26px 24px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg,#e0e7ff,#f3e8ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{c.i}</div>
+            <div
+              key={i}
+              style={{ ...GlassStyle, padding: "26px 24px", display: "flex", flexDirection: "column", gap: "12px", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 26px 70px rgba(99,102,241,0.14)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = GlassStyle.boxShadow; }}
+            >
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "radial-gradient(circle at 32% 28%, #ffffff, #e0e7ff 55%, #c7d2fe 100%)", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{c.i}</div>
               <h3 style={{ fontSize: 15, fontWeight: 800, color: Theme.textPrimary }}>{c.t}</h3>
               <p style={{ fontSize: 13.5, color: Theme.textSecondary, lineHeight: 1.6 }}>{c.d}</p>
             </div>
@@ -202,8 +347,13 @@ const WhatsInside = () => {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "24px" }}>
           {features.map((f, i) => (
-            <div key={i} style={{ ...GlassStyle, padding: "24px", display: "flex", flexDirection: "column", gap: "16px", transition: "transform 0.3s" }} onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-4px)"} onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}>
-              <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: `linear-gradient(135deg, ${Theme.bgGlow}, #e0e7ff)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", border: `1px solid ${Theme.border}` }}>
+            <div
+              key={i}
+              style={{ ...GlassStyle, padding: "24px", display: "flex", flexDirection: "column", gap: "16px", transition: "transform 0.3s ease, box-shadow 0.3s ease" }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 26px 70px rgba(99,102,241,0.14)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = GlassStyle.boxShadow; }}
+            >
+              <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "radial-gradient(circle at 32% 28%, #ffffff, #e0e7ff 55%, #c7d2fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", border: "1px solid rgba(255,255,255,0.9)", boxShadow: "inset 0 1px 3px rgba(255,255,255,0.9), 0 4px 10px rgba(99,102,241,0.18)" }}>
                 {f.i}
               </div>
               <div>
@@ -242,7 +392,12 @@ const Reviews = () => {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px" }}>
           {reviews.map((r, i) => (
-            <div key={i} style={{ ...GlassStyle, padding: "30px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div
+              key={i}
+              style={{ ...GlassStyle, padding: "30px 24px", display: "flex", flexDirection: "column", gap: "16px", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 26px 70px rgba(99,102,241,0.14)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = GlassStyle.boxShadow; }}
+            >
               <div style={{ display: "flex", gap: "4px" }}>
                 {[1, 2, 3, 4, 5].map((s) => <span key={s} style={{ color: Theme.accentYellow, fontSize: "18px" }}>★</span>)}
               </div>
@@ -287,10 +442,22 @@ const FAQ = () => {
 
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {questions.map((faq, i) => (
-            <div key={i} style={{ ...GlassStyle, padding: "0", overflow: "hidden", cursor: "pointer" }} onClick={() => setOpenIdx(openIdx === i ? null : i)}>
+            <div
+              key={i}
+              style={{
+                ...GlassStyle,
+                padding: "0",
+                overflow: "hidden",
+                cursor: "pointer",
+                border: openIdx === i ? "1px solid rgba(99,102,241,0.28)" : GlassStyle.border,
+                boxShadow: openIdx === i ? "0 20px 60px rgba(99,102,241,0.14)" : GlassStyle.boxShadow,
+                transition: "border 0.2s ease, box-shadow 0.2s ease",
+              }}
+              onClick={() => setOpenIdx(openIdx === i ? null : i)}
+            >
               <div style={{ padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: "700", color: Theme.textPrimary, gap: 16 }}>
                 {faq.q}
-                <span style={{ flexShrink: 0, fontSize: "20px", color: Theme.accentBlue, transform: openIdx === i ? "rotate(45deg)" : "none", transition: "transform 0.2s" }}>+</span>
+                <span style={{ flexShrink: 0, width: 26, height: 26, borderRadius: "50%", background: openIdx === i ? Theme.gradPremium : "rgba(59,130,246,0.10)", color: openIdx === i ? "#fff" : Theme.accentBlue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", transform: openIdx === i ? "rotate(45deg)" : "none", transition: "transform 0.2s ease, background 0.2s ease" }}>+</span>
               </div>
               {openIdx === i && (
                 <div style={{ padding: "0 24px 20px", fontSize: "15px", color: Theme.textSecondary, lineHeight: "1.6" }}>
@@ -333,7 +500,7 @@ const FinalCTA = () => {
             </button>
             <div style={{ position: "relative", display: "inline-flex" }}>
               <span style={{ position: "absolute", top: "-10px", right: "8px", background: `linear-gradient(135deg,#f59e0b,${Theme.accentPink})`, color: "#fff", fontSize: 9, fontWeight: 800, letterSpacing: "0.5px", textTransform: "uppercase", padding: "3px 8px", borderRadius: "100px" }}>Recommended</span>
-              <button onClick={() => navigate("/checkout?plan=yearly")} style={{ background: Theme.gradAccent, color: "#fff", border: "none", padding: "16px 30px", borderRadius: "100px", fontSize: "15px", fontWeight: 800, cursor: "pointer", boxShadow: "0 12px 30px rgba(59,130,246,0.3)" }}>
+              <button onClick={() => navigate("/checkout?plan=yearly")} className="liquid-btn-premium" style={{ background: Theme.gradPremium, color: "#fff", border: "none", padding: "16px 30px", borderRadius: "100px", fontSize: "15px", fontWeight: 800, cursor: "pointer", boxShadow: "0 12px 30px rgba(99,102,241,0.32)" }}>
                 Full Year ₹49
               </button>
             </div>
@@ -378,7 +545,8 @@ const FooterWhite = () => {
         </div>
 
         <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center" }}>
-          <button onClick={() => scrollToId("pricing")} style={footerLinkBtn}>Product</button>
+          <button onClick={() => scrollToId("product")} style={footerLinkBtn}>Product</button>
+          <button onClick={() => scrollToId("pricing")} style={footerLinkBtn}>Pricing</button>
           <button onClick={() => scrollToId("inside")} style={footerLinkBtn}>What's Inside</button>
           <button onClick={() => scrollToId("reviews")} style={footerLinkBtn}>Reviews</button>
           <button onClick={() => scrollToId("faq")} style={footerLinkBtn}>FAQ</button>
@@ -390,7 +558,7 @@ const FooterWhite = () => {
           <button onClick={() => goToPage("/checkout?plan=monthly")} style={{ background: "#fff", color: Theme.textPrimary, border: `1px solid ${Theme.border}`, padding: "9px 18px", borderRadius: "100px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             Monthly ₹19
           </button>
-          <button onClick={() => goToPage("/checkout?plan=yearly")} style={{ background: Theme.gradAccent, color: "#fff", border: "none", padding: "9px 18px", borderRadius: "100px", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(59,130,246,0.3)" }}>
+          <button onClick={() => goToPage("/checkout?plan=yearly")} className="liquid-btn-premium" style={{ background: Theme.gradPremium, color: "#fff", border: "none", padding: "9px 18px", borderRadius: "100px", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(99,102,241,0.32)" }}>
             Full Year ₹49
           </button>
         </div>
@@ -428,7 +596,8 @@ const StickyBubble = () => {
     <div style={{ position: "fixed", bottom: "22px", right: "22px", zIndex: 400, ...GlassStyle, padding: "10px 12px 10px 14px", display: "flex", alignItems: "center", gap: "8px", animation: "fadeInUp 0.3s ease" }}>
       <button
         onClick={() => navigate("/checkout?plan=yearly")}
-        style={{ background: Theme.gradAccent, color: "#fff", border: "none", padding: "10px 18px", borderRadius: "100px", fontSize: "13px", fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}
+        className="liquid-btn-premium"
+        style={{ background: Theme.gradPremium, color: "#fff", border: "none", padding: "10px 18px", borderRadius: "100px", fontSize: "13px", fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}
       >
         Get Full Year ₹49
       </button>
@@ -450,6 +619,7 @@ export const WhiteHomePage = () => {
   return (
     <div style={{ background: Theme.bg, minHeight: "100vh", animation: "fadeIn 0.6s ease" }}>
       <WhiteSaaSHero />
+      <ProductShowcase />
       <ProductPricing />
       <ExcelPrivacy />
       <WhatsInside />

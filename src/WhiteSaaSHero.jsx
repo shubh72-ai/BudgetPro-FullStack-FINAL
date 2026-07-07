@@ -1,334 +1,354 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Theme, GlassStyle, prefersReducedMotion } from "./WhiteTheme";
+import { Theme, GlassStyle, prefersReducedMotion, isCoarsePointer } from "./WhiteTheme";
 
 // ═══════════════════════════════════════════════════════════════════
-//  REAL PRODUCT SCREENSHOT
-//  Drop the actual tracker screenshot into your project's /public
-//  folder using this exact filename (works unchanged on both CRA and
-//  Vite — no import path or bundler config to fix). See delivery
-//  notes for where this file comes from.
+//  NOTE ON THIS FILE
+//  WhiteHomePage.jsx imports { WhiteSaaSHero } from "./WhiteSaaSHero",
+//  but WhiteSaaSHero.jsx itself was not included in the last upload, so
+//  this is a full reconstruction built directly against your written
+//  spec (exact headline copy, 42/58 layout split, glass orb background,
+//  dashboard-preview-frame sizing, magnetic buttons, cursor particles).
+//  If you have a real WhiteSaaSHero.jsx already in your repo, diff it
+//  against this one before overwriting — this file assumes the "no
+//  props" usage seen in WhiteHomePage.jsx (`<WhiteSaaSHero />`).
 // ═══════════════════════════════════════════════════════════════════
-const SCREENSHOT_SRC = "/tracker-screenshot.png";
 
-const TrackerScreenshot = ({ fit = "contain", position = "center" }) => {
-  const [errored, setErrored] = useState(false);
+// ───────────────────────────────────────────────────────────────────
+//  MAGNETIC HOVER — tiny reusable helper, no external library.
+//  Spread the returned handlers onto any element to get a subtle
+//  "pulled toward the cursor" feel on desktop only.
+// ───────────────────────────────────────────────────────────────────
+function useMagnetic(strength = 14) {
+  const ref = useRef(null);
+  const onMouseMove = useCallback((e) => {
+    if (isCoarsePointer() || prefersReducedMotion()) return;
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    const dx = Math.max(-strength, Math.min(strength, x / 6));
+    const dy = Math.max(-strength, Math.min(strength, y / 6));
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
+  }, [strength]);
+  const onMouseLeave = useCallback(() => {
+    if (ref.current) ref.current.style.transform = "translate(0,0)";
+  }, []);
+  return { ref, onMouseMove, onMouseLeave };
+}
 
-  if (errored) {
-    return (
-      <div style={{
-        width: "100%", height: "100%",
-        background: "linear-gradient(135deg,#f8fbff,#f3f0ff)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 20, textAlign: "center", fontSize: 12, fontWeight: 600,
-        color: Theme.textSecondary, lineHeight: 1.5,
-      }}>
-        Add your tracker screenshot as{" "}
-        <code style={{ margin: "0 4px", background: "#fff", padding: "2px 6px", borderRadius: 6 }}>
-          tracker-screenshot.png
-        </code>{" "}
-        to the /public folder
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ width: "100%", height: "100%", background: "#ffffff" }}>
-      <img
-        src={SCREENSHOT_SRC}
-        alt="Smart Expense Tracker — real Excel dashboard showing income, expenses, savings, bills and left-to-spend for the month"
-        style={{ width: "100%", height: "100%", objectFit: fit, objectPosition: position, display: "block" }}
-        loading="eager"
-        onError={() => setErrored(true)}
-      />
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════════
-//  CURSOR PARTICLES (Antigravity-style, hero only)
-// ═══════════════════════════════════════════════════════════════════
+// ───────────────────────────────────────────────────────────────────
+//  CURSOR PARTICLES — antigravity trail, desktop only, capped count,
+//  respects prefers-reduced-motion, sits behind content (pointer-events none)
+// ───────────────────────────────────────────────────────────────────
 const CursorParticles = () => {
   const canvasRef = useRef(null);
-
   useEffect(() => {
-    if (window.matchMedia("(max-width: 1024px)").matches) return;
-    if (prefersReducedMotion()) return;
-
+    if (isCoarsePointer() || prefersReducedMotion()) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let particles = [];
-    let animationFrameId;
-    let mouse = { x: -1000, y: -1000, active: false };
-
+    let rafId;
+    const colors = ["rgba(59,130,246,0.55)", "rgba(139,92,246,0.55)", "rgba(6,182,212,0.5)", "rgba(236,72,153,0.4)"];
     const resize = () => {
-      canvas.width = canvas.parentElement.offsetWidth;
-      canvas.height = canvas.parentElement.offsetHeight;
+      canvas.width = canvas.parentElement?.offsetWidth || window.innerWidth;
+      canvas.height = canvas.parentElement?.offsetHeight || window.innerHeight;
     };
     window.addEventListener("resize", resize);
     resize();
-
-    const handleMouseMove = (e) => {
+    const onMove = (e) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-      mouse.active = true;
-
-      // Scatter new particles (capped so long hover sessions can't leak memory / tank fps)
-      if (Math.random() > 0.3 && particles.length < 140) {
-        const colors = [Theme.accentCyan, Theme.accentBlue, Theme.accentPurple, Theme.accentPink];
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) return;
+      if (Math.random() > 0.4 && particles.length < 70) {
         particles.push({
-          x: mouse.x + (Math.random() - 0.5) * 40,
-          y: mouse.y + (Math.random() - 0.5) * 40,
-          size: Math.random() * 2.5 + 1,
+          x: x + (Math.random() - 0.5) * 30,
+          y: y + (Math.random() - 0.5) * 30,
+          r: Math.random() * 2.4 + 0.8,
           color: colors[Math.floor(Math.random() * colors.length)],
-          speedX: (Math.random() - 0.5) * 2,
-          speedY: (Math.random() - 0.5) * 2 - 0.5,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: (Math.random() - 0.5) * 1.8 - 0.3,
           life: 1,
         });
       }
     };
-
-    const handleMouseLeave = () => { mouse.active = false; };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
-
-    const render = () => {
+    window.addEventListener("mousemove", onMove);
+    const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (let i = 0; i < particles.length; i++) {
+      for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.life -= 0.015;
-
-        if (p.life <= 0) {
-          particles.splice(i, 1);
-          i--;
-          continue;
-        }
-
+        p.x += p.vx; p.y += p.vy; p.life -= 0.013;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.life * 0.6;
         ctx.fill();
         ctx.globalAlpha = 1;
       }
-
-      animationFrameId = requestAnimationFrame(render);
+      rafId = requestAnimationFrame(draw);
     };
-    render();
-
+    draw();
     return () => {
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(rafId);
     };
   }, []);
-
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        position: "absolute", inset: 0, width: "100%", height: "100%",
-        pointerEvents: "none", zIndex: 1,
-      }}
+      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 2 }}
+    />
+  );
+};
+
+// ───────────────────────────────────────────────────────────────────
+//  DASHBOARD PREVIEW IMAGE — real screenshot, contain-fit, top-anchored
+// ───────────────────────────────────────────────────────────────────
+export const MonthlyDashboardPreview = () => {
+  const [errored, setErrored] = useState(false);
+  if (errored) {
+    return (
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, color: Theme.textMuted, fontSize: 12, fontWeight: 600, background: "linear-gradient(135deg,#f8fbff,#f3f0ff)" }}>
+        <span style={{ fontSize: 30 }}>📊</span>
+        <span>Add <code style={{ background: "#fff", padding: "2px 6px", borderRadius: 6, border: `1px solid ${Theme.border}` }}>monthly-dashboard-preview.png</code> to /public</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src="/monthly-dashboard-preview.png"
+      alt="Monthly Smart Expense Tracker dashboard preview"
+      loading="eager"
+      onError={() => setErrored(true)}
+      style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top", display: "block" }}
     />
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════
-//  MAIN HERO COMPONENT
+//  WHITE SAAS HERO
 // ═══════════════════════════════════════════════════════════════════
 export const WhiteSaaSHero = () => {
   const navigate = useNavigate();
+  const goTo = (path) => { navigate(path); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  const monthlyBtn = useMagnetic(10);
+  const yearlyBtn = useMagnetic(12);
+  const cardMagnets = [useMagnetic(8), useMagnetic(8), useMagnetic(8), useMagnetic(8)];
+
+  const features = [
+    { icon: "✓", label: "Track every rupee with clarity" },
+    { icon: "📅", label: "Monthly & yearly expense views" },
+    { icon: "📊", label: "Premium dashboard visuals" },
+    { icon: "♾️", label: "One-time purchase, lifetime use" },
+  ];
 
   return (
-    <section style={{
-      position: "relative",
-      background: Theme.bg,
-      color: Theme.textPrimary,
-      fontFamily: Theme.font,
-      padding: "80px 20px 60px",
-      overflow: "hidden",
-      display: "flex",
-      alignItems: "center",
-    }}>
-      {/* Background Soft Glows */}
-      <div style={{ position: "absolute", top: -200, right: 0, width: 800, height: 800, background: `radial-gradient(circle, rgba(59,130,246,0.05) 0%, rgba(255,255,255,0) 70%)`, pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: -200, left: "-10%", width: 600, height: 600, background: `radial-gradient(circle, rgba(139,92,246,0.04) 0%, rgba(255,255,255,0) 70%)`, pointerEvents: "none" }} />
+    <section
+      style={{
+        position: "relative",
+        background: Theme.gradHero,
+        padding: "84px 20px 72px",
+        overflow: "hidden",
+        minHeight: "94vh",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <CursorParticles />
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%", position: "relative", zIndex: 10 }}>
+      {/* ── Glass orbs — 4 large blurred droplets, positioned to never cover text/buttons ── */}
+      <div className="glass-orb" style={{ top: "-90px", left: "-70px", width: 260, height: 260, animation: "orbFloat 16s ease-in-out infinite" }} />
+      <div className="glass-orb" style={{ top: "18%", right: "2%", width: 340, height: 340, zIndex: 1, animation: "orbFloat 20s ease-in-out infinite reverse" }} />
+      <div className="glass-orb" style={{ bottom: "-100px", left: "6%", width: 220, height: 220, animation: "orbFloat 13s ease-in-out infinite 1.5s" }} />
+      <div className="glass-orb" style={{ top: "6%", right: "22%", width: 90, height: 90, animation: "orbFloat 11s ease-in-out infinite 0.6s" }} />
 
-        {/* Interactive Cursor Effect (Behind Content) */}
-        <CursorParticles />
+      <div style={{ maxWidth: 1440, margin: "0 auto", width: "100%", position: "relative", zIndex: 3 }}>
+        <div className="hero-flex" style={{ display: "flex", gap: 56, alignItems: "center" }}>
 
-        <div className="white-saas-hero-grid" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "40px", position: "relative", zIndex: 5 }}>
-
-          {/* ── LEFT COLUMN: COPY & CTA (45%) ── */}
-          <div className="white-saas-hero-left" style={{ flex: "1 1 45%", minWidth: "320px", display: "flex", flexDirection: "column", gap: "24px" }}>
-
-            {/* Badges */}
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              <div style={{ background: "#fff", border: `1px solid ${Theme.border}`, padding: "6px 14px", borderRadius: "100px", fontSize: "13px", fontWeight: "700", color: Theme.accentPink, boxShadow: Theme.shadowSubtle, display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: Theme.accentPink, animation: "pulse 2s infinite" }} />
-                Limited-time Pricing
-              </div>
-              <div style={{ background: "#fff", border: `1px solid ${Theme.border}`, padding: "6px 14px", borderRadius: "100px", fontSize: "13px", fontWeight: "700", color: Theme.accentYellow, boxShadow: Theme.shadowSubtle }}>
-                ★ 4.9 Rating · 5,000+ Buyers
-              </div>
+          {/* ══════════ LEFT — 42% ══════════ */}
+          <div className="hero-left" style={{ flexBasis: "42%", flexGrow: 0, flexShrink: 0, display: "flex", flexDirection: "column", gap: 22, minWidth: 0 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ background: "rgba(236,72,153,0.10)", color: "#db2777", border: "1px solid rgba(236,72,153,0.18)", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 800 }}>
+                🔥 Limited-time Pricing
+              </span>
+              <span style={{ background: "rgba(234,179,8,0.10)", color: "#a16207", border: "1px solid rgba(234,179,8,0.20)", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 800 }}>
+                ⭐ 4.9 Rating · 5,000+ Buyers
+              </span>
             </div>
 
-            {/* Headline */}
-            <h1 style={{ fontSize: "clamp(42px, 5vw, 56px)", fontWeight: "800", lineHeight: "1.1", letterSpacing: "-0.03em", color: Theme.textPrimary, margin: 0 }}>
-              Your money isn’t disappearing — <br />
-              <span style={{ background: Theme.gradPrimary, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                it’s just untracked.
+            <h1 style={{ fontFamily: Theme.fontHeading, fontSize: "clamp(36px, 4.4vw, 58px)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.03em", color: Theme.textPrimary, margin: 0 }}>
+              Your money<br />
+              isn't disappearing —<br />
+              <span style={{ background: "linear-gradient(135deg,#3b82f6 0%,#6366f1 45%,#8b5cf6 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", display: "inline-block" }}>
+                it's just untracked.
               </span>
             </h1>
 
-            {/* Subtext */}
-            <p style={{ fontSize: "17px", color: Theme.textSecondary, lineHeight: "1.6", margin: 0, maxWidth: "500px", fontWeight: "500" }}>
-              Meet Smart Expense Tracker — a premium Excel dashboard that shows exactly where every rupee goes, how much you save, and what you can control every month.
+            <p style={{ fontSize: 16.5, color: Theme.textSecondary, lineHeight: 1.7, maxWidth: 480, margin: 0 }}>
+              Meet <strong style={{ color: Theme.textPrimary }}>Smart Expense Tracker</strong> — a premium Excel dashboard that shows exactly where every rupee goes, how much you save, and what you can control every month.
             </p>
 
-            {/* Feature Pills */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", margin: "8px 0 16px" }}>
-              {[
-                { i: "✓", t: "Track every rupee with clarity" },
-                { i: "📅", t: "Monthly and yearly expense views" },
-                { i: "📊", t: "Premium dashboard visuals" },
-                { i: "♾️", t: "One-time purchase, lifetime use" },
-              ].map((pill, i) => (
-                <div key={i} className="feature-pill" style={{ display: "flex", alignItems: "center", gap: "12px", background: "#fff", padding: "14px 16px", borderRadius: "16px", border: `1px solid ${Theme.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)", transition: "transform 0.2s" }}>
-                  <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: Theme.accentBlue }}>{pill.i}</div>
-                  <span style={{ fontSize: "14px", fontWeight: "700", color: Theme.textPrimary }}>{pill.t}</span>
+            {/* Feature glass cards — magnetic, icon in circular 3D glass bubble */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {features.map((f, i) => (
+                <div
+                  key={f.label}
+                  ref={cardMagnets[i].ref}
+                  onMouseMove={cardMagnets[i].onMouseMove}
+                  onMouseLeave={cardMagnets[i].onMouseLeave}
+                  className="magnetic-card"
+                  style={{ ...GlassStyle, borderRadius: 18, padding: "13px 14px", display: "flex", alignItems: "center", gap: 11, cursor: "default", transition: "transform 0.15s ease, box-shadow 0.25s ease" }}
+                >
+                  <div style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0, background: "radial-gradient(circle at 32% 28%, #ffffff, #e0e7ff 55%, #c7d2fe 100%)", border: "1px solid rgba(255,255,255,0.9)", boxShadow: "inset 0 1px 3px rgba(255,255,255,0.9), 0 4px 10px rgba(99,102,241,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>
+                    {f.icon}
+                  </div>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: Theme.textPrimary, lineHeight: 1.35 }}>{f.label}</span>
                 </div>
               ))}
             </div>
 
-            {/* CTAs — Monthly (secondary) + Annual (recommended, primary) */}
-            <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
+            {/* CTAs */}
+            <div className="hero-cta-row" style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", marginTop: 4 }}>
               <button
-                onClick={() => navigate("/checkout?plan=monthly")}
-                style={{ background: "#fff", color: Theme.textPrimary, border: `2px solid #e2e8f0`, padding: "14px 32px", borderRadius: "100px", fontSize: "16px", fontWeight: "700", cursor: "pointer", boxShadow: Theme.shadowSubtle, transition: "all 0.2s", display: "flex", alignItems: "center", gap: "8px" }}
-                onMouseOver={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
-                onMouseOut={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
+                ref={monthlyBtn.ref}
+                onMouseMove={monthlyBtn.onMouseMove}
+                onMouseLeave={monthlyBtn.onMouseLeave}
+                onClick={() => goTo("/checkout?plan=monthly")}
+                className="magnetic-btn liquid-btn-white"
+                style={{ flex: "1 1 auto", minWidth: 190, justifyContent: "center", display: "inline-flex", alignItems: "center", gap: 8, padding: "15px 28px", borderRadius: 999, fontSize: 15, fontWeight: 800, color: Theme.textPrimary, cursor: "pointer", border: "1px solid rgba(15,23,42,0.10)", background: "rgba(255,255,255,0.85)", boxShadow: "0 10px 30px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.9)" }}
               >
                 Start Monthly for ₹19
               </button>
 
-              <div style={{ position: "relative", display: "inline-flex" }}>
-                <span style={{ position: "absolute", top: "-12px", right: "10px", background: `linear-gradient(135deg, #f59e0b, ${Theme.accentPink})`, color: "#fff", fontSize: "10px", fontWeight: 800, letterSpacing: "0.5px", textTransform: "uppercase", padding: "4px 10px", borderRadius: "100px", boxShadow: "0 4px 10px rgba(236,72,153,0.35)", zIndex: 2, whiteSpace: "nowrap" }}>
+              <div style={{ position: "relative", flex: "1 1 auto", minWidth: 220 }}>
+                <span style={{ position: "absolute", top: -13, right: 16, background: "linear-gradient(135deg,#f59e0b,#ec4899)", color: "#fff", fontSize: 10, fontWeight: 800, letterSpacing: "0.4px", textTransform: "uppercase", padding: "4px 11px", borderRadius: 999, boxShadow: "0 4px 12px rgba(236,72,153,0.35)", whiteSpace: "nowrap", zIndex: 2 }}>
                   Recommended
                 </span>
                 <button
-                  onClick={() => navigate("/checkout?plan=yearly")}
-                  style={{ background: Theme.gradAccent, color: "#fff", border: "none", padding: "16px 36px", borderRadius: "100px", fontSize: "16px", fontWeight: "700", cursor: "pointer", boxShadow: "0 12px 30px rgba(59, 130, 246, 0.3)", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "8px" }}
-                  onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 16px 35px rgba(59, 130, 246, 0.4)"; }}
-                  onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 12px 30px rgba(59, 130, 246, 0.3)"; }}
+                  ref={yearlyBtn.ref}
+                  onMouseMove={yearlyBtn.onMouseMove}
+                  onMouseLeave={yearlyBtn.onMouseLeave}
+                  onClick={() => goTo("/checkout?plan=yearly")}
+                  className="magnetic-btn liquid-btn-premium"
+                  style={{ width: "100%", justifyContent: "center", display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 30px", borderRadius: 999, fontSize: 15, fontWeight: 800, color: "#fff", cursor: "pointer", border: "none", background: Theme.gradPremium, boxShadow: "0 12px 34px rgba(99,102,241,0.40), inset 0 1px 0 rgba(255,255,255,0.25)" }}
                 >
                   Get Full Year for ₹49
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </button>
               </div>
             </div>
 
-            {/* Bottom Trust Row */}
-            <div style={{ display: "flex", gap: "24px", marginTop: "8px", flexWrap: "wrap" }}>
-              {[
-                { i: "🛡️", t: "Secure Payment" },
-                { i: "⚡", t: "Instant Download" },
-                { i: "✅", t: "Works on Excel & Google Sheets" },
-                { i: "🔒", t: "No app login required" },
-              ].map((t) => (
-                <div key={t.t} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: Theme.textSecondary, fontWeight: "600" }}>
-                  <span>{t.i}</span> {t.t}
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+              {[["🛡️", "Secure Payments"], ["⚡", "Instant Download"], ["🔁", "30-Day Support"]].map(([i, t]) => (
+                <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: Theme.textMuted, fontWeight: 600 }}>
+                  <span>{i}</span><span>{t}</span>
                 </div>
               ))}
             </div>
-
           </div>
 
-          {/* ── RIGHT COLUMN: VISUALS (55%) ── */}
-          <div className="white-saas-hero-right" style={{ flex: "1 1 50%", display: "flex", justifyContent: "center", position: "relative" }}>
+          {/* ══════════ RIGHT — 58%, large glass dashboard preview ══════════ */}
+          <div className="hero-right" style={{ flexBasis: "58%", flexGrow: 1, position: "relative", display: "flex", justifyContent: "center" }}>
+            <div style={{
+              position: "absolute", top: -18, left: "50%", transform: "translateX(-50%)", zIndex: 10,
+              background: "rgba(255,255,255,0.95)", border: "1px solid rgba(255,255,255,0.98)",
+              padding: "8px 20px", borderRadius: 999, fontSize: 13, fontWeight: 700, color: "#16a34a",
+              boxShadow: "0 8px 24px rgba(15,23,42,0.10)", display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a", boxShadow: "0 0 8px #16a34a" }} />
+              Live Dashboard Preview
+            </div>
 
-            <div style={{ position: "relative", width: "100%", maxWidth: "620px", display: "flex", justifyContent: "center" }}>
-
-              {/* Premium floating glass frame + laptop mockup (real screenshot inside) */}
-              <div className="hero-laptop-wrap" style={{ ...GlassStyle, width: "100%", padding: "38px 26px 30px", position: "relative", zIndex: 2, animation: "floatSlow 8s ease-in-out infinite" }}>
-
-                {/* Live preview label */}
-                <div style={{ position: "absolute", top: "-16px", left: "50%", transform: "translateX(-50%)", zIndex: 4, background: "#fff", border: `1px solid ${Theme.border}`, padding: "6px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, color: Theme.accentBlue, boxShadow: Theme.shadowSubtle, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: Theme.accentGreen }} />
-                  Live Excel Dashboard Preview
-                </div>
-
-                {/* Laptop Screen */}
-                <div style={{ background: "#e2e8f0", padding: "12px 12px 18px", borderRadius: "18px 18px 0 0", border: `1px solid #cbd5e1`, borderBottom: "none", boxShadow: Theme.shadowFloat }}>
-                  <div style={{ background: "#fff", borderRadius: "10px", overflow: "hidden", border: `2px solid #0f172a`, aspectRatio: "1622 / 837", position: "relative" }}>
-                    <TrackerScreenshot fit="contain" />
-                  </div>
-                </div>
-                {/* Laptop Base */}
-                <div style={{ background: "#cbd5e1", height: "16px", borderRadius: "0 0 18px 18px", border: `1px solid #94a3b8`, position: "relative", display: "flex", justifyContent: "center", boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}>
-                  <div style={{ width: "90px", height: "5px", background: "#94a3b8", borderRadius: "0 0 6px 6px" }} />
-                </div>
-              </div>
-
-              {/* Mobile Mockup (accent preview) */}
-              <div style={{ position: "absolute", bottom: "-30px", right: "-20px", width: "130px", height: "260px", background: "#fff", borderRadius: "24px", border: "5px solid #0f172a", boxShadow: Theme.shadowFloat, zIndex: 3, animation: "float 6s ease-in-out infinite 1s", overflow: "hidden" }}>
-                <div style={{ width: "50px", height: "14px", background: "#0f172a", margin: "0 auto", borderRadius: "0 0 8px 8px" }} />
-                <div style={{ width: "100%", height: "calc(100% - 14px)" }}>
-                  <TrackerScreenshot fit="cover" position="top" />
-                </div>
+            <div className="dashboard-preview-frame">
+              <div className="dashboard-preview-inner">
+                <MonthlyDashboardPreview />
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* ── Scoped styles: glass orbs, floating anim, preview frame, magnetics, responsive ── */}
       <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        @keyframes floatSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        .feature-pill:hover { transform: translateY(-3px); }
-
-        /* Soft lavender/blue glow behind the laptop frame — a pseudo-element so it
-           never changes the DOM child count/order of .white-saas-hero-right > div
-           (that order is relied on by the mobile-mockup hide rule below). */
-        .hero-laptop-wrap::before {
-          content: "";
+        .glass-orb {
           position: absolute;
-          top: -70px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 480px;
-          height: 480px;
-          background: radial-gradient(circle, rgba(139,92,246,0.16) 0%, rgba(59,130,246,0.10) 45%, rgba(255,255,255,0) 72%);
-          filter: blur(6px);
-          z-index: -1;
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at 30% 25%, rgba(255,255,255,0.95), rgba(255,255,255,0.25) 36%, rgba(139,92,246,0.18) 70%, rgba(59,130,246,0.10));
+          border: 1px solid rgba(255,255,255,0.75);
+          box-shadow:
+            inset 0 1px 8px rgba(255,255,255,0.85),
+            0 24px 70px rgba(99,102,241,0.18);
+          backdrop-filter: blur(18px) saturate(160%);
+          -webkit-backdrop-filter: blur(18px) saturate(160%);
           pointer-events: none;
         }
+        @keyframes orbFloat {
+          0%,100% { transform: translate(0,0) scale(1); }
+          50%     { transform: translate(14px,-16px) scale(1.03); }
+        }
+        @keyframes floatSlow {
+          0%,100% { transform: translateY(0); }
+          50%     { transform: translateY(-12px); }
+        }
+        .dashboard-preview-frame {
+          position: relative;
+          width: 100%;
+          max-width: 920px;
+          padding: 20px;
+          border-radius: 34px;
+          background: linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.42));
+          border: 1px solid rgba(255,255,255,0.82);
+          box-shadow:
+            0 34px 100px rgba(99,102,241,0.18),
+            0 14px 40px rgba(15,23,42,0.10),
+            inset 0 1px 0 rgba(255,255,255,0.95);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          animation: floatSlow 8s ease-in-out infinite;
+          z-index: 4;
+        }
+        .dashboard-preview-inner {
+          overflow: hidden;
+          border-radius: 24px;
+          background: #fff;
+          border: 1px solid rgba(99,102,241,0.16);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.95),
+            0 20px 60px rgba(15,23,42,0.08);
+          aspect-ratio: 1536 / 1024;
+        }
+        .liquid-btn-white:hover { background: rgba(255,255,255,0.98); box-shadow: 0 14px 36px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.95); }
+        .liquid-btn-premium { position: relative; overflow: hidden; isolation: isolate; }
+        .liquid-btn-premium::after {
+          content: '';
+          position: absolute; top: -60%; bottom: -60%; width: 36%; left: -50%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.40), transparent);
+          transform: rotate(14deg);
+          opacity: 0; transition: opacity 0.2s;
+        }
+        .liquid-btn-premium:hover::after { opacity: 1; animation: shineSweep 0.7s ease-out; }
+        .liquid-btn-premium:hover { filter: brightness(1.05); }
+        @keyframes shineSweep { from { transform: translateX(-120%) rotate(14deg); } to { transform: translateX(180%) rotate(14deg); } }
+        .magnetic-btn, .magnetic-card { transition: transform 0.15s ease-out; }
+        .magnetic-card:hover { box-shadow: 0 16px 40px rgba(99,102,241,0.14) !important; }
 
         @media (max-width: 1024px) {
-          .white-saas-hero-grid { flex-direction: column; text-align: center; }
-          .white-saas-hero-left { align-items: center; }
-          .white-saas-hero-left p { margin-left: auto; margin-right: auto; }
-          .white-saas-hero-left > div:first-child { justify-content: center; }
-          .white-saas-hero-left > div:nth-of-type(2) { text-align: left; max-width: 600px; margin: 20px auto; }
-          .white-saas-hero-left > div:nth-of-type(3) { justify-content: center; width: 100%; }
-          .white-saas-hero-left > div:nth-of-type(4) { justify-content: center; }
+          .hero-flex { flex-direction: column !important; }
+          .hero-left, .hero-right { flex-basis: 100% !important; }
+          .hero-right { margin-top: 36px; }
+          .dashboard-preview-frame { max-width: 100%; }
         }
         @media (max-width: 640px) {
-          .white-saas-hero-left > div:nth-of-type(2) { grid-template-columns: 1fr; }
-          .white-saas-hero-left button { width: 100%; justify-content: center; }
-          .white-saas-hero-right { margin-top: 40px; }
-          .white-saas-hero-right > div > div:nth-child(2) { display: none; }
+          .hero-cta-row { flex-direction: column !important; }
+          .hero-cta-row > button, .hero-cta-row > div { width: 100% !important; }
+          .glass-orb { display: none; }
         }
       `}</style>
     </section>
