@@ -188,27 +188,60 @@ const GlobalStyles = () => (
       -webkit-backdrop-filter: blur(32px) saturate(180%);
     }
 
-    /* ── Premium Button Shine ── */
+    /* ── Premium Button Shine — liquid glass water-drop ── */
     .premium-btn {
       position: relative;
       overflow: hidden;
       isolation: isolate;
       transition: all 0.22s ${DS.ease.smooth};
     }
+    .premium-btn::before {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0.08) 42%, rgba(255,255,255,0));
+      pointer-events: none;
+      z-index: 1;
+    }
     .premium-btn::after {
       content: '';
       position: absolute;
       top: -50%; bottom: -50%;
       width: 40%; left: -55%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
       transform: rotate(12deg);
       opacity: 0;
       transition: opacity 0.2s;
-      z-index: 1;
+      z-index: 2;
     }
+    .premium-btn > * { position: relative; z-index: 3; }
     .premium-btn:hover::after { opacity: 1; animation: shine 0.75s ${DS.ease.out}; }
     .premium-btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
     .premium-btn:active { transform: translateY(0); filter: brightness(0.98); }
+
+    /* ── Liquid glass bubble — soft floating orb, sits behind content ── */
+    .glass-bubble {
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 1;
+      background:
+        radial-gradient(circle at 30% 22%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.72) 14%, rgba(255,255,255,0.20) 38%, rgba(139,92,246,0.20) 68%, rgba(59,130,246,0.12) 100%);
+      border: 1px solid rgba(255,255,255,0.82);
+      box-shadow:
+        inset 0 2px 12px rgba(255,255,255,0.92),
+        inset -12px -18px 30px rgba(99,102,241,0.14),
+        0 28px 80px rgba(99,102,241,0.18);
+      backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+      opacity: 0.72;
+      animation: bubbleFloat 12s ease-in-out infinite;
+    }
+    @keyframes bubbleFloat {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(0,-18px,0) scale(1.035); }
+    }
 
     /* ── Card hover lift ── */
     .card-lift { transition: all 0.26s ${DS.ease.smooth}; }
@@ -243,10 +276,15 @@ const GlobalStyles = () => (
     ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.18); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.32); }
 
-    /* ── Responsive ── */
+    /* ── Responsive — preview stays visible down to mobile, only decorative bubbles fade ── */
     @media (max-width: 1024px) {
       .hero-grid { flex-direction: column !important; }
-      .hero-right { display: none !important; }
+      .hero-right {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 900px !important;
+        margin: 0 auto !important;
+      }
     }
     @media (max-width: 768px) {
       .pricing-grid   { grid-template-columns: 1fr !important; }
@@ -259,12 +297,17 @@ const GlobalStyles = () => (
       .hero-cta-row   { flex-direction: column !important; }
       .hero-cta-row button, .hero-cta-row > div { width: 100% !important; }
     }
+    @media (max-width: 640px) {
+      .hero-right { transform: none !important; }
+      .glass-bubble { opacity: 0.25; }
+    }
     @media (max-width: 480px) {
       .benefits-grid  { grid-template-columns: 1fr !important; }
       .footer-grid    { grid-template-columns: 1fr !important; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .glass-bubble { animation: none !important; }
     }
   `}</style>
 );
@@ -397,7 +440,7 @@ const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={},
       background: DS.grad.cta,
       color: "#fff",
       border: "none",
-      boxShadow: "0 4px 20px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+      boxShadow: "0 16px 38px rgba(99,102,241,0.36), inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -10px 18px rgba(29,78,216,0.18)",
     },
     white: {
       background: "rgba(255,255,255,0.88)",
@@ -452,16 +495,27 @@ const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={},
         WebkitBackdropFilter:"blur(12px)",
         ...style,
       }}
-    >{children}</button>
+    >
+      <span style={{ position: "relative", zIndex: 3, display: "inline-flex", alignItems: "center", gap: "inherit" }}>
+        {children}
+      </span>
+    </button>
   );
 });
 
 // ═══════════════════════════════════════════════════════════════════
-//  TRACKER SCREENSHOT COMPONENT
-//  Place tracker-screenshot.png in /public folder
+//  DASHBOARD IMAGE — real screenshots, monthly/annual switching
+//  Place monthly-dashboard-preview.png and annual-dashboard-preview.png
+//  in /public. Real image ratio is 1536×1024 (3:2) for both files.
 // ═══════════════════════════════════════════════════════════════════
-const TrackerScreenshot = memo(({ fit="contain", position="top" }) => {
+const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "contain", position = "center top" }) => {
   const [errored, setErrored] = useState(false);
+  const src = type === "annual" ? "/annual-dashboard-preview.png" : "/monthly-dashboard-preview.png";
+  const label = type === "annual" ? "annual-dashboard-preview.png" : "monthly-dashboard-preview.png";
+  const alt = type === "annual"
+    ? "Annual expenses dashboard preview — 12-month income, expenses, savings and debt overview"
+    : "Monthly budget tracker dashboard preview — income, expenses, savings and category breakdown";
+
   if (errored) {
     return (
       <div style={{
@@ -471,23 +525,35 @@ const TrackerScreenshot = memo(({ fit="contain", position="top" }) => {
         padding:20,textAlign:"center",fontSize:12,fontWeight:600,
         color:DS.color.slateLight,lineHeight:1.6,flexDirection:"column",gap:8,
       }}>
-        <span style={{fontSize:32}}>📊</span>
-        <span>Add <code style={{background:"#fff",padding:"2px 6px",borderRadius:6,border:"1px solid #e2e8f0"}}>tracker-screenshot.png</code> to /public</span>
+        <span style={{fontSize:32}}>{type==="annual"?"📈":"📊"}</span>
+        <span>Add <code style={{background:"#fff",padding:"2px 6px",borderRadius:6,border:"1px solid #e2e8f0"}}>{label}</code> to /public</span>
       </div>
     );
   }
   return (
-    <div style={{width:"100%",height:"100%",background:"#ffffff"}}>
-      <img
-        src="/tracker-screenshot.png"
-        alt="Smart Expense Tracker — premium Excel dashboard with income, expenses, savings and categories"
-        style={{width:"100%",height:"100%",objectFit:fit,objectPosition:position,display:"block"}}
-        loading="eager"
-        onError={()=>setErrored(true)}
-      />
-    </div>
+    <img
+      src={src}
+      alt={alt}
+      loading={loading}
+      onError={()=>setErrored(true)}
+      style={{ width:"100%", height:"100%", objectFit:fit, objectPosition:position, display:"block" }}
+    />
   );
 });
+
+// Kept as a thin backward-compatible alias — some older sections below
+// referenced TrackerScreenshot directly; both names now point to the
+// same real-image component so nothing breaks if either name is used.
+const TrackerScreenshot = memo(({ fit="contain", position="top" }) => (
+  <DashboardImage type="monthly" loading="eager" fit={fit} position={position} />
+));
+
+// ═══════════════════════════════════════════════════════════════════
+//  GLASS BUBBLE — decorative liquid glass orb, sits behind content
+// ═══════════════════════════════════════════════════════════════════
+const GlassBubble = memo(({ style = {}, size = 120 }) => (
+  <div aria-hidden="true" className="glass-bubble" style={{ width:size, height:size, ...style }} />
+));
 
 // ═══════════════════════════════════════════════════════════════════
 //  HERO SECTION — Luxury Liquid Glass with real tracker image
@@ -507,16 +573,22 @@ const HeroSection = memo(({ onNavigate }) => {
     }}>
       <CursorParticles />
 
-      {/* Ambient orbs — no bubbles, just soft gradient blobs */}
+      {/* Ambient soft gradient blobs (behind bubbles) */}
       <div style={{position:"absolute",top:"-10%",right:"5%",width:520,height:520,borderRadius:"50%",background:"radial-gradient(circle,rgba(139,92,246,0.10),transparent 70%)",pointerEvents:"none",animation:"orb 18s ease-in-out infinite"}}/>
       <div style={{position:"absolute",bottom:"5%",left:"-5%",width:420,height:420,borderRadius:"50%",background:"radial-gradient(circle,rgba(59,130,246,0.09),transparent 70%)",pointerEvents:"none",animation:"orb 13s ease-in-out infinite reverse"}}/>
       <div style={{position:"absolute",top:"40%",left:"30%",width:300,height:300,borderRadius:"50%",background:"radial-gradient(circle,rgba(6,182,212,0.06),transparent 70%)",pointerEvents:"none",animation:"orb 20s ease-in-out infinite 2s"}}/>
 
-      <div style={{maxWidth:1180,margin:"0 auto",width:"100%",position:"relative",zIndex:3}}>
-        <div className="hero-grid" style={{display:"flex",gap:60,alignItems:"center",justifyContent:"space-between"}}>
+      {/* Real liquid glass bubbles — 4, positioned to never cover text/buttons */}
+      <GlassBubble size={140} style={{ top:"18%", left:"2%" }} />
+      <GlassBubble size={220} style={{ top:"22%", right:"4%", animationDelay:"1.5s" }} />
+      <GlassBubble size={110} style={{ bottom:"8%", left:"8%", animationDelay:"3s" }} />
+      <GlassBubble size={64}  style={{ top:"8%", right:"26%", animationDelay:"2s" }} />
 
-          {/* ── LEFT: Copy ── */}
-          <div style={{flex:"0 0 44%",display:"flex",flexDirection:"column",gap:24}}>
+      <div style={{maxWidth:1480,margin:"0 auto",width:"100%",position:"relative",zIndex:3}}>
+        <div className="hero-grid" style={{display:"flex",gap:56,alignItems:"center",justifyContent:"space-between"}}>
+
+          {/* ── LEFT: Copy — ~39% ── */}
+          <div style={{flex:"0 0 39%",display:"flex",flexDirection:"column",gap:24,minWidth:0}}>
             {/* Badges */}
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               <Badge color="rgba(239,68,68,0.10)" text="#dc2626" style={{border:"1px solid rgba(239,68,68,0.18)"}}>
@@ -624,10 +696,10 @@ const HeroSection = memo(({ onNavigate }) => {
             </div>
           </div>
 
-          {/* ── RIGHT: Real Tracker Screenshot in glass frame ── */}
-          <div className="hero-right" style={{flex:"0 0 52%",display:"flex",justifyContent:"center",position:"relative"}}>
+          {/* ── RIGHT: Real Dashboard Preview — ~60%, the hero's main visual ── */}
+          <div className="hero-right" style={{flex:"1 1 60%",display:"flex",justifyContent:"center",position:"relative"}}>
             {/* Outer glow */}
-            <div style={{position:"absolute",top:-60,left:-60,right:-60,bottom:-60,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(99,102,241,0.14) 0%,transparent 70%)",pointerEvents:"none"}}/>
+            <div style={{position:"absolute",top:-60,left:-60,right:-60,bottom:-60,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(99,102,241,0.16) 0%,transparent 70%)",pointerEvents:"none"}}/>
 
             {/* "Live Dashboard Preview" pill */}
             <div style={{
@@ -645,67 +717,30 @@ const HeroSection = memo(({ onNavigate }) => {
               Live Dashboard Preview
             </div>
 
-            {/* Main glass frame — floating laptop-style */}
-            <div className="glass-card-hero floating" style={{
-              borderRadius:DS.radius["3xl"],
-              padding:"8px 8px 0 8px",
+            {/* Main glass preview frame — the dashboard IS the hero visual now, no laptop bezel */}
+            <div className="floating" style={{
               width:"100%",
-              maxWidth:620,
-              zIndex:4,
+              maxWidth:960,
+              padding:20,
+              borderRadius:38,
               position:"relative",
-              boxShadow:`${DS.shadow.float}, 0 0 80px rgba(99,102,241,0.12)`,
+              zIndex:4,
+              background:"linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.38))",
+              border:"1px solid rgba(255,255,255,0.88)",
+              boxShadow:"0 38px 110px rgba(99,102,241,0.22), 0 18px 48px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.95)",
+              backdropFilter:"blur(30px) saturate(180%)",
+              WebkitBackdropFilter:"blur(30px) saturate(180%)",
+              animation:"floatSlow 8s ease-in-out infinite",
             }}>
-              {/* Browser chrome bar */}
               <div style={{
-                background:"rgba(248,251,255,0.95)",
-                borderRadius:`${DS.radius.xl} ${DS.radius.xl} 0 0`,
-                padding:"10px 16px",
-                display:"flex",alignItems:"center",gap:8,
-                borderBottom:"1px solid rgba(15,23,42,0.07)",
-              }}>
-                <div style={{display:"flex",gap:6}}>
-                  {["#ff5f57","#febc2e","#28c840"].map(c=>(
-                    <div key={c} style={{width:10,height:10,borderRadius:"50%",background:c}}/>
-                  ))}
-                </div>
-                <div style={{
-                  flex:1,background:"rgba(15,23,42,0.05)",borderRadius:DS.radius.pill,
-                  padding:"4px 16px",fontSize:11,color:DS.color.slateLight,
-                  border:"1px solid rgba(15,23,42,0.06)",textAlign:"center",
-                }}>
-                  budgetpro-tracker.xlsx — April 2026
-                </div>
-              </div>
-
-              {/* Screenshot area */}
-              <div style={{
-                background:"#ffffff",
                 overflow:"hidden",
-                borderRadius:`0 0 calc(${DS.radius["3xl"]} - 8px) calc(${DS.radius["3xl"]} - 8px)`,
-                aspectRatio:"1622/900",
-                position:"relative",
+                borderRadius:26,
+                background:"#fff",
+                border:"1px solid rgba(99,102,241,0.16)",
+                aspectRatio:"1536 / 1024",
+                boxShadow:"inset 0 1px 0 rgba(255,255,255,0.95), 0 22px 70px rgba(15,23,42,0.08)",
               }}>
-                <TrackerScreenshot fit="cover" position="top" />
-                {/* Subtle bottom fade to blend into card */}
-                <div style={{position:"absolute",bottom:0,left:0,right:0,height:60,background:"linear-gradient(to top,rgba(255,255,255,0.7),transparent)",pointerEvents:"none"}}/>
-              </div>
-            </div>
-
-            {/* Floating mini mobile mockup */}
-            <div style={{
-              position:"absolute",bottom:-28,right:-24,
-              width:110,height:220,
-              background:"#ffffff",
-              borderRadius:20,
-              border:"4px solid rgba(15,23,42,0.90)",
-              boxShadow:DS.shadow.float,
-              zIndex:5,
-              animation:"float 6s ease-in-out infinite 1.2s",
-              overflow:"hidden",
-            }}>
-              <div style={{width:44,height:12,background:"rgba(15,23,42,0.90)",margin:"0 auto",borderRadius:"0 0 8px 8px"}}/>
-              <div style={{width:"100%",height:"calc(100% - 12px)"}}>
-                <TrackerScreenshot fit="cover" position="top"/>
+                <DashboardImage type="monthly" loading="eager" fit="contain" position="center top" />
               </div>
             </div>
           </div>
@@ -856,76 +891,65 @@ const Nav = memo(() => {
 
   return (
     <>
-      {/* Outer sticky wrapper — lets the page's own background show at the
-          edges so the nav reads as one floating glass capsule, matching
-          the reference image, instead of a full-bleed bar. */}
-      <div style={{
+      <nav style={{
         position:"sticky",top:0,zIndex:200,
-        padding:scrolled?"10px 16px":"18px 16px",
-        transition:`padding 0.3s ${DS.ease.smooth}`,
-        pointerEvents:"none",
+        background:scrolled?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.72)",
+        backdropFilter:"blur(24px) saturate(180%)",
+        WebkitBackdropFilter:"blur(24px) saturate(180%)",
+        borderBottom:`1px solid ${scrolled?"rgba(15,23,42,0.08)":"rgba(255,255,255,0.60)"}`,
+        boxShadow:scrolled?DS.shadow.sm:"none",
+        transition:`all 0.3s ${DS.ease.smooth}`,
       }}>
-        <nav style={{
-          maxWidth:1180,margin:"0 auto",pointerEvents:"auto",
-          background:scrolled?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.76)",
-          border:"1px solid rgba(255,255,255,0.85)",
-          borderRadius:DS.radius.pill,
-          backdropFilter:"blur(24px) saturate(180%)",
-          WebkitBackdropFilter:"blur(24px) saturate(180%)",
-          boxShadow:scrolled?DS.shadow.lg:DS.shadow.sm,
-          transition:`all 0.3s ${DS.ease.smooth}`,
-        }}>
-          <div style={{padding:"0 12px 0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:62}}>
-            {/* Logo */}
-            <button onClick={()=>goTo("/")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:10,padding:0}}>
-              <div style={{
-                background:DS.grad.cta,
-                borderRadius:DS.radius.lg,
-                padding:"8px 12px",
-                color:"#fff",
-                fontSize:17,
-                boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
-              }}>📊</div>
-              <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:19,color:DS.color.navy,letterSpacing:"-0.02em"}}>
-                Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span>
-              </span>
-            </button>
+        <div style={{maxWidth:1180,margin:"0 auto",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:66}}>
+          {/* Logo */}
+          <button onClick={()=>goTo("/")} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:10,padding:0}}>
+            <div style={{
+              background:DS.grad.cta,
+              borderRadius:DS.radius.lg,
+              padding:"8px 12px",
+              color:"#fff",
+              fontSize:17,
+              boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
+            }}>📊</div>
+            <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:"-0.02em"}}>
+              Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span>
+            </span>
+          </button>
 
-            {/* Center nav pills — sits in its own soft-tinted capsule track */}
-            <div className="nav-desktop" style={{display:"flex",gap:2,alignItems:"center",background:"rgba(248,251,255,0.75)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.06)"}}>
-              {navLinks.map(l=>{
-                const isActive = l.id==="/"?path==="/":path.startsWith(l.id.split("#")[0]);
-                return (
-                  <button key={l.id} onClick={()=>goTo(l.id)} className={`nav-item ${isActive?"active":""}`}
-                    style={{background:"transparent",border:"none",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:13.5,fontFamily:"inherit"}}>
-                    {l.label}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Center nav pills */}
+          <div className="nav-desktop" style={{display:"flex",gap:2,alignItems:"center",background:"rgba(248,251,255,0.80)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.07)",backdropFilter:"blur(12px)"}}>
+            {navLinks.map(l=>{
+              const isActive = l.id==="/"?path==="/":path.startsWith(l.id.split("#")[0]);
+              return (
+                <button key={l.id} onClick={()=>goTo(l.id)} className={`nav-item ${isActive?"active":""}`}
+                  style={{background:"transparent",border:"none",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:14,fontFamily:"inherit"}}>
+                  {l.label}
+                </button>
+              );
+            })}
+          </div>
 
-            {/* Right CTAs */}
-            <div className="nav-desktop" style={{display:"flex",gap:8,alignItems:"center"}}>
-              <LiquidBtn variant="white" size="sm" onClick={()=>goTo("/checkout?plan=monthly")}>Monthly ₹19</LiquidBtn>
-              <LiquidBtn variant="cta" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
-                style={{boxShadow:"0 4px 16px rgba(99,102,241,0.35)"}}>Full Year ₹49</LiquidBtn>
-              <button onClick={()=>goTo("/admin")} style={{background:"rgba(248,251,255,0.90)",border:"1px solid rgba(15,23,42,0.08)",borderRadius:"50%",cursor:"pointer",padding:"9px",color:DS.color.slate,display:"flex",alignItems:"center"}}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              </button>
-            </div>
-
-            {/* Hamburger */}
-            <button className="mobile-nav-btn" onClick={()=>setMobileOpen(!mobileOpen)}
-              style={{display:"none",background:"none",border:"none",cursor:"pointer",padding:8}} aria-label="Toggle nav">
-              <Icon name={mobileOpen?"close":"menu"} size={22} color={DS.color.navy}/>
+          {/* Right CTAs */}
+          <div className="nav-desktop" style={{display:"flex",gap:10,alignItems:"center"}}>
+            <LiquidBtn variant="white" size="sm" onClick={()=>goTo("/checkout?plan=monthly")}>Monthly ₹19</LiquidBtn>
+            <LiquidBtn variant="cta" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
+              style={{boxShadow:"0 4px 16px rgba(99,102,241,0.35)"}}>Full Year ₹49</LiquidBtn>
+            <button onClick={()=>goTo("/admin")} style={{background:"rgba(248,251,255,0.80)",border:"1px solid rgba(15,23,42,0.08)",borderRadius:"50%",cursor:"pointer",padding:"9px",color:DS.color.slate,display:"flex",alignItems:"center",backdropFilter:"blur(12px)"}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </button>
           </div>
-        </nav>
-      </div>
 
-      {/* Mobile menu — unchanged logic, repositioned for the floating pill */}
+          {/* Hamburger */}
+          <button className="mobile-nav-btn" onClick={()=>setMobileOpen(!mobileOpen)}
+            style={{display:"none",background:"none",border:"none",cursor:"pointer",padding:8}} aria-label="Toggle nav">
+            <Icon name={mobileOpen?"close":"menu"} size={22} color={DS.color.navy}/>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile menu */}
       {mobileOpen&&(
-        <div style={{position:"fixed",top:80,left:16,right:16,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",zIndex:199,border:"1px solid rgba(255,255,255,0.9)",borderRadius:DS.radius["2xl"],padding:"16px 20px",animation:"slideDown 0.22s ease",boxShadow:DS.shadow.lg}}>
+        <div style={{position:"fixed",top:66,left:0,right:0,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",zIndex:199,borderBottom:`1px solid ${DS.color.border}`,padding:"16px 20px",animation:"slideDown 0.22s ease",boxShadow:DS.shadow.lg}}>
           {navLinks.map(l=>(
             <button key={l.id} onClick={()=>goTo(l.id)}
               style={{display:"block",width:"100%",textAlign:"left",background:path===l.id?"rgba(99,102,241,0.08)":"transparent",border:"none",cursor:"pointer",padding:"12px 16px",borderRadius:DS.radius.lg,fontWeight:600,color:path===l.id?DS.color.mintText:DS.color.slate,fontSize:15,marginBottom:3,fontFamily:"inherit"}}>
@@ -1050,7 +1074,6 @@ const TestimonialCard = memo(({ t }) => (
 const HomePage = memo(() => {
   const navigate = useNavigate();
   const goTo = p => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); };
-  const [selectedMonth,setSelectedMonth] = useState("Jun");
   const [stickyVisible,setStickyVisible] = useState(false);
 
   useEffect(()=>{
@@ -1122,33 +1145,35 @@ const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* LIVE DEMO */}
-      <section style={{padding:"80px 20px",background:"#ffffff"}}>
-        <div style={{maxWidth:980,margin:"0 auto"}}>
+      {/* LIVE DEMO — real Annual Dashboard preview, not the fake animated chart */}
+      <section style={{padding:"80px 20px",background:"#ffffff",position:"relative",overflow:"hidden"}}>
+        <GlassBubble size={160} style={{ top:"12%", right:"6%" }} />
+        <GlassBubble size={70}  style={{ bottom:"8%", left:"4%", animationDelay:"2s" }} />
+        <div style={{maxWidth:1100,margin:"0 auto",position:"relative",zIndex:2}}>
           <div style={{textAlign:"center",marginBottom:52}}>
             <Badge style={{marginBottom:16}}>Live Demo</Badge>
-            <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,marginBottom:12,letterSpacing:"-0.02em"}}>See It In Action</h2>
-            <p style={{color:DS.color.slateLight,fontSize:16,lineHeight:1.7}}>Switch months to simulate real usage — this is exactly what Smart Expense Tracker shows you</p>
+            <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,marginBottom:12,letterSpacing:"-0.02em"}}>Annual Dashboard Preview</h2>
+            <p style={{color:DS.color.slateLight,fontSize:16,lineHeight:1.7,maxWidth:640,margin:"0 auto"}}>See the full-year view with income, expenses, savings, debt, spending trends, and smart money insights.</p>
           </div>
-          <div style={{boxShadow:DS.shadow.glassLg,borderRadius:DS.radius["2xl"],overflow:"hidden",border:"1px solid rgba(255,255,255,0.85)"}}>
-            <div style={{background:"rgba(248,251,255,0.95)",padding:"12px 18px",display:"flex",gap:7,alignItems:"center",borderBottom:`1px solid ${DS.color.border}`,backdropFilter:"blur(12px)"}}>
-              {["#ff5f57","#febc2e","#28c840"].map(c=><div key={c} style={{width:11,height:11,borderRadius:"50%",background:c}}/>)}
-              <div style={{background:"rgba(15,23,42,0.05)",borderRadius:DS.radius.pill,padding:"3px 20px",fontSize:10,color:DS.color.slateLight,flex:1,textAlign:"center"}}>Smart Expense Tracker · Live Preview</div>
-              <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-                {CHART_MONTHS.map(m=>(
-                  <button key={m} onClick={()=>setSelectedMonth(m)} style={{
-                    padding:"2px 7px",borderRadius:DS.radius.pill,
-                    border:`1px solid ${m===selectedMonth?"rgba(99,102,241,0.4)":"rgba(15,23,42,0.08)"}`,
-                    background:m===selectedMonth?"rgba(99,102,241,0.10)":"transparent",
-                    color:m===selectedMonth?"#4338ca":DS.color.slateLight,
-                    fontSize:9,fontWeight:700,cursor:"pointer",
-                    transition:`all 0.18s ${DS.ease.smooth}`,
-                  }}>{m}</button>
-                ))}
+          <div style={{position:"relative",display:"flex",justifyContent:"center"}}>
+            <div style={{position:"absolute",top:-40,left:-40,right:-40,bottom:-40,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(139,92,246,0.14) 0%,transparent 70%)",pointerEvents:"none"}}/>
+            <div className="floating" style={{
+              width:"100%",maxWidth:1040,padding:20,borderRadius:38,position:"relative",zIndex:2,
+              background:"linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.38))",
+              border:"1px solid rgba(255,255,255,0.88)",
+              boxShadow:"0 38px 110px rgba(139,92,246,0.20), 0 18px 48px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.95)",
+              backdropFilter:"blur(30px) saturate(180%)",
+              WebkitBackdropFilter:"blur(30px) saturate(180%)",
+              animation:"floatSlow 9s ease-in-out infinite",
+            }}>
+              <div style={{
+                overflow:"hidden",borderRadius:26,background:"#fff",
+                border:"1px solid rgba(139,92,246,0.16)",
+                aspectRatio:"1536 / 1024",
+                boxShadow:"inset 0 1px 0 rgba(255,255,255,0.95), 0 22px 70px rgba(15,23,42,0.08)",
+              }}>
+                <DashboardImage type="annual" loading="lazy" fit="contain" position="center top" />
               </div>
-            </div>
-            <div style={{padding:20,background:DS.grad.section}}>
-              <DashboardPreview selectedMonth={selectedMonth} onMonthChange={setSelectedMonth}/>
             </div>
           </div>
         </div>
@@ -1248,24 +1273,29 @@ const ProductPage = memo(() => {
   const navigate = useNavigate();
   const goTo = p => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); };
   const [activeTab,setActiveTab] = useState("features");
-  const [selectedMonth,setSelectedMonth] = useState("Jun");
   const [selectedPlan,setSelectedPlan] = useState("yearly");
 
   const features=["Monthly income & expense tracker","Income vs Savings visualization charts","Category-wise expense breakdown","Savings goal progress tracker","Annual expense summary (Full Year only)","Beginner-friendly, no macros needed","Works on Excel 2016+ and Google Sheets","Indian Rupee (₹) formatted throughout","12-month rolling expense view (Full Year)","Print-ready monthly reports"];
   const specs=[["Format","Excel (.xlsx) + Google Sheets link"],["Compatibility","Excel 2016, 2019, 2021, 365, Google Sheets"],["File Size","~2.4 MB (Monthly) / ~4.1 MB (Full Year)"],["Currency","Indian Rupee (₹)"],["Language","English"],["Macros","No macros — 100% safe"],["Updates","Free lifetime updates"],["Support","Email support included"]];
 
   return (
-    <div style={{background:DS.grad.section,minHeight:"100vh",padding:"60px 20px"}}>
-      <div style={{maxWidth:1100,margin:"0 auto"}}>
+    <div style={{background:DS.grad.section,minHeight:"100vh",padding:"60px 20px",position:"relative",overflow:"hidden"}}>
+      <GlassBubble size={130} style={{ top:"6%", right:"3%" }} />
+      <GlassBubble size={60}  style={{ bottom:"6%", left:"3%", animationDelay:"2.4s" }} />
+      <div style={{maxWidth:1100,margin:"0 auto",position:"relative",zIndex:2}}>
         <div className="product-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:52,alignItems:"start"}}>
           <div>
             <div style={{boxShadow:DS.shadow.glassLg,borderRadius:DS.radius["2xl"],overflow:"hidden",border:"1px solid rgba(255,255,255,0.85)"}}>
               <div style={{background:"rgba(248,251,255,0.95)",padding:"11px 16px",display:"flex",gap:6,alignItems:"center",borderBottom:`1px solid ${DS.color.border}`}}>
                 {["#ff5f57","#febc2e","#28c840"].map(c=><div key={c} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}
-                <div style={{background:"rgba(15,23,42,0.05)",borderRadius:DS.radius.pill,padding:"3px 14px",fontSize:10,color:DS.color.slateLight,marginLeft:6}}>Live Preview</div>
+                <div style={{background:"rgba(15,23,42,0.05)",borderRadius:DS.radius.pill,padding:"3px 14px",fontSize:10,color:DS.color.slateLight,marginLeft:6}}>
+                  {selectedPlan==="monthly"?"Monthly Dashboard Preview":"Annual Dashboard Preview"}
+                </div>
               </div>
-              <div style={{padding:14,background:DS.grad.section}}>
-                <DashboardPreview selectedMonth={selectedMonth} onMonthChange={setSelectedMonth}/>
+              <div style={{padding:14,background:DS.grad.section,aspectRatio:"1536 / 1024"}}>
+                <div style={{width:"100%",height:"100%",borderRadius:DS.radius.lg,overflow:"hidden",background:"#fff",border:"1px solid rgba(99,102,241,0.12)"}}>
+                  <DashboardImage type={selectedPlan==="monthly"?"monthly":"annual"} loading="eager" fit="contain" position="center top" />
+                </div>
               </div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginTop:14}}>
