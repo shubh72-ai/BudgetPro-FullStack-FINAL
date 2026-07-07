@@ -541,13 +541,6 @@ const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "conta
   );
 });
 
-// Kept as a thin backward-compatible alias — some older sections below
-// referenced TrackerScreenshot directly; both names now point to the
-// same real-image component so nothing breaks if either name is used.
-const TrackerScreenshot = memo(({ fit="contain", position="top" }) => (
-  <DashboardImage type="monthly" loading="eager" fit={fit} position={position} />
-));
-
 // ═══════════════════════════════════════════════════════════════════
 //  GLASS BUBBLE — decorative liquid glass orb, sits behind content
 // ═══════════════════════════════════════════════════════════════════
@@ -676,7 +669,7 @@ const HeroSection = memo(({ onNavigate }) => {
                 }}>Recommended</div>
                 <LiquidBtn variant="cta" size="lg" onClick={()=>goTo("/checkout?plan=yearly")}
                   style={{width:"100%",justifyContent:"center",animation:"pulse 2.5s infinite"}}>
-                  Get Full Year for ₹49
+                  Download the Annual Budget Template for just ₹49!
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </LiquidBtn>
               </div>
@@ -747,125 +740,6 @@ const HeroSection = memo(({ onNavigate }) => {
         </div>
       </div>
     </section>
-  );
-});
-
-// ═══════════════════════════════════════════════════════════════════
-//  DASHBOARD DATA & ANIMATED PREVIEW
-// ═══════════════════════════════════════════════════════════════════
-const MONTH_DATA = {
-  Jan:{income:45000,expenses:32000,cats:[{cat:"Housing",pct:42},{cat:"Food",pct:28},{cat:"Transport",pct:15},{cat:"Other",pct:15}]},
-  Feb:{income:48000,expenses:35000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:30},{cat:"Transport",pct:14},{cat:"Other",pct:16}]},
-  Mar:{income:46000,expenses:30000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:25},{cat:"Transport",pct:13},{cat:"Other",pct:22}]},
-  Apr:{income:52000,expenses:38000,cats:[{cat:"Housing",pct:38},{cat:"Food",pct:26},{cat:"Transport",pct:18},{cat:"Other",pct:18}]},
-  May:{income:50000,expenses:33000,cats:[{cat:"Housing",pct:41},{cat:"Food",pct:24},{cat:"Transport",pct:16},{cat:"Other",pct:19}]},
-  Jun:{income:55000,expenses:36000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:25},{cat:"Transport",pct:15},{cat:"Other",pct:20}]},
-  Jul:{income:53000,expenses:40000,cats:[{cat:"Housing",pct:38},{cat:"Food",pct:28},{cat:"Transport",pct:17},{cat:"Other",pct:17}]},
-  Aug:{income:58000,expenses:37000,cats:[{cat:"Housing",pct:39},{cat:"Food",pct:26},{cat:"Transport",pct:14},{cat:"Other",pct:21}]},
-  Sep:{income:56000,expenses:34000,cats:[{cat:"Housing",pct:41},{cat:"Food",pct:23},{cat:"Transport",pct:16},{cat:"Other",pct:20}]},
-  Oct:{income:60000,expenses:41000,cats:[{cat:"Housing",pct:37},{cat:"Food",pct:29},{cat:"Transport",pct:18},{cat:"Other",pct:16}]},
-  Nov:{income:62000,expenses:45000,cats:[{cat:"Housing",pct:36},{cat:"Food",pct:31},{cat:"Transport",pct:17},{cat:"Other",pct:16}]},
-  Dec:{income:70000,expenses:55000,cats:[{cat:"Housing",pct:35},{cat:"Food",pct:33},{cat:"Transport",pct:16},{cat:"Other",pct:16}]},
-};
-const CHART_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const CAT_COLORS = ["#6366f1","#f59e0b","#3b82f6","#ec4899"];
-
-const DashboardPreview = memo(({ selectedMonth="Jun", onMonthChange }) => {
-  const data = MONTH_DATA[selectedMonth];
-  const savings = data.income - data.expenses;
-  const savingsPct = Math.round((savings/data.income)*100);
-  const [animated, setAnimated] = useState(false);
-  const fmt = v=>`₹${v.toLocaleString("en-IN")}`;
-  useEffect(()=>{ setAnimated(false); const t=setTimeout(()=>setAnimated(true),50); return()=>clearTimeout(t); },[selectedMonth]);
-
-  return (
-    <div className="glass-card" style={{borderRadius:DS.radius["2xl"],padding:18,background:DS.grad.glass,border:"1px solid rgba(255,255,255,0.85)"}}>
-      {/* Header */}
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        <div>
-          <div style={{fontFamily:DS.font.heading,fontSize:14,fontWeight:800,color:DS.color.navy,letterSpacing:"-0.01em"}}>Smart Expense Tracker</div>
-          <div style={{fontSize:10,color:DS.color.slateLight,marginTop:2}}>{selectedMonth} 2026 · Income, expenses, savings</div>
-        </div>
-        {onMonthChange?(
-          <select value={selectedMonth} onChange={e=>onMonthChange(e.target.value)} style={{
-            background:"rgba(255,255,255,0.80)",color:DS.color.navy,border:"1px solid rgba(15,23,42,0.10)",
-            borderRadius:DS.radius.pill,padding:"5px 14px",fontSize:10,fontWeight:700,cursor:"pointer",
-          }}>
-            {CHART_MONTHS.map(m=><option key={m} value={m}>{m} 2026</option>)}
-          </select>
-        ):<Badge color="rgba(99,102,241,0.09)" text="#4338ca">{selectedMonth} 2026</Badge>}
-      </div>
-
-      {/* KPI cards */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12}}>
-        {[
-          {l:"Income",  v:fmt(data.income),   c:DS.color.mint,   bg:DS.color.mintLight,    icon:"↑"},
-          {l:"Expenses",v:fmt(data.expenses), c:"#ef4444",       bg:"rgba(239,68,68,0.08)", icon:"↓"},
-          {l:"Savings", v:fmt(savings),        c:DS.color.purple, bg:DS.color.purpleLight,  icon:`${savingsPct}%`},
-        ].map(m=>(
-          <div key={m.l} style={{
-            background:m.bg,borderRadius:DS.radius.lg,padding:"10px 8px",
-            border:"1px solid rgba(255,255,255,0.80)",
-            animation:animated?"countUp 0.4s ease":"none",
-          }}>
-            <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:DS.radius.sm,background:"rgba(255,255,255,0.60)",marginBottom:5}}>
-              <span style={{fontSize:9,fontWeight:800,color:m.c}}>{m.icon}</span>
-            </div>
-            <div style={{fontSize:9,color:DS.color.slateLight,fontWeight:600}}>{m.l}</div>
-            <div style={{fontFamily:DS.font.number,fontSize:13,fontWeight:900,color:m.c,marginTop:1}}>{m.v}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bar chart */}
-      <div style={{background:"rgba(255,255,255,0.65)",borderRadius:DS.radius.lg,padding:"12px 10px",marginBottom:10,border:"1px solid rgba(255,255,255,0.80)"}}>
-        <div style={{fontSize:9,fontWeight:700,color:DS.color.slateLight,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Income vs Expenses · All Months</div>
-        <div style={{display:"flex",alignItems:"flex-end",gap:3,height:68}}>
-          {CHART_MONTHS.map(m=>{
-            const d=MONTH_DATA[m]; const maxV=75000;
-            const iH=animated?`${(d.income/maxV)*68}px`:"0";
-            const eH=animated?`${(d.expenses/maxV)*68}px`:"0";
-            const sel=m===selectedMonth;
-            return (
-              <div key={m} style={{flex:1,display:"flex",gap:1.5,alignItems:"flex-end",cursor:"pointer"}} onClick={()=>onMonthChange&&onMonthChange(m)}>
-                <div style={{flex:1,background:sel?DS.color.mint:`${DS.color.mint}44`,borderRadius:"2px 2px 0 0",height:iH,transition:`height 0.5s ${DS.ease.spring}`,minHeight:2}}/>
-                <div style={{flex:1,background:sel?"#ef4444":"rgba(239,68,68,0.35)",borderRadius:"2px 2px 0 0",height:eH,transition:`height 0.5s ${DS.ease.spring} 0.08s`,minHeight:2}}/>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{display:"flex",gap:4,marginTop:5}}>
-          {CHART_MONTHS.map(m=>(
-            <div key={m} style={{flex:1,fontSize:7,color:m===selectedMonth?DS.color.mintText:DS.color.slateLight,textAlign:"center",fontWeight:m===selectedMonth?800:400}}>{m}</div>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:10,marginTop:6}}>
-          {[{c:DS.color.mint,l:"Income"},{c:"#ef4444",l:"Expenses"}].map(x=>(
-            <div key={x.l} style={{display:"flex",gap:4,alignItems:"center"}}>
-              <div style={{width:7,height:7,borderRadius:1.5,background:x.c}}/><span style={{fontSize:9,color:DS.color.slateLight,fontWeight:600}}>{x.l}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Category breakdown */}
-      <div style={{background:"rgba(255,255,255,0.65)",borderRadius:DS.radius.lg,padding:"12px 10px",border:"1px solid rgba(255,255,255,0.80)"}}>
-        <div style={{fontSize:9,fontWeight:700,color:DS.color.slateLight,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Spending Breakdown</div>
-        <div style={{display:"flex",gap:10,alignItems:"center"}}>
-          <div style={{width:44,height:44,borderRadius:"50%",flexShrink:0,background:`conic-gradient(${data.cats.map((c,i)=>`${CAT_COLORS[i]} ${i===0?0:data.cats.slice(0,i).reduce((a,b)=>a+b.pct,0)}% ${data.cats.slice(0,i+1).reduce((a,b)=>a+b.pct,0)}%`).join(",")})`}}/>
-          <div style={{flex:1,display:"grid",gap:3}}>
-            {data.cats.map((c,i)=>(
-              <div key={c.cat} style={{display:"flex",justifyContent:"space-between"}}>
-                <div style={{display:"flex",gap:5,alignItems:"center"}}>
-                  <div style={{width:6,height:6,borderRadius:1.5,background:CAT_COLORS[i]}}/><span style={{fontSize:9,color:DS.color.slateLight}}>{c.cat}</span>
-                </div>
-                <span style={{fontFamily:DS.font.number,fontSize:9,fontWeight:700,color:DS.color.navy}}>{c.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 });
 
@@ -1127,7 +1001,7 @@ const HomePage = memo(() => {
           <div style={{textAlign:"center",marginBottom:60}}>
             <Badge style={{marginBottom:16}}>Choose Your Plan</Badge>
             <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,lineHeight:1.12,marginBottom:16,letterSpacing:"-0.02em"}}>
-              Feels like a <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>₹999 product.</span><br/>Priced for everyone.
+              Feels like a <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>₹999 premium template.</span><br/>Yours for just ₹49.
             </h2>
             <p style={{color:DS.color.slateLight,fontSize:17,maxWidth:480,margin:"0 auto",lineHeight:1.7}}>Pick the plan that fits your goals. Both include instant download and lifetime access.</p>
           </div>
@@ -1257,7 +1131,7 @@ const HomePage = memo(() => {
           <p style={{color:DS.color.slateLight,fontSize:17,marginBottom:44,lineHeight:1.75}}>Join 5,000+ Indians already using BudgetPro to save more, spend smarter, and stress less about money.</p>
           <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
             <LiquidBtn variant="white" size="lg" onClick={()=>goTo("/checkout?plan=monthly")} style={{minWidth:200,justifyContent:"center"}}>Start Monthly for ₹19</LiquidBtn>
-            <LiquidBtn variant="cta"   size="lg" onClick={()=>goTo("/checkout?plan=yearly")}  style={{minWidth:220,justifyContent:"center",animation:"pulse 2s infinite"}}>Get Full Year for ₹49</LiquidBtn>
+            <LiquidBtn variant="cta"   size="lg" onClick={()=>goTo("/checkout?plan=yearly")}  style={{minWidth:220,justifyContent:"center",animation:"pulse 2s infinite"}}>Download the Annual Budget Template for just ₹49!</LiquidBtn>
           </div>
           <div style={{marginTop:28,color:DS.color.slateLight,fontSize:DS.type.sm}}>🔒 Secure payment · Instant download · 100% satisfaction</div>
         </div>
