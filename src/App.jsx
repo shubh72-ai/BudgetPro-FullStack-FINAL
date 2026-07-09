@@ -3,6 +3,9 @@ import {
   BrowserRouter, Routes, Route, useNavigate,
   useLocation, useSearchParams, Navigate,
 } from "react-router-dom";
+import HeroScrollSequence from "./HeroScrollSequence";
+import monthlyDashboardPreview from "./assets/monthly-dashboard-preview.png";
+import annualDashboardPreview from "./assets/annual-dashboard-preview.png";
 
 // ═══════════════════════════════════════════════════════════════════
 //  DESIGN SYSTEM — Luxury Liquid Glass / Apple-inspired white SaaS
@@ -193,6 +196,8 @@ const GlobalStyles = () => (
       position: relative;
       overflow: hidden;
       isolation: isolate;
+      transform: translateZ(0);
+      transform-style: preserve-3d;
       transition: all 0.22s ${DS.ease.smooth};
     }
     .premium-btn::before {
@@ -200,7 +205,12 @@ const GlobalStyles = () => (
       position: absolute;
       inset: 1px;
       border-radius: inherit;
-      background: linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0.08) 42%, rgba(255,255,255,0));
+      background:
+        radial-gradient(circle at 24% 18%, rgba(255,255,255,0.70), rgba(255,255,255,0.18) 24%, rgba(255,255,255,0) 48%),
+        linear-gradient(180deg, rgba(255,255,255,0.46), rgba(255,255,255,0.12) 42%, rgba(255,255,255,0));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.75),
+        inset 0 -10px 22px rgba(67,56,202,0.10);
       pointer-events: none;
       z-index: 1;
     }
@@ -217,8 +227,382 @@ const GlobalStyles = () => (
     }
     .premium-btn > * { position: relative; z-index: 3; }
     .premium-btn:hover::after { opacity: 1; animation: shine 0.75s ${DS.ease.out}; }
-    .premium-btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
-    .premium-btn:active { transform: translateY(0); filter: brightness(0.98); }
+    .premium-btn:hover {
+      transform: translateY(-3px) scale(1.012);
+      filter: brightness(1.055);
+      box-shadow:
+        0 18px 42px rgba(79,70,229,0.24),
+        0 7px 18px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.62) !important;
+    }
+    .premium-btn:active { transform: translateY(1px) scale(0.992); filter: brightness(0.98); }
+
+    .glass-nav-shell,
+    .glass-segment {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 24% 12%, rgba(255,255,255,0.98), rgba(255,255,255,0.30) 34%, rgba(255,255,255,0) 62%),
+        linear-gradient(145deg, rgba(255,255,255,0.80), rgba(219,234,254,0.50) 48%, rgba(237,233,254,0.62)) !important;
+      border: 1px solid rgba(255,255,255,0.82) !important;
+      border-top-color: rgba(255,255,255,0.96) !important;
+      box-shadow:
+        0 20px 42px rgba(79,70,229,0.18),
+        0 8px 18px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.94),
+        inset 0 -14px 30px rgba(99,102,241,0.10) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      transform: perspective(800px) rotateX(2deg) translateZ(0);
+      transform-style: preserve-3d;
+    }
+    .glass-nav-shell::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.64), rgba(255,255,255,0.08) 56%, rgba(99,102,241,0.08));
+      pointer-events: none;
+    }
+    .glass-nav-shell > * {
+      position: relative;
+      z-index: 1;
+    }
+    .glass-segment {
+      padding: 5px !important;
+      border-radius: ${DS.radius["2xl"]} !important;
+    }
+    .glass-segment-btn,
+    .glass-tab-btn {
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.46) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.72),
+        0 7px 18px rgba(79,70,229,0.09) !important;
+      backdrop-filter: blur(14px) saturate(165%);
+      -webkit-backdrop-filter: blur(14px) saturate(165%);
+    }
+    .plan-segment-btn {
+      min-width: 0;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      gap: 10px !important;
+    }
+    .plan-segment-btn .plan-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .plan-segment-btn .plan-badge {
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+    .checkout-glass-card {
+      background:
+        radial-gradient(circle at 22% 8%, rgba(255,255,255,0.98), rgba(255,255,255,0.34) 35%, rgba(255,255,255,0) 62%),
+        linear-gradient(145deg, rgba(255,255,255,0.78), rgba(219,234,254,0.42) 52%, rgba(237,233,254,0.54)) !important;
+      border: 1px solid rgba(255,255,255,0.80) !important;
+      border-top-color: rgba(255,255,255,0.98) !important;
+      box-shadow:
+        0 28px 72px rgba(99,102,241,0.15),
+        0 10px 24px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.94),
+        inset 0 -18px 36px rgba(99,102,241,0.07) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    }
+    .checkout-glass-button {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 24% 14%, rgba(255,255,255,0.95), rgba(255,255,255,0.30) 35%, rgba(255,255,255,0) 60%),
+        linear-gradient(145deg, rgba(255,255,255,0.82), rgba(219,234,254,0.46), rgba(237,233,254,0.56)) !important;
+      border: 1px solid rgba(255,255,255,0.78) !important;
+      border-top-color: rgba(255,255,255,0.98) !important;
+      box-shadow:
+        0 14px 32px rgba(99,102,241,0.13),
+        0 5px 14px rgba(15,23,42,0.07),
+        inset 0 1px 0 rgba(255,255,255,0.90),
+        inset 0 -12px 24px rgba(99,102,241,0.08) !important;
+      backdrop-filter: blur(18px) saturate(175%);
+      -webkit-backdrop-filter: blur(18px) saturate(175%);
+    }
+    .checkout-glass-button.active {
+      color: #ffffff !important;
+      background:
+        radial-gradient(circle at 28% 12%, rgba(255,255,255,0.82), rgba(255,255,255,0.18) 34%, rgba(255,255,255,0) 58%),
+        linear-gradient(135deg, rgba(37,99,235,0.94), rgba(79,70,229,0.94) 48%, rgba(124,58,237,0.94)) !important;
+      border-color: rgba(255,255,255,0.66) !important;
+      box-shadow:
+        0 18px 40px rgba(79,70,229,0.30),
+        0 7px 18px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.64),
+        inset 0 -14px 26px rgba(67,56,202,0.20) !important;
+    }
+    .upi-symbol {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.74),
+        0 6px 12px rgba(79,70,229,0.14);
+      flex: 0 0 auto;
+    }
+    .upi-symbol.googlepay {
+      color: #ffffff;
+      background: conic-gradient(from 30deg, #4285f4, #34a853, #fbbc05, #ea4335, #4285f4);
+    }
+    .upi-symbol.phonepe { color: #ffffff; background: linear-gradient(135deg, #5f259f, #7c3aed); }
+    .upi-symbol.paytm { color: #ffffff; background: linear-gradient(135deg, #00baf2, #002970); }
+    .upi-symbol.bhim { color: #ffffff; background: linear-gradient(135deg, #f97316, #16a34a); }
+    .glass-trust-card {
+      background:
+        radial-gradient(circle at 26% 18%, rgba(255,255,255,0.90), rgba(255,255,255,0.30) 32%, rgba(255,255,255,0) 60%),
+        linear-gradient(145deg, rgba(255,255,255,0.76), rgba(219,234,254,0.46) 52%, rgba(237,233,254,0.58)) !important;
+      border: 1px solid rgba(255,255,255,0.78) !important;
+      border-top-color: rgba(255,255,255,0.98) !important;
+      box-shadow:
+        0 16px 34px rgba(99,102,241,0.16),
+        0 5px 14px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.92),
+        inset 0 -14px 24px rgba(59,130,246,0.08) !important;
+      transform: translateZ(0);
+      transition: all 0.24s ${DS.ease.smooth};
+    }
+    .glass-trust-card:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 22px 44px rgba(99,102,241,0.20),
+        0 7px 18px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.96) !important;
+    }
+    .product-preview-shell {
+      position: relative;
+      transform-style: preserve-3d;
+      transform: perspective(1100px) rotateX(2.2deg) rotateY(-3deg) translateZ(0);
+      transition: transform 0.35s ${DS.ease.smooth}, box-shadow 0.35s ${DS.ease.smooth};
+    }
+    .product-preview-shell::before {
+      content: "";
+      position: absolute;
+      inset: -18px;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 32% 8%, rgba(255,255,255,0.72), rgba(255,255,255,0) 34%),
+        radial-gradient(circle at 70% 88%, rgba(139,92,246,0.24), rgba(139,92,246,0) 52%);
+      filter: blur(1px);
+      opacity: 0.62;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .product-preview-shell:hover {
+      transform: perspective(1100px) rotateX(3.2deg) rotateY(-4.4deg) translateY(-7px) !important;
+      box-shadow:
+        0 42px 110px rgba(79,70,229,0.26),
+        0 18px 42px rgba(15,23,42,0.14),
+        inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    }
+    .product-preview-image-wrap {
+      position: relative;
+      z-index: 1;
+      transform: translateZ(34px);
+      transform-style: preserve-3d;
+      isolation: isolate;
+      background: #ffffff !important;
+      contain: paint;
+    }
+    .product-preview-hd {
+      box-shadow:
+        0 28px 70px rgba(67,56,202,0.15),
+        0 10px 24px rgba(15,23,42,0.08),
+        inset 0 0 0 1px rgba(255,255,255,0.92),
+        inset 0 -18px 34px rgba(79,70,229,0.035) !important;
+    }
+    .product-preview-hd::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.84),
+        inset 0 1px 0 rgba(255,255,255,0.92);
+      z-index: 2;
+    }
+    .product-preview-image-wrap img {
+      transform: translateZ(0) scale(1);
+      transform-origin: center;
+      filter:
+        contrast(1.36)
+        saturate(1.24)
+        brightness(0.955)
+        drop-shadow(0 10px 16px rgba(67,56,202,0.10));
+      image-rendering: auto;
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .dashboard-image-hd {
+      image-rendering: -webkit-optimize-contrast;
+      outline: 1px solid transparent;
+      will-change: filter;
+    }
+    .brand-wordmark-3d {
+      display: inline-flex;
+      align-items: baseline;
+      color: ${DS.color.navy} !important;
+      letter-spacing: 0 !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.96),
+        0 3px 0 rgba(99,102,241,0.10),
+        0 10px 22px rgba(15,23,42,0.18),
+        0 18px 36px rgba(79,70,229,0.16);
+      transform: perspective(600px) rotateX(1.4deg);
+      filter: drop-shadow(0 10px 16px rgba(99,102,241,0.12));
+    }
+    .brand-wordmark-3d span {
+      filter: drop-shadow(0 8px 12px rgba(99,102,241,0.20));
+    }
+    .brand-pro-outline {
+      display: inline-block;
+      -webkit-text-stroke: 0.95px rgba(49,46,129,0.96);
+      paint-order: stroke fill;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,1),
+        0 0 1px rgba(37,99,235,0.34),
+        0 3px 0 rgba(99,102,241,0.18),
+        0 9px 16px rgba(79,70,229,0.28);
+      filter:
+        drop-shadow(0 3px 5px rgba(37,99,235,0.32))
+        drop-shadow(0 7px 12px rgba(67,56,202,0.22));
+    }
+    .product-media-glass-panel {
+      padding: 18px;
+      border-radius: ${DS.radius["3xl"]};
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.50), rgba(219,234,254,0.24) 48%, rgba(237,233,254,0.36));
+      border: 1px solid rgba(255,255,255,0.64);
+      box-shadow:
+        0 28px 72px rgba(99,102,241,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.82);
+      backdrop-filter: blur(20px) saturate(170%);
+      -webkit-backdrop-filter: blur(20px) saturate(170%);
+      transform-style: preserve-3d;
+    }
+    .dashboard-demo-3d {
+      position: relative;
+      transform-style: preserve-3d;
+      animation: none !important;
+      transform: none !important;
+      will-change: auto;
+    }
+    .dashboard-demo-3d::before {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      border-radius: inherit;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.52), rgba(219,234,254,0.18), rgba(237,233,254,0.34));
+      box-shadow:
+        0 42px 120px rgba(79,70,229,0.24),
+        0 16px 44px rgba(15,23,42,0.12);
+      transform: translateZ(-28px);
+      pointer-events: none;
+      z-index: -1;
+      display: none;
+    }
+    .dashboard-demo-frame {
+      transform: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.96),
+        0 26px 72px rgba(67,56,202,0.18) !important;
+    }
+    .dashboard-demo-frame img {
+      transform: none !important;
+      filter: contrast(1.07) saturate(1.05) brightness(1.02);
+      image-rendering: auto;
+      backface-visibility: hidden;
+    }
+    .reviews-heading-premium {
+      font-family: 'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-weight: 900 !important;
+      letter-spacing: 0 !important;
+      line-height: 1.02 !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.95),
+        0 8px 22px rgba(15,23,42,0.10),
+        0 18px 42px rgba(99,102,241,0.12);
+    }
+    @keyframes dashboardFloat3d {
+      0%, 100% { transform: perspective(1200px) rotateX(2deg) rotateY(-3deg) translateY(0); }
+      50% { transform: perspective(1200px) rotateX(3.4deg) rotateY(-4.2deg) translateY(-12px); }
+    }
+    .text-3d-heading {
+      color: #0f172a !important;
+      letter-spacing: 0 !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.95),
+        0 3px 0 rgba(99,102,241,0.10),
+        0 12px 26px rgba(15,23,42,0.18),
+        0 24px 48px rgba(79,70,229,0.16);
+      transform: perspective(900px) rotateX(1.2deg);
+      transform-origin: left center;
+      filter: drop-shadow(0 14px 22px rgba(99,102,241,0.10));
+    }
+    .product-title-premium {
+      font-family: 'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-weight: 700 !important;
+      line-height: 1.02 !important;
+      letter-spacing: 0 !important;
+      color: #0b1222 !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.98),
+        0 8px 18px rgba(15,23,42,0.11),
+        0 20px 46px rgba(79,70,229,0.14) !important;
+      transform: none !important;
+      filter: none !important;
+    }
+    .product-title-premium .product-title-line {
+      display: block;
+    }
+    .product-title-premium .product-title-accent {
+      display: block;
+      background: linear-gradient(90deg, #111827 0%, #1d4ed8 54%, #6d28d9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+      filter: drop-shadow(0 12px 22px rgba(79,70,229,0.16));
+    }
+    .pricing-cta-glass {
+      background:
+        radial-gradient(circle at 24% 12%, rgba(255,255,255,0.90), rgba(255,255,255,0.18) 36%, rgba(255,255,255,0) 60%),
+        linear-gradient(145deg, rgba(255,255,255,0.88), rgba(237,233,254,0.78) 48%, rgba(196,181,253,0.42)) !important;
+      color: #4c1d95 !important;
+      border: 1.5px solid rgba(124,58,237,0.32) !important;
+      box-shadow:
+        0 20px 48px rgba(124,58,237,0.20),
+        0 8px 20px rgba(15,23,42,0.09),
+        inset 0 1px 0 rgba(255,255,255,0.96),
+        inset 0 -16px 28px rgba(124,58,237,0.13) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    }
+    .pricing-cta-glass:hover {
+      color: #3b0764 !important;
+      box-shadow:
+        0 26px 58px rgba(124,58,237,0.24),
+        0 10px 24px rgba(15,23,42,0.11),
+        inset 0 1px 0 rgba(255,255,255,0.98),
+        inset 0 -16px 28px rgba(124,58,237,0.15) !important;
+    }
 
     /* ── Liquid glass bubble — soft floating orb, sits behind content ── */
     .glass-bubble {
@@ -248,9 +632,105 @@ const GlobalStyles = () => (
     .card-lift:hover { transform: translateY(-4px); box-shadow: ${DS.shadow.glassLg} !important; }
 
     /* ── Nav item ── */
-    .nav-item { transition: all 0.18s ${DS.ease.smooth}; border-radius: ${DS.radius.pill} !important; }
-    .nav-item:hover { background: rgba(99,102,241,0.07) !important; color: ${DS.color.navyMid} !important; }
-    .nav-item.active { background: rgba(59,130,246,0.10) !important; color: ${DS.color.mintText} !important; font-weight: 700 !important; }
+    .nav-item {
+      transition: all 0.18s ${DS.ease.smooth};
+      border-radius: ${DS.radius.pill} !important;
+      position: relative;
+      z-index: 1;
+      transform: translateZ(8px);
+      text-shadow: 0 1px 0 rgba(255,255,255,0.78);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.54),
+        0 5px 12px rgba(79,70,229,0.06);
+    }
+    .nav-item:hover {
+      background: linear-gradient(145deg, rgba(255,255,255,0.76), rgba(219,234,254,0.46)) !important;
+      color: ${DS.color.navyMid} !important;
+      border-color: rgba(255,255,255,0.62) !important;
+      transform: translateY(-1px) translateZ(16px);
+      box-shadow: 0 12px 22px rgba(99,102,241,0.14), inset 0 1px 0 rgba(255,255,255,0.80) !important;
+    }
+    .nav-item.active {
+      background: linear-gradient(145deg, rgba(219,234,254,0.86), rgba(237,233,254,0.78)) !important;
+      color: ${DS.color.mintText} !important;
+      font-weight: 700 !important;
+      border-color: rgba(255,255,255,0.72) !important;
+      transform: translateY(-1px) translateZ(20px);
+      box-shadow:
+        0 14px 28px rgba(99,102,241,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.86),
+        inset 0 -10px 20px rgba(99,102,241,0.08) !important;
+    }
+    nav .premium-btn {
+      box-shadow:
+        0 16px 38px rgba(99,102,241,0.22),
+        0 6px 16px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.68),
+        inset 0 -12px 24px rgba(99,102,241,0.09) !important;
+    }
+    .nav-year-cta {
+      color: #ffffff !important;
+      font-weight: 900 !important;
+      letter-spacing: 0 !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.22),
+        0 2px 8px rgba(30,64,175,0.34);
+      border: 1px solid rgba(255,255,255,0.62) !important;
+      background:
+        radial-gradient(circle at 28% 10%, rgba(255,255,255,0.86), rgba(255,255,255,0.12) 34%, rgba(255,255,255,0) 56%),
+        linear-gradient(135deg, #2563eb 0%, #4f46e5 42%, #8b5cf6 72%, #a855f7 100%) !important;
+      box-shadow:
+        0 18px 38px rgba(79,70,229,0.34),
+        0 7px 18px rgba(15,23,42,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.70),
+        inset 0 -14px 26px rgba(59,130,246,0.24) !important;
+    }
+    .nav-orb-btn {
+      width: 42px;
+      height: 42px;
+      justify-content: center;
+      color: #4338ca !important;
+      border: 1px solid rgba(255,255,255,0.84) !important;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.98), rgba(255,255,255,0.42) 32%, rgba(255,255,255,0) 58%),
+        linear-gradient(145deg, rgba(239,246,255,0.96), rgba(224,231,255,0.78), rgba(237,233,254,0.72)) !important;
+      box-shadow:
+        0 15px 32px rgba(79,70,229,0.18),
+        0 5px 14px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.92),
+        inset 0 -10px 20px rgba(99,102,241,0.10) !important;
+    }
+    .nav-orb-btn svg {
+      filter: drop-shadow(0 3px 6px rgba(67,56,202,0.24));
+    }
+    .pricing-card-kicker {
+      color: #4338ca !important;
+      font-weight: 900 !important;
+      letter-spacing: 0 !important;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.90), 0 8px 18px rgba(99,102,241,0.12);
+    }
+    .pricing-title-gradient {
+      color: #111827;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.95), 0 12px 26px rgba(30,64,175,0.13);
+    }
+    .pricing-title-gradient.hot {
+      background: linear-gradient(135deg, #1d4ed8 0%, #4f46e5 44%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+    .pricing-desc-vivid {
+      color: #334155 !important;
+      font-weight: 700 !important;
+    }
+    .pricing-price-vivid {
+      color: #0f172a !important;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.95),
+        0 12px 26px rgba(15,23,42,0.13),
+        0 22px 44px rgba(79,70,229,0.14);
+    }
 
     /* ── Skeleton ── */
     .skeleton {
@@ -276,6 +756,29 @@ const GlobalStyles = () => (
     ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.18); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.32); }
 
+    /* ── Frame-sequence scroll hero ── */
+    .hero-scroll-section {
+      position: relative;
+      height: 300vh;
+      background: ${DS.grad.hero};
+    }
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding-top: 90px;
+      padding-bottom: 56px;
+    }
+    .frame-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
     /* ── Responsive — preview stays visible down to mobile, only decorative bubbles fade ── */
     @media (max-width: 1024px) {
       .hero-grid { flex-direction: column !important; }
@@ -296,6 +799,22 @@ const GlobalStyles = () => (
       .mobile-nav-btn { display: flex !important; }
       .hero-cta-row   { flex-direction: column !important; }
       .hero-cta-row button, .hero-cta-row > div { width: 100% !important; }
+      .hero-scroll-section { height: auto !important; }
+      .hero-sticky {
+        position: relative !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding-top: 88px !important;
+        padding-bottom: 54px !important;
+        overflow: visible !important;
+      }
+      .hero-dashboard-shell {
+        padding: 0 !important;
+        border-radius: 28px !important;
+      }
+      .hero-dashboard-frame {
+        border-radius: 24px !important;
+      }
     }
     @media (max-width: 640px) {
       .hero-right { transform: none !important; }
@@ -308,6 +827,8 @@ const GlobalStyles = () => (
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
       .glass-bubble { animation: none !important; }
+      .hero-scroll-section { height: auto !important; }
+      .hero-sticky { position: relative !important; top: auto !important; height: auto !important; min-height: 92vh; }
     }
   `}</style>
 );
@@ -415,8 +936,8 @@ const Icon = memo(({ name, size=20, color="currentColor", style={}, filled=false
 // ═══════════════════════════════════════════════════════════════════
 
 // Badge
-const Badge = memo(({ children, color="rgba(99,102,241,0.10)", text="#4338ca", style={} }) => (
-  <span style={{
+const Badge = memo(({ children, color="rgba(99,102,241,0.10)", text="#4338ca", style={}, className="" }) => (
+  <span className={className} style={{
     background:color, color:text,
     borderRadius:DS.radius.pill,
     padding:"5px 14px",
@@ -437,22 +958,22 @@ const Divider = ({ style={} }) => (
 const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={}, disabled=false, className="" }) => {
   const variants = {
     cta: {
-      background: DS.grad.cta,
+      background: "linear-gradient(135deg, rgba(59,130,246,0.94) 0%, rgba(99,102,241,0.94) 48%, rgba(139,92,246,0.94) 100%)",
       color: "#fff",
-      border: "none",
-      boxShadow: "0 16px 38px rgba(99,102,241,0.36), inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -10px 18px rgba(29,78,216,0.18)",
+      border: "1px solid rgba(255,255,255,0.38)",
+      boxShadow: "0 18px 42px rgba(99,102,241,0.34), 0 7px 16px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -12px 22px rgba(29,78,216,0.18)",
     },
     white: {
-      background: "rgba(255,255,255,0.88)",
+      background: "linear-gradient(145deg, rgba(255,255,255,0.92), rgba(239,246,255,0.74) 48%, rgba(237,233,254,0.58))",
       color: DS.color.navy,
-      border: "1.5px solid rgba(15,23,42,0.10)",
-      boxShadow: DS.shadow.glass,
+      border: "1px solid rgba(255,255,255,0.78)",
+      boxShadow: "0 14px 34px rgba(99,102,241,0.14), 0 5px 14px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.88), inset 0 -12px 24px rgba(99,102,241,0.07)",
     },
     outline: {
-      background: "rgba(255,255,255,0.70)",
-      color: DS.color.mintText,
-      border: `1.5px solid rgba(99,102,241,0.22)`,
-      boxShadow: DS.shadow.sm,
+      background: "linear-gradient(145deg, rgba(255,255,255,0.78), rgba(237,233,254,0.58))",
+      color: "#4f46e5",
+      border: `1px solid rgba(139,92,246,0.30)`,
+      boxShadow: "0 14px 30px rgba(99,102,241,0.13), 0 4px 12px rgba(15,23,42,0.07), inset 0 1px 0 rgba(255,255,255,0.82)",
     },
     ghost: {
       background: "transparent",
@@ -467,10 +988,10 @@ const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={},
       boxShadow: "0 4px 14px rgba(239,68,68,0.30)",
     },
     premium: {
-      background: DS.grad.premium,
+      background: "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(139,92,246,0.96), rgba(168,85,247,0.94))",
       color: "#fff",
-      border: "none",
-      boxShadow: "0 6px 24px rgba(139,92,246,0.38), inset 0 1px 0 rgba(255,255,255,0.22)",
+      border: "1px solid rgba(255,255,255,0.34)",
+      boxShadow: "0 18px 44px rgba(139,92,246,0.34), 0 7px 18px rgba(15,23,42,0.10), inset 0 1px 0 rgba(255,255,255,0.44), inset 0 -12px 24px rgba(67,56,202,0.20)",
     },
   };
   const sizes = {
@@ -508,13 +1029,27 @@ const LiquidBtn = memo(({ children, onClick, variant="cta", size="md", style={},
 //  Place monthly-dashboard-preview.png and annual-dashboard-preview.png
 //  in /public. Real image ratio is 1536×1024 (3:2) for both files.
 // ═══════════════════════════════════════════════════════════════════
-const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "contain", position = "center top" }) => {
+const DASHBOARD_PREVIEWS = {
+  monthly: {
+    src: monthlyDashboardPreview,
+    label: "monthly-dashboard-preview.png",
+    alt: "Monthly budget tracker dashboard preview - income, expenses, savings and category breakdown",
+    title: "Monthly Dashboard Preview",
+  },
+  annual: {
+    src: annualDashboardPreview,
+    label: "annual-dashboard-preview.png",
+    alt: "Annual expenses dashboard preview - 12-month income, expenses, savings and debt overview",
+    title: "Annual Dashboard Preview",
+  },
+};
+
+const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "contain", position = "center top", className = "", style = {} }) => {
   const [errored, setErrored] = useState(false);
-  const src = type === "annual" ? "/annual-dashboard-preview.png" : "/monthly-dashboard-preview.png";
-  const label = type === "annual" ? "annual-dashboard-preview.png" : "monthly-dashboard-preview.png";
-  const alt = type === "annual"
-    ? "Annual expenses dashboard preview — 12-month income, expenses, savings and debt overview"
-    : "Monthly budget tracker dashboard preview — income, expenses, savings and category breakdown";
+  const preview = DASHBOARD_PREVIEWS[type] || DASHBOARD_PREVIEWS.monthly;
+  const src = preview.src;
+  const label = preview.label;
+  const alt = preview.alt;
 
   if (errored) {
     return (
@@ -526,20 +1061,30 @@ const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "conta
         color:DS.color.slateLight,lineHeight:1.6,flexDirection:"column",gap:8,
       }}>
         <span style={{fontSize:32}}>{type==="annual"?"📈":"📊"}</span>
-        <span>Add <code style={{background:"#fff",padding:"2px 6px",borderRadius:6,border:"1px solid #e2e8f0"}}>{label}</code> to /public</span>
+        <span>Could not load <code style={{background:"#fff",padding:"2px 6px",borderRadius:6,border:"1px solid #e2e8f0"}}>{label}</code></span>
       </div>
     );
   }
   return (
     <img
+      className={className || undefined}
       src={src}
       alt={alt}
       loading={loading}
+      decoding="async"
+      fetchPriority={loading === "eager" ? "high" : "auto"}
       onError={()=>setErrored(true)}
-      style={{ width:"100%", height:"100%", objectFit:fit, objectPosition:position, display:"block" }}
+      style={{ width:"100%", height:"100%", objectFit:fit, objectPosition:position, display:"block", imageRendering:"auto", ...style }}
     />
   );
 });
+
+// Kept as a thin backward-compatible alias — some older sections below
+// referenced TrackerScreenshot directly; both names now point to the
+// same real-image component so nothing breaks if either name is used.
+const TrackerScreenshot = memo(({ fit="contain", position="top" }) => (
+  <DashboardImage type="monthly" loading="eager" fit={fit} position={position} />
+));
 
 // ═══════════════════════════════════════════════════════════════════
 //  GLASS BUBBLE — decorative liquid glass orb, sits behind content
@@ -549,20 +1094,352 @@ const GlassBubble = memo(({ style = {}, size = 120 }) => (
 ));
 
 // ═══════════════════════════════════════════════════════════════════
+//  FRAME SEQUENCE HERO — Apple-style scroll-scrub canvas animation
+//  Reads 240 PNG frames from /public/frames/frame_0001.png..frame_0240.png
+//  (1280×720 source). Desktop: scroll-driven via the .hero-scroll-section
+//  wrapper (see HeroSection below). Mobile / prefers-reduced-motion:
+//  loads a single static frame instead of the full 240-image sequence —
+//  this is the explicitly-allowed lightweight fallback, and it matters
+//  here because the full frame set is ~154MB uncompressed (see the
+//  perf note in the final written summary).
+// ═══════════════════════════════════════════════════════════════════
+const FRAME_COUNT = 240;
+const FRAME_ASPECT = 1280 / 720;
+const DEBUG_FRAMES = false;
+// Frames were converted from the original 240 PNGs (154MB total, ~657KB/frame)
+// to WebP quality 80 at the same 1280×720 resolution (9.1MB total, ~38KB/frame)
+// — a 94% size reduction with no visible quality loss on this UI-screenshot
+// content. WebP has full support across all modern browsers. PNG fallback is
+// kept so the hero still works if a deployment has the original frame set.
+const getFrameSrc = (frameNumber) => `/frames/frame_${String(frameNumber).padStart(4, "0")}.webp`;
+
+const FrameSequenceHero = memo(() => {
+  const canvasRef = useRef(null);
+  const imagesRef = useRef([]);        // Image() objects, index 0 = frame_0001
+  const currentFrameRef = useRef(0);   // last successfully drawn frame index (0-based)
+  const desiredFrameRef = useRef(0);   // frame requested by scroll, even if not loaded yet
+  const hasDrawnRef = useRef(false);
+  const loadedCountRef = useRef(0);
+  const scrollRafRef = useRef(null);
+  const [frameUi, setFrameUi] = useState({
+    status: "loading",
+    currentFrame: 1,
+    loadedCount: 0,
+    path: getFrameSrc(1),
+    error: "",
+  });
+  const [lightMode, setLightMode] = useState(false); // mobile / reduced-motion: static frame only
+
+  // Draw a given 0-based frame index onto the canvas, contain-fit, DPR-sharp.
+  const drawFrame = useCallback((index) => {
+    const canvas = canvasRef.current;
+    const img = imagesRef.current[index];
+    if (!canvas || !img || !img.complete || img.naturalWidth === 0) return false;
+
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
+    if (displayWidth === 0 || displayHeight === 0) return false;
+
+    const dpr = window.devicePixelRatio || 1;
+    const targetW = Math.round(displayWidth * dpr);
+    const targetH = Math.round(displayHeight * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+    const scale = Math.min(displayWidth / img.naturalWidth, displayHeight / img.naturalHeight);
+    const drawWidth = img.naturalWidth * scale;
+    const drawHeight = img.naturalHeight * scale;
+    const x = (displayWidth - drawWidth) / 2;
+    const y = (displayHeight - drawHeight) / 2;
+    ctx.drawImage(img, x, y, drawWidth, drawHeight);
+
+    const wasWaitingForFirstDraw = !hasDrawnRef.current;
+    currentFrameRef.current = index;
+    hasDrawnRef.current = true;
+    if (wasWaitingForFirstDraw || DEBUG_FRAMES) {
+      setFrameUi({
+        status: "ready",
+        currentFrame: index + 1,
+        loadedCount: loadedCountRef.current,
+        path: getFrameSrc(index + 1),
+        error: "",
+      });
+    }
+    window.__budgetProFrameStats = {
+      frame: index + 1,
+      loaded: loadedCountRef.current,
+      total: FRAME_COUNT,
+      path: getFrameSrc(index + 1),
+    };
+    return true;
+  }, []);
+
+  const drawNearestLoadedFrame = useCallback((targetIndex) => {
+    if (drawFrame(targetIndex)) return true;
+
+    for (let distance = 1; distance < FRAME_COUNT; distance += 1) {
+      const before = targetIndex - distance;
+      const after = targetIndex + distance;
+      if (before >= 0 && drawFrame(before)) return true;
+      if (after < FRAME_COUNT && drawFrame(after)) return true;
+    }
+    return false;
+  }, [drawFrame]);
+
+  const drawRequestedFrame = useCallback((index) => {
+    desiredFrameRef.current = Math.max(0, Math.min(FRAME_COUNT - 1, index));
+    if (drawFrame(desiredFrameRef.current)) return;
+
+    drawNearestLoadedFrame(desiredFrameRef.current);
+  }, [drawFrame, drawNearestLoadedFrame]);
+
+  // Compute scroll progress (0..1) from the .hero-scroll-section ancestor
+  // and draw the matching frame. rAF-throttled, no React state per scroll tick.
+  const handleScroll = useCallback(() => {
+    if (scrollRafRef.current) return;
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null;
+      const canvas = canvasRef.current;
+      const section = canvas && canvas.closest(".hero-scroll-section");
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const scrollableDistance = section.offsetHeight - window.innerHeight;
+      let progress = scrollableDistance > 0 ? -rect.top / scrollableDistance : 0;
+      progress = Math.max(0, Math.min(1, progress));
+
+      const frameNumber = Math.min(
+        FRAME_COUNT,
+        Math.max(1, Math.floor(progress * (FRAME_COUNT - 1)) + 1)
+      );
+      drawRequestedFrame(frameNumber - 1);
+    });
+  }, [drawRequestedFrame]);
+
+  // Mount: decide light vs full mode, preload frames accordingly.
+  useEffect(() => {
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+    const useLight = reduced || mobile;
+    setLightMode(useLight);
+
+    let cancelled = false;
+    let preloadTimer = null;
+    imagesRef.current = new Array(FRAME_COUNT);
+    loadedCountRef.current = 0;
+    currentFrameRef.current = 0;
+    desiredFrameRef.current = 0;
+    hasDrawnRef.current = false;
+    setFrameUi({
+      status: "loading",
+      currentFrame: 1,
+      loadedCount: 0,
+      path: getFrameSrc(1),
+      error: "",
+    });
+    window.__budgetProFrameStats = {
+      frame: 1,
+      loaded: 0,
+      total: FRAME_COUNT,
+      path: getFrameSrc(1),
+    };
+    if (DEBUG_FRAMES) {
+      console.log("Frame test:", getFrameSrc(1), getFrameSrc(120), getFrameSrc(240));
+    }
+
+    const loadFrameImage = (index) => {
+      const existing = imagesRef.current[index];
+      if (existing?.complete && existing?.naturalWidth) return existing;
+
+      const frameNumber = index + 1;
+      const img = new Image();
+      img.decoding = "async";
+
+      img.onload = () => {
+        if (cancelled) return;
+        imagesRef.current[index] = img;
+        if (!img.__budgetProLoaded) {
+          img.__budgetProLoaded = true;
+          loadedCountRef.current += 1;
+        }
+
+        if (index === desiredFrameRef.current || !hasDrawnRef.current) {
+          drawFrame(index);
+        }
+
+        if (DEBUG_FRAMES) {
+          setFrameUi((prev) => ({
+            ...prev,
+            status: hasDrawnRef.current ? "ready" : "loading",
+            loadedCount: loadedCountRef.current,
+          }));
+        }
+
+        window.__budgetProFrameStats = {
+          frame: currentFrameRef.current + 1,
+          loaded: loadedCountRef.current,
+          total: FRAME_COUNT,
+          path: getFrameSrc(currentFrameRef.current + 1),
+        };
+      };
+
+      img.onerror = () => {
+        const failedUrl = getFrameSrc(frameNumber);
+        console.warn("Frame failed:", failedUrl);
+        if (frameNumber === 1 && !hasDrawnRef.current) {
+          setFrameUi({
+            status: "error",
+            currentFrame: 1,
+            loadedCount: loadedCountRef.current,
+            path: failedUrl,
+            error: `Could not load ${failedUrl}`,
+          });
+        }
+      };
+
+      img.src = getFrameSrc(frameNumber);
+      imagesRef.current[index] = img;
+      return img;
+    };
+
+    if (useLight) {
+      // Lightweight path: load exactly one representative frame (roughly
+      // the midpoint of the sequence, so mobile users see a "filled in"
+      // dashboard rather than the near-empty frame 1) and stop there.
+      const midIndex = Math.floor(FRAME_COUNT / 2);
+      desiredFrameRef.current = midIndex;
+      loadFrameImage(midIndex);
+      return () => {
+        cancelled = true;
+        if (preloadTimer) window.clearTimeout(preloadTimer);
+      };
+    }
+
+    // Full path: preload frame 1 first and draw it immediately as the
+    // fallback, then preload the remaining 239 frames in small batches.
+    // Refs only — never setState per-image, to avoid 240 re-renders.
+    desiredFrameRef.current = 0;
+    loadFrameImage(0);
+
+    let nextIndex = 1;
+    const loadBatch = () => {
+      if (cancelled || nextIndex >= FRAME_COUNT) return;
+
+      const batchEnd = Math.min(FRAME_COUNT, nextIndex + 12);
+      for (; nextIndex < batchEnd; nextIndex += 1) {
+        loadFrameImage(nextIndex);
+      }
+      preloadTimer = window.setTimeout(loadBatch, 24);
+    };
+
+    preloadTimer = window.setTimeout(loadBatch, 80);
+
+    return () => {
+      cancelled = true;
+      if (preloadTimer) window.clearTimeout(preloadTimer);
+      imagesRef.current.forEach((img) => {
+        if (!img) return;
+        img.onload = null;
+        img.onerror = null;
+      });
+    };
+  }, [drawFrame]);
+
+  // Scroll + resize listeners (full mode only).
+  useEffect(() => {
+    if (lightMode) return;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
+    };
+  }, [lightMode, handleScroll]);
+
+  // Redraw current frame on resize in light mode too (keeps canvas sharp
+  // if the user rotates a tablet, etc.)
+  useEffect(() => {
+    if (!lightMode) return;
+    const onResize = () => drawFrame(currentFrameRef.current);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [lightMode, drawFrame]);
+
+  return (
+    <div style={{position:"relative",width:"100%",height:"100%",borderRadius:"inherit",background:"#f8f7ff",overflow:"hidden"}}>
+      <canvas
+        ref={canvasRef}
+        className="frame-canvas"
+        aria-label="Smart Expense Tracker dashboard preview animation"
+        role="img"
+        style={{
+          width: "100%",
+          height: "100%",
+          aspectRatio: String(FRAME_ASPECT),
+          borderRadius: "inherit",
+          background: "#f8f7ff",
+        }}
+      />
+      {frameUi.status === "loading" && (
+        <div style={{
+          position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",
+          background:"linear-gradient(145deg, rgba(248,247,255,0.82), rgba(237,233,254,0.58))",
+          color:DS.color.slate,fontWeight:800,fontSize:13,letterSpacing:0,
+        }}>
+          Loading dashboard frames...
+        </div>
+      )}
+      {frameUi.status === "error" && (
+        <div style={{
+          position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",
+          padding:24,textAlign:"center",background:"#f8f7ff",color:"#b91c1c",
+          fontSize:13,fontWeight:800,lineHeight:1.6,
+        }}>
+          {frameUi.error || "Dashboard frames could not load."}
+        </div>
+      )}
+      {DEBUG_FRAMES && (
+        <div style={{
+          position:"absolute",right:12,bottom:12,zIndex:5,
+          background:"rgba(15,23,42,0.78)",color:"#fff",
+          border:"1px solid rgba(255,255,255,0.22)",
+          borderRadius:12,padding:"8px 10px",
+          fontSize:10,lineHeight:1.5,fontFamily:DS.font.number,
+          backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",
+        }}>
+          <div>Frame: {frameUi.currentFrame} / {FRAME_COUNT}</div>
+          <div>Loaded: {frameUi.loadedCount} / {FRAME_COUNT}</div>
+          <div>Path: {frameUi.path}</div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+// ═══════════════════════════════════════════════════════════════════
 //  HERO SECTION — Luxury Liquid Glass with real tracker image
 // ═══════════════════════════════════════════════════════════════════
+// eslint-disable-next-line no-unused-vars
 const HeroSection = memo(({ onNavigate }) => {
   const goTo = (path) => { onNavigate(path); };
 
   return (
-    <section style={{
-      position:"relative",
+    <section className="hero-scroll-section">
+    <div className="hero-sticky" style={{
       background:DS.grad.hero,
-      padding:"88px 20px 80px",
+      padding:"90px 20px 56px",
       overflow:"hidden",
-      minHeight:"92vh",
-      display:"flex",
-      alignItems:"center",
+      width:"100%",
     }}>
       <CursorParticles />
 
@@ -578,10 +1455,10 @@ const HeroSection = memo(({ onNavigate }) => {
       <GlassBubble size={64}  style={{ top:"8%", right:"26%", animationDelay:"2s" }} />
 
       <div style={{maxWidth:1480,margin:"0 auto",width:"100%",position:"relative",zIndex:3}}>
-        <div className="hero-grid" style={{display:"flex",gap:56,alignItems:"center",justifyContent:"space-between"}}>
+        <div className="hero-grid" style={{display:"flex",gap:48,alignItems:"center",justifyContent:"space-between"}}>
 
           {/* ── LEFT: Copy — ~39% ── */}
-          <div style={{flex:"0 0 39%",display:"flex",flexDirection:"column",gap:24,minWidth:0}}>
+          <div style={{flex:"0 0 40%",display:"flex",flexDirection:"column",gap:24,minWidth:0}}>
             {/* Badges */}
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               <Badge color="rgba(239,68,68,0.10)" text="#dc2626" style={{border:"1px solid rgba(239,68,68,0.18)"}}>
@@ -596,10 +1473,10 @@ const HeroSection = memo(({ onNavigate }) => {
             <div>
               <h1 style={{
                 fontFamily:DS.font.heading,
-                fontSize:"clamp(38px,4.8vw,62px)",
+                fontSize:"clamp(46px,4.6vw,74px)",
                 fontWeight:900,
-                lineHeight:1.08,
-                letterSpacing:"-0.03em",
+                lineHeight:1.04,
+                letterSpacing:0,
                 color:DS.color.navy,
                 margin:0,
               }}>
@@ -669,7 +1546,7 @@ const HeroSection = memo(({ onNavigate }) => {
                 }}>Recommended</div>
                 <LiquidBtn variant="cta" size="lg" onClick={()=>goTo("/checkout?plan=yearly")}
                   style={{width:"100%",justifyContent:"center",animation:"pulse 2.5s infinite"}}>
-                  Download the Annual Budget Template for just ₹49!
+                  Get Full Year for ₹49
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </LiquidBtn>
               </div>
@@ -711,35 +1588,154 @@ const HeroSection = memo(({ onNavigate }) => {
             </div>
 
             {/* Main glass preview frame — the dashboard IS the hero visual now, no laptop bezel */}
-            <div className="floating" style={{
+            <div className="hero-dashboard-shell" style={{
               width:"100%",
-              maxWidth:960,
-              padding:20,
-              borderRadius:38,
+              maxWidth:980,
+              padding:0,
+              borderRadius:34,
               position:"relative",
               zIndex:4,
-              background:"linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.38))",
-              border:"1px solid rgba(255,255,255,0.88)",
-              boxShadow:"0 38px 110px rgba(99,102,241,0.22), 0 18px 48px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.95)",
+              background:"transparent",
+              border:"none",
+              boxShadow:"0 38px 110px rgba(99,102,241,0.24), 0 18px 52px rgba(15,23,42,0.12)",
               backdropFilter:"blur(30px) saturate(180%)",
               WebkitBackdropFilter:"blur(30px) saturate(180%)",
-              animation:"floatSlow 8s ease-in-out infinite",
             }}>
-              <div style={{
+              <div className="hero-dashboard-frame" style={{
                 overflow:"hidden",
-                borderRadius:26,
-                background:"#fff",
-                border:"1px solid rgba(99,102,241,0.16)",
-                aspectRatio:"1536 / 1024",
-                boxShadow:"inset 0 1px 0 rgba(255,255,255,0.95), 0 22px 70px rgba(15,23,42,0.08)",
+                borderRadius:34,
+                background:"#f8f7ff",
+                border:"1px solid rgba(255,255,255,0.72)",
+                aspectRatio:"16 / 9",
+                boxShadow:"0 26px 82px rgba(99,102,241,0.18), inset 0 1px 0 rgba(255,255,255,0.82)",
               }}>
-                <DashboardImage type="monthly" loading="eager" fit="contain" position="center top" />
+                <FrameSequenceHero />
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </section>
+  );
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  DASHBOARD DATA & ANIMATED PREVIEW
+// ═══════════════════════════════════════════════════════════════════
+const MONTH_DATA = {
+  Jan:{income:45000,expenses:32000,cats:[{cat:"Housing",pct:42},{cat:"Food",pct:28},{cat:"Transport",pct:15},{cat:"Other",pct:15}]},
+  Feb:{income:48000,expenses:35000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:30},{cat:"Transport",pct:14},{cat:"Other",pct:16}]},
+  Mar:{income:46000,expenses:30000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:25},{cat:"Transport",pct:13},{cat:"Other",pct:22}]},
+  Apr:{income:52000,expenses:38000,cats:[{cat:"Housing",pct:38},{cat:"Food",pct:26},{cat:"Transport",pct:18},{cat:"Other",pct:18}]},
+  May:{income:50000,expenses:33000,cats:[{cat:"Housing",pct:41},{cat:"Food",pct:24},{cat:"Transport",pct:16},{cat:"Other",pct:19}]},
+  Jun:{income:55000,expenses:36000,cats:[{cat:"Housing",pct:40},{cat:"Food",pct:25},{cat:"Transport",pct:15},{cat:"Other",pct:20}]},
+  Jul:{income:53000,expenses:40000,cats:[{cat:"Housing",pct:38},{cat:"Food",pct:28},{cat:"Transport",pct:17},{cat:"Other",pct:17}]},
+  Aug:{income:58000,expenses:37000,cats:[{cat:"Housing",pct:39},{cat:"Food",pct:26},{cat:"Transport",pct:14},{cat:"Other",pct:21}]},
+  Sep:{income:56000,expenses:34000,cats:[{cat:"Housing",pct:41},{cat:"Food",pct:23},{cat:"Transport",pct:16},{cat:"Other",pct:20}]},
+  Oct:{income:60000,expenses:41000,cats:[{cat:"Housing",pct:37},{cat:"Food",pct:29},{cat:"Transport",pct:18},{cat:"Other",pct:16}]},
+  Nov:{income:62000,expenses:45000,cats:[{cat:"Housing",pct:36},{cat:"Food",pct:31},{cat:"Transport",pct:17},{cat:"Other",pct:16}]},
+  Dec:{income:70000,expenses:55000,cats:[{cat:"Housing",pct:35},{cat:"Food",pct:33},{cat:"Transport",pct:16},{cat:"Other",pct:16}]},
+};
+const CHART_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const CAT_COLORS = ["#6366f1","#f59e0b","#3b82f6","#ec4899"];
+
+const DashboardPreview = memo(({ selectedMonth="Jun", onMonthChange }) => {
+  const data = MONTH_DATA[selectedMonth];
+  const savings = data.income - data.expenses;
+  const savingsPct = Math.round((savings/data.income)*100);
+  const [animated, setAnimated] = useState(false);
+  const fmt = v=>`₹${v.toLocaleString("en-IN")}`;
+  useEffect(()=>{ setAnimated(false); const t=setTimeout(()=>setAnimated(true),50); return()=>clearTimeout(t); },[selectedMonth]);
+
+  return (
+    <div className="glass-card" style={{borderRadius:DS.radius["2xl"],padding:18,background:DS.grad.glass,border:"1px solid rgba(255,255,255,0.85)"}}>
+      {/* Header */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <div>
+          <div style={{fontFamily:DS.font.heading,fontSize:14,fontWeight:800,color:DS.color.navy,letterSpacing:"-0.01em"}}>Smart Expense Tracker</div>
+          <div style={{fontSize:10,color:DS.color.slateLight,marginTop:2}}>{selectedMonth} 2026 · Income, expenses, savings</div>
+        </div>
+        {onMonthChange?(
+          <select value={selectedMonth} onChange={e=>onMonthChange(e.target.value)} style={{
+            background:"rgba(255,255,255,0.80)",color:DS.color.navy,border:"1px solid rgba(15,23,42,0.10)",
+            borderRadius:DS.radius.pill,padding:"5px 14px",fontSize:10,fontWeight:700,cursor:"pointer",
+          }}>
+            {CHART_MONTHS.map(m=><option key={m} value={m}>{m} 2026</option>)}
+          </select>
+        ):<Badge color="rgba(99,102,241,0.09)" text="#4338ca">{selectedMonth} 2026</Badge>}
+      </div>
+
+      {/* KPI cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12}}>
+        {[
+          {l:"Income",  v:fmt(data.income),   c:DS.color.mint,   bg:DS.color.mintLight,    icon:"↑"},
+          {l:"Expenses",v:fmt(data.expenses), c:"#ef4444",       bg:"rgba(239,68,68,0.08)", icon:"↓"},
+          {l:"Savings", v:fmt(savings),        c:DS.color.purple, bg:DS.color.purpleLight,  icon:`${savingsPct}%`},
+        ].map(m=>(
+          <div key={m.l} style={{
+            background:m.bg,borderRadius:DS.radius.lg,padding:"10px 8px",
+            border:"1px solid rgba(255,255,255,0.80)",
+            animation:animated?"countUp 0.4s ease":"none",
+          }}>
+            <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:DS.radius.sm,background:"rgba(255,255,255,0.60)",marginBottom:5}}>
+              <span style={{fontSize:9,fontWeight:800,color:m.c}}>{m.icon}</span>
+            </div>
+            <div style={{fontSize:9,color:DS.color.slateLight,fontWeight:600}}>{m.l}</div>
+            <div style={{fontFamily:DS.font.number,fontSize:13,fontWeight:900,color:m.c,marginTop:1}}>{m.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bar chart */}
+      <div style={{background:"rgba(255,255,255,0.65)",borderRadius:DS.radius.lg,padding:"12px 10px",marginBottom:10,border:"1px solid rgba(255,255,255,0.80)"}}>
+        <div style={{fontSize:9,fontWeight:700,color:DS.color.slateLight,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Income vs Expenses · All Months</div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:3,height:68}}>
+          {CHART_MONTHS.map(m=>{
+            const d=MONTH_DATA[m]; const maxV=75000;
+            const iH=animated?`${(d.income/maxV)*68}px`:"0";
+            const eH=animated?`${(d.expenses/maxV)*68}px`:"0";
+            const sel=m===selectedMonth;
+            return (
+              <div key={m} style={{flex:1,display:"flex",gap:1.5,alignItems:"flex-end",cursor:"pointer"}} onClick={()=>onMonthChange&&onMonthChange(m)}>
+                <div style={{flex:1,background:sel?DS.color.mint:`${DS.color.mint}44`,borderRadius:"2px 2px 0 0",height:iH,transition:`height 0.5s ${DS.ease.spring}`,minHeight:2}}/>
+                <div style={{flex:1,background:sel?"#ef4444":"rgba(239,68,68,0.35)",borderRadius:"2px 2px 0 0",height:eH,transition:`height 0.5s ${DS.ease.spring} 0.08s`,minHeight:2}}/>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{display:"flex",gap:4,marginTop:5}}>
+          {CHART_MONTHS.map(m=>(
+            <div key={m} style={{flex:1,fontSize:7,color:m===selectedMonth?DS.color.mintText:DS.color.slateLight,textAlign:"center",fontWeight:m===selectedMonth?800:400}}>{m}</div>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:6}}>
+          {[{c:DS.color.mint,l:"Income"},{c:"#ef4444",l:"Expenses"}].map(x=>(
+            <div key={x.l} style={{display:"flex",gap:4,alignItems:"center"}}>
+              <div style={{width:7,height:7,borderRadius:1.5,background:x.c}}/><span style={{fontSize:9,color:DS.color.slateLight,fontWeight:600}}>{x.l}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Category breakdown */}
+      <div style={{background:"rgba(255,255,255,0.65)",borderRadius:DS.radius.lg,padding:"12px 10px",border:"1px solid rgba(255,255,255,0.80)"}}>
+        <div style={{fontSize:9,fontWeight:700,color:DS.color.slateLight,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.06em"}}>Spending Breakdown</div>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{width:44,height:44,borderRadius:"50%",flexShrink:0,background:`conic-gradient(${data.cats.map((c,i)=>`${CAT_COLORS[i]} ${i===0?0:data.cats.slice(0,i).reduce((a,b)=>a+b.pct,0)}% ${data.cats.slice(0,i+1).reduce((a,b)=>a+b.pct,0)}%`).join(",")})`}}/>
+          <div style={{flex:1,display:"grid",gap:3}}>
+            {data.cats.map((c,i)=>(
+              <div key={c.cat} style={{display:"flex",justifyContent:"space-between"}}>
+                <div style={{display:"flex",gap:5,alignItems:"center"}}>
+                  <div style={{width:6,height:6,borderRadius:1.5,background:CAT_COLORS[i]}}/><span style={{fontSize:9,color:DS.color.slateLight}}>{c.cat}</span>
+                </div>
+                <span style={{fontFamily:DS.font.number,fontSize:9,fontWeight:700,color:DS.color.navy}}>{c.pct}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 });
 
@@ -761,7 +1757,7 @@ const Nav = memo(() => {
   useEffect(()=>setMobileOpen(false),[location]);
 
   const goTo=(p)=>{navigate(p);window.scrollTo({top:0,behavior:"smooth"});};
-  const navLinks=[{id:"/",label:"Home"},{id:"/product",label:"Product"},{id:"/#faq",label:"FAQ"}];
+  const navLinks=[{id:"/",label:"Home"},{id:"/product",label:"Product"}];
 
   return (
     <>
@@ -785,18 +1781,18 @@ const Nav = memo(() => {
               fontSize:17,
               boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
             }}>📊</div>
-            <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:"-0.02em"}}>
-              Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span>
+            <span className="brand-wordmark-3d" style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:0}}>
+              Budget<span className="brand-pro-outline" style={{color:"#4f46e5",WebkitTextFillColor:"#4f46e5"}}>Pro</span>
             </span>
           </button>
 
           {/* Center nav pills */}
-          <div className="nav-desktop" style={{display:"flex",gap:2,alignItems:"center",background:"rgba(248,251,255,0.80)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.07)",backdropFilter:"blur(12px)"}}>
+          <div className="nav-desktop glass-nav-shell" style={{display:"flex",gap:4,alignItems:"center",background:"rgba(248,251,255,0.80)",borderRadius:DS.radius.pill,padding:"4px",border:"1px solid rgba(15,23,42,0.07)",backdropFilter:"blur(12px)"}}>
             {navLinks.map(l=>{
               const isActive = l.id==="/"?path==="/":path.startsWith(l.id.split("#")[0]);
               return (
                 <button key={l.id} onClick={()=>goTo(l.id)} className={`nav-item ${isActive?"active":""}`}
-                  style={{background:"transparent",border:"none",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:14,fontFamily:"inherit"}}>
+                  style={{background:"transparent",border:"1px solid transparent",cursor:"pointer",padding:"7px 16px",fontWeight:600,color:DS.color.slate,fontSize:14,fontFamily:"inherit"}}>
                   {l.label}
                 </button>
               );
@@ -806,9 +1802,9 @@ const Nav = memo(() => {
           {/* Right CTAs */}
           <div className="nav-desktop" style={{display:"flex",gap:10,alignItems:"center"}}>
             <LiquidBtn variant="white" size="sm" onClick={()=>goTo("/checkout?plan=monthly")}>Monthly ₹19</LiquidBtn>
-            <LiquidBtn variant="cta" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
-              style={{boxShadow:"0 4px 16px rgba(99,102,241,0.35)"}}>Full Year ₹49</LiquidBtn>
-            <button onClick={()=>goTo("/admin")} style={{background:"rgba(248,251,255,0.80)",border:"1px solid rgba(15,23,42,0.08)",borderRadius:"50%",cursor:"pointer",padding:"9px",color:DS.color.slate,display:"flex",alignItems:"center",backdropFilter:"blur(12px)"}}>
+            <LiquidBtn className="nav-year-cta" variant="premium" size="sm" onClick={()=>goTo("/checkout?plan=yearly")}
+              style={{padding:"9px 22px",boxShadow:"0 18px 38px rgba(79,70,229,0.34), 0 7px 18px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.70), inset 0 -14px 26px rgba(59,130,246,0.24)"}}>Full Year ₹49</LiquidBtn>
+            <button className="premium-btn nav-orb-btn" onClick={()=>goTo("/admin")} style={{borderRadius:"50%",cursor:"pointer",padding:"9px",display:"flex",alignItems:"center",backdropFilter:"blur(16px) saturate(180%)",WebkitBackdropFilter:"blur(16px) saturate(180%)"}}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </button>
           </div>
@@ -896,30 +1892,35 @@ const PricingCard = memo(({ plan }) => {
         </>
       )}
       <div style={{position:"relative",zIndex:1}}>
-        <Badge color={hl?"rgba(99,102,241,0.10)":"rgba(15,23,42,0.05)"} text={hl?"#4338ca":DS.color.slateLight}>{plan.badge}</Badge>
-        <h3 style={{fontFamily:DS.font.heading,fontSize:DS.type.h4,fontWeight:800,color:DS.color.navy,margin:"14px 0 4px",letterSpacing:"-0.01em"}}>{plan.name}</h3>
-        <p style={{fontSize:DS.type.sm,color:DS.color.slateLight,marginBottom:24,lineHeight:1.6}}>{plan.desc}</p>
+        <Badge className="pricing-card-kicker" color={hl?"rgba(79,70,229,0.12)":"rgba(59,130,246,0.10)"} text={hl?"#4338ca":"#2563eb"}>{plan.badge}</Badge>
+        <h3 className={`pricing-title-gradient ${hl?"hot":""}`} style={{fontFamily:DS.font.heading,fontSize:DS.type.h4,fontWeight:900,color:hl?undefined:DS.color.navy,margin:"14px 0 4px",letterSpacing:0}}>{plan.name}</h3>
+        <p className="pricing-desc-vivid" style={{fontSize:DS.type.sm,color:DS.color.slate,marginBottom:24,lineHeight:1.6}}>{plan.desc}</p>
         <div style={{display:"flex",alignItems:"flex-end",gap:10,marginBottom:6}}>
-          <span style={{fontFamily:DS.font.number,fontSize:58,fontWeight:900,color:DS.color.navy,lineHeight:1,letterSpacing:"-0.03em"}}>₹{plan.price}</span>
+          <span className="pricing-price-vivid" style={{fontFamily:DS.font.number,fontSize:58,fontWeight:900,color:DS.color.navy,lineHeight:1,letterSpacing:0}}>₹{plan.price}</span>
           <div style={{paddingBottom:10}}>
             <div style={{fontFamily:DS.font.number,color:DS.color.slateLight,textDecoration:"line-through",fontSize:18,fontWeight:600}}>₹{plan.original}</div>
             <Badge color="rgba(239,68,68,0.08)" text="#dc2626">{plan.discount} OFF</Badge>
           </div>
         </div>
-        <div style={{fontSize:DS.type.xs,color:DS.color.slateLight,marginBottom:28}}>One-time payment · Instant download</div>
+        <div style={{fontSize:DS.type.xs,color:hl?"#4f46e5":"#2563eb",fontWeight:800,marginBottom:28}}>One-time payment · Instant download</div>
         <ul style={{listStyle:"none",marginBottom:32,display:"grid",gap:11}}>
           {plan.features.map(f=>(
             <li key={f} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
               <div style={{background:"rgba(99,102,241,0.10)",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>
                 <Icon name="check" size={11} color="#4338ca"/>
               </div>
-              <span style={{color:DS.color.slate,fontSize:DS.type.sm,lineHeight:1.6}}>{f}</span>
+              <span style={{color:hl?"#334155":"#475569",fontSize:DS.type.sm,lineHeight:1.6,fontWeight:650}}>{f}</span>
             </li>
           ))}
         </ul>
-        <LiquidBtn variant={hl?"cta":"outline"} size="lg" onClick={()=>goTo(`/checkout?plan=${plan.id}`)}
-          style={{width:"100%",justifyContent:"center",boxShadow:hl?"0 8px 32px rgba(99,102,241,0.35)":"none",animation:hl?"pulse 2.5s infinite":"none"}}>
-          <Icon name={hl?"bag":"download"} size={18} color={hl?"#fff":"#4338ca"}/>
+        <LiquidBtn className="pricing-cta-glass" variant="outline" size="lg" onClick={()=>goTo(`/checkout?plan=${plan.id}`)}
+          style={{
+            width:"100%",
+            justifyContent:"center",
+            color:"#4c1d95",
+            animation:"none",
+          }}>
+          <Icon name={hl?"bag":"download"} size={18} color="#4c1d95"/>
           {plan.cta}
         </LiquidBtn>
       </div>
@@ -951,9 +1952,20 @@ const HomePage = memo(() => {
   const [stickyVisible,setStickyVisible] = useState(false);
 
   useEffect(()=>{
-    const fn=()=>setStickyVisible(window.scrollY>500);
+    const fn=()=>{
+      const hero = document.querySelector("[data-hero-scroll-sequence]");
+      const threshold = hero
+        ? hero.offsetTop + hero.offsetHeight - window.innerHeight * 0.75
+        : 500;
+      setStickyVisible(window.scrollY > threshold);
+    };
+    fn();
     window.addEventListener("scroll",fn,{passive:true});
-    return()=>window.removeEventListener("scroll",fn);
+    window.addEventListener("resize",fn);
+    return()=>{
+      window.removeEventListener("scroll",fn);
+      window.removeEventListener("resize",fn);
+    };
   },[]);
 
   const testimonials=[
@@ -988,7 +2000,7 @@ const HomePage = memo(() => {
       <StickyCTA visible={stickyVisible}/>
 
       {/* HERO */}
-      <HeroSection onNavigate={p=>{navigate(p);window.scrollTo({top:0,behavior:"smooth"});}}/>
+      <HeroScrollSequence />
 
       {/* URGENCY STRIP */}
       <div style={{background:"linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899,#8b5cf6,#6366f1)",backgroundSize:"300% 100%",animation:"gradShift 5s ease infinite",padding:"13px 20px",textAlign:"center"}}>
@@ -1001,7 +2013,7 @@ const HomePage = memo(() => {
           <div style={{textAlign:"center",marginBottom:60}}>
             <Badge style={{marginBottom:16}}>Choose Your Plan</Badge>
             <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,lineHeight:1.12,marginBottom:16,letterSpacing:"-0.02em"}}>
-              Feels like a <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>₹999 premium template.</span><br/>Yours for just ₹49.
+              Feels like a <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>₹999 product.</span><br/>Priced for everyone.
             </h2>
             <p style={{color:DS.color.slateLight,fontSize:17,maxWidth:480,margin:"0 auto",lineHeight:1.7}}>Pick the plan that fits your goals. Both include instant download and lifetime access.</p>
           </div>
@@ -1031,22 +2043,21 @@ const HomePage = memo(() => {
           </div>
           <div style={{position:"relative",display:"flex",justifyContent:"center"}}>
             <div style={{position:"absolute",top:-40,left:-40,right:-40,bottom:-40,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(139,92,246,0.14) 0%,transparent 70%)",pointerEvents:"none"}}/>
-            <div className="floating" style={{
-              width:"100%",maxWidth:1040,padding:20,borderRadius:38,position:"relative",zIndex:2,
-              background:"linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.38))",
-              border:"1px solid rgba(255,255,255,0.88)",
-              boxShadow:"0 38px 110px rgba(139,92,246,0.20), 0 18px 48px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.95)",
-              backdropFilter:"blur(30px) saturate(180%)",
-              WebkitBackdropFilter:"blur(30px) saturate(180%)",
-              animation:"floatSlow 9s ease-in-out infinite",
+            <div className="dashboard-demo-3d" style={{
+              width:"100%",maxWidth:1040,padding:0,borderRadius:34,position:"relative",zIndex:2,
+              background:"transparent",
+              border:"none",
+              boxShadow:"0 30px 90px rgba(139,92,246,0.16), 0 12px 34px rgba(15,23,42,0.10)",
+              backdropFilter:"none",
+              WebkitBackdropFilter:"none",
             }}>
-              <div style={{
-                overflow:"hidden",borderRadius:26,background:"#fff",
-                border:"1px solid rgba(139,92,246,0.16)",
+              <div className="dashboard-demo-frame" style={{
+                overflow:"hidden",borderRadius:30,background:"#fff",
+                border:"none",
                 aspectRatio:"1536 / 1024",
-                boxShadow:"inset 0 1px 0 rgba(255,255,255,0.95), 0 22px 70px rgba(15,23,42,0.08)",
+                boxShadow:"0 22px 70px rgba(67,56,202,0.14)",
               }}>
-                <DashboardImage type="annual" loading="lazy" fit="contain" position="center top" />
+                <DashboardImage type="annual" loading="eager" fit="cover" position="center top" />
               </div>
             </div>
           </div>
@@ -1082,7 +2093,7 @@ const HomePage = memo(() => {
         <div style={{maxWidth:980,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:52}}>
             <Badge style={{marginBottom:16}}>Real Reviews</Badge>
-            <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,letterSpacing:"-0.02em",marginBottom:8}}>Loved by Thousands of Indians</h2>
+            <h2 className="reviews-heading-premium" style={{fontFamily:DS.font.number,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,letterSpacing:0,marginBottom:8}}>Loved by Thousands of Indians</h2>
             <p style={{color:DS.color.slateLight,fontSize:16}}>People just like you who took control of their money</p>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:22}}>
@@ -1092,7 +2103,7 @@ const HomePage = memo(() => {
       </section>
 
       {/* FAQ */}
-      <section id="faq" style={{padding:"80px 20px",background:DS.grad.section}}>
+      <section id="faq" style={{display:"none",padding:"80px 20px",background:DS.grad.section}}>
         <div style={{maxWidth:760,margin:"0 auto"}}>
           <div style={{textAlign:"center",marginBottom:44}}>
             <Badge style={{marginBottom:16}}>Questions</Badge>
@@ -1131,7 +2142,7 @@ const HomePage = memo(() => {
           <p style={{color:DS.color.slateLight,fontSize:17,marginBottom:44,lineHeight:1.75}}>Join 5,000+ Indians already using BudgetPro to save more, spend smarter, and stress less about money.</p>
           <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
             <LiquidBtn variant="white" size="lg" onClick={()=>goTo("/checkout?plan=monthly")} style={{minWidth:200,justifyContent:"center"}}>Start Monthly for ₹19</LiquidBtn>
-            <LiquidBtn variant="cta"   size="lg" onClick={()=>goTo("/checkout?plan=yearly")}  style={{minWidth:220,justifyContent:"center",animation:"pulse 2s infinite"}}>Download the Annual Budget Template for just ₹49!</LiquidBtn>
+            <LiquidBtn variant="cta"   size="lg" onClick={()=>goTo("/checkout?plan=yearly")}  style={{minWidth:220,justifyContent:"center",animation:"pulse 2s infinite"}}>Get Full Year for ₹49</LiquidBtn>
           </div>
           <div style={{marginTop:28,color:DS.color.slateLight,fontSize:DS.type.sm}}>🔒 Secure payment · Instant download · 100% satisfaction</div>
         </div>
@@ -1148,58 +2159,99 @@ const ProductPage = memo(() => {
   const goTo = p => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); };
   const [activeTab,setActiveTab] = useState("features");
   const [selectedPlan,setSelectedPlan] = useState("yearly");
+  const [previewOpen,setPreviewOpen] = useState(false);
+  const previewType = selectedPlan === "monthly" ? "monthly" : "annual";
+  const selectedPreview = DASHBOARD_PREVIEWS[previewType];
+
+  useEffect(()=>{
+    if(!previewOpen) return undefined;
+    const prevOverflow = document.body.style.overflow;
+    const onKeyDown = e => {
+      if(e.key === "Escape") setPreviewOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return ()=>{
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  },[previewOpen]);
 
   const features=["Monthly income & expense tracker","Income vs Savings visualization charts","Category-wise expense breakdown","Savings goal progress tracker","Annual expense summary (Full Year only)","Beginner-friendly, no macros needed","Works on Excel 2016+ and Google Sheets","Indian Rupee (₹) formatted throughout","12-month rolling expense view (Full Year)","Print-ready monthly reports"];
-  const specs=[["Format","Excel (.xlsx) + Google Sheets link"],["Compatibility","Excel 2016, 2019, 2021, 365, Google Sheets"],["File Size","~2.4 MB (Monthly) / ~4.1 MB (Full Year)"],["Currency","Indian Rupee (₹)"],["Language","English"],["Macros","No macros — 100% safe"],["Updates","Free lifetime updates"],["Support","Email support included"]];
+  const specs=[["Format","Excel (.xlsx) + Google Sheets link"],["Compatibility","Excel 2016, 2019, 2021, 365, Google Sheets"],["File Size","~2.4 MB (Monthly) / ~4.1 MB (Full Year)"],["Currency","Indian Rupee (₹), Dollar ($), Euro (€)"],["Language","English"],["Macros","No macros — 100% safe"],["Support","Email support included"]];
 
   return (
+    <>
     <div style={{background:DS.grad.section,minHeight:"100vh",padding:"60px 20px",position:"relative",overflow:"hidden"}}>
       <GlassBubble size={130} style={{ top:"6%", right:"3%" }} />
       <GlassBubble size={60}  style={{ bottom:"6%", left:"3%", animationDelay:"2.4s" }} />
-      <div style={{maxWidth:1100,margin:"0 auto",position:"relative",zIndex:2}}>
-        <div className="product-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:52,alignItems:"start"}}>
-          <div>
-            <div style={{boxShadow:DS.shadow.glassLg,borderRadius:DS.radius["2xl"],overflow:"hidden",border:"1px solid rgba(255,255,255,0.85)"}}>
-              <div style={{background:"rgba(248,251,255,0.95)",padding:"11px 16px",display:"flex",gap:6,alignItems:"center",borderBottom:`1px solid ${DS.color.border}`}}>
-                {["#ff5f57","#febc2e","#28c840"].map(c=><div key={c} style={{width:10,height:10,borderRadius:"50%",background:c}}/>)}
-                <div style={{background:"rgba(15,23,42,0.05)",borderRadius:DS.radius.pill,padding:"3px 14px",fontSize:10,color:DS.color.slateLight,marginLeft:6}}>
-                  {selectedPlan==="monthly"?"Monthly Dashboard Preview":"Annual Dashboard Preview"}
-                </div>
-              </div>
-              <div style={{padding:14,background:DS.grad.section,aspectRatio:"1536 / 1024"}}>
-                <div style={{width:"100%",height:"100%",borderRadius:DS.radius.lg,overflow:"hidden",background:"#fff",border:"1px solid rgba(99,102,241,0.12)"}}>
-                  <DashboardImage type={selectedPlan==="monthly"?"monthly":"annual"} loading="eager" fit="contain" position="center top" />
-                </div>
-              </div>
+      <div style={{maxWidth:1160,margin:"0 auto",position:"relative",zIndex:2}}>
+        <div className="product-grid" style={{display:"grid",gridTemplateColumns:"1.08fr 1fr",gap:44,alignItems:"start"}}>
+          <div className="product-media-glass-panel">
+            <div className="product-preview-shell" style={{
+              boxShadow:"0 36px 92px rgba(79,70,229,0.24), 0 14px 34px rgba(15,23,42,0.12)",
+              borderRadius:DS.radius["3xl"],
+              overflow:"visible",
+              border:"none",
+              background:"transparent",
+              padding:0,
+            }}>
+              <button type="button" className="product-preview-image-wrap product-preview-hd" onClick={()=>setPreviewOpen(true)} title="Open dashboard preview" aria-label={`Open ${selectedPreview.title}`} style={{
+                width:"100%",
+                aspectRatio:"1536 / 1024",
+                borderRadius:26,
+                overflow:"hidden",
+                background:"#ffffff",
+                border:"none",
+                cursor:"zoom-in",
+                padding:0,
+                display:"block",
+                position:"relative",
+                appearance:"none",
+                boxShadow:"0 28px 70px rgba(67,56,202,0.15), 0 10px 24px rgba(15,23,42,0.08), inset 0 0 0 1px rgba(255,255,255,0.92)",
+              }}>
+                <DashboardImage className="dashboard-image-hd" type={previewType} loading="eager" fit="contain" position="center top" />
+                <span aria-hidden="true" style={{position:"absolute",right:14,bottom:14,width:40,height:40,borderRadius:DS.radius.pill,display:"inline-flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(145deg, rgba(255,255,255,0.94), rgba(219,234,254,0.70))",border:"1px solid rgba(255,255,255,0.86)",boxShadow:"0 12px 28px rgba(79,70,229,0.18), inset 0 1px 0 rgba(255,255,255,0.92)",zIndex:3}}>
+                  <Icon name="eye" size={18} color="#4338ca"/>
+                </span>
+              </button>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginTop:14}}>
               {[{icon:"shield",text:"Secure Payment"},{icon:"zap",text:"Instant Download"},{icon:"check",text:"Lifetime Access"}].map(b=>(
-                <div key={b.text} className="glass-card" style={{borderRadius:DS.radius.xl,padding:"14px 10px",textAlign:"center"}}>
-                  <Icon name={b.icon} size={18} color="#4338ca"/><div style={{fontSize:11,color:DS.color.slateLight,marginTop:7,fontWeight:700}}>{b.text}</div>
+                <div key={b.text} className="glass-card glass-trust-card" style={{borderRadius:DS.radius.xl,padding:"14px 10px",textAlign:"center"}}>
+                  <Icon name={b.icon} size={18} color="#4f46e5"/><div style={{fontSize:11,color:DS.color.slate,marginTop:7,fontWeight:800}}>{b.text}</div>
                 </div>
               ))}
             </div>
           </div>
           <div>
             <Badge style={{marginBottom:12}}>Best Seller</Badge>
-            <h1 style={{fontFamily:DS.font.heading,fontSize:DS.type.h1,fontWeight:900,color:DS.color.navy,margin:"12px 0 10px",lineHeight:1.12,letterSpacing:"-0.02em"}}>Ultimate Budget Dashboard Template</h1>
+            <h1 className="text-3d-heading product-title-premium" style={{fontFamily:"'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",fontSize:DS.type.h1,fontWeight:700,color:DS.color.navy,margin:"12px 0 10px",lineHeight:1.02,letterSpacing:0}}>
+              <span className="product-title-line">Ultimate Budget</span>
+              <span className="product-title-accent">Dashboard Template</span>
+            </h1>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
               <div style={{display:"flex",gap:2}}>{[1,2,3,4,5].map(s=><Icon key={s} name="star" size={14} color={DS.color.gold} filled/>)}</div>
-              <span style={{color:DS.color.slateLight,fontSize:13}}>4.9 · 312 verified reviews</span>
+              <span style={{color:DS.color.slate,fontSize:13,fontWeight:800}}>4.9 · 312 verified reviews</span>
             </div>
             <p style={{color:DS.color.slateLight,lineHeight:1.8,marginBottom:26,fontSize:DS.type.body}}>A professionally designed Excel & Google Sheets template that makes budgeting simple, beautiful, and actually useful.</p>
 
             {/* Plan selector */}
-            <div className="glass-card" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:4,marginBottom:22}}>
+            <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:22}}>
               {[{id:"monthly",label:"Monthly",price:"₹19"},{id:"yearly",label:"Full Year",price:"₹49"}].map(p=>(
-                <button key={p.id} onClick={()=>setSelectedPlan(p.id)} style={{
-                  flex:1,padding:"11px 14px",borderRadius:DS.radius.lg,border:"none",cursor:"pointer",fontWeight:700,fontSize:DS.type.sm,fontFamily:"inherit",
-                  background:selectedPlan===p.id?DS.grad.cta:"transparent",color:selectedPlan===p.id?"#fff":DS.color.slateLight,
-                  boxShadow:selectedPlan===p.id?"0 4px 16px rgba(99,102,241,0.30)":"none",
-                  transition:`all 0.2s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:6,
+                <button key={p.id} className="premium-btn glass-segment-btn plan-segment-btn" onClick={()=>setSelectedPlan(p.id)} style={{
+                  flex:1,padding:"11px 12px",borderRadius:DS.radius.lg,border:"1px solid rgba(255,255,255,0.50)",cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",
+                  background:selectedPlan===p.id
+                    ? "linear-gradient(135deg, rgba(59,130,246,0.94), rgba(99,102,241,0.94) 48%, rgba(139,92,246,0.94))"
+                    : "linear-gradient(145deg, rgba(255,255,255,0.58), rgba(219,234,254,0.30))",
+                  color:selectedPlan===p.id?"#fff":DS.color.slate,
+                  boxShadow:selectedPlan===p.id
+                    ? "0 16px 34px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.46), inset 0 -12px 22px rgba(67,56,202,0.16)"
+                    : "inset 0 1px 0 rgba(255,255,255,0.66), 0 7px 16px rgba(99,102,241,0.08)",
+                  transition:`all 0.2s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:8,
                 }}>
-                  {p.label}<span style={{fontFamily:DS.font.number,fontWeight:900}}>{p.price}</span>
-                  {p.id==="yearly"&&<Badge color="rgba(245,158,11,0.15)" text="#b45309" style={{fontSize:9,padding:"1px 7px"}}>Best Value</Badge>}
+                  <span className="plan-label">{p.label}<span style={{fontFamily:DS.font.number,fontWeight:900}}>{p.price}</span></span>
+                  {p.id==="yearly"&&<Badge className="plan-badge" color={selectedPlan===p.id?"rgba(255,255,255,0.22)":"rgba(99,102,241,0.11)"} text={selectedPlan===p.id?"#ffffff":"#4f46e5"} style={{fontSize:9,padding:"2px 7px",border:"1px solid rgba(255,255,255,0.50)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.55), 0 5px 12px rgba(67,56,202,0.16)",textShadow:selectedPlan===p.id?"0 1px 2px rgba(67,56,202,0.35)":"none"}}>Best Value</Badge>}
                 </button>
               ))}
             </div>
@@ -1222,13 +2274,19 @@ const ProductPage = memo(() => {
             </div>
 
             {/* Tabs */}
-            <div className="glass-card" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:4,marginBottom:18}}>
+            <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:18}}>
               {["features","specs"].map(t=>(
-                <button key={t} onClick={()=>setActiveTab(t)} style={{
-                  flex:1,padding:"9px 14px",borderRadius:DS.radius.lg,border:"none",cursor:"pointer",
+                <button key={t} className="premium-btn glass-tab-btn" onClick={()=>setActiveTab(t)} style={{
+                  flex:1,padding:"9px 14px",borderRadius:DS.radius.lg,border:"1px solid rgba(255,255,255,0.50)",cursor:"pointer",
                   fontWeight:700,fontSize:DS.type.sm,textTransform:"capitalize",fontFamily:"inherit",
-                  background:activeTab===t?DS.grad.glass:"transparent",color:activeTab===t?DS.color.navy:DS.color.slateLight,
-                  boxShadow:activeTab===t?DS.shadow.xs:"none",transition:`all 0.18s ${DS.ease.smooth}`,
+                  background:activeTab===t
+                    ? "linear-gradient(145deg, rgba(255,255,255,0.92), rgba(219,234,254,0.56), rgba(237,233,254,0.62))"
+                    : "linear-gradient(145deg, rgba(255,255,255,0.46), rgba(219,234,254,0.24))",
+                  color:activeTab===t?DS.color.navy:DS.color.slate,
+                  boxShadow:activeTab===t
+                    ? "0 12px 26px rgba(99,102,241,0.14), inset 0 1px 0 rgba(255,255,255,0.82)"
+                    : "inset 0 1px 0 rgba(255,255,255,0.54)",
+                  transition:`all 0.18s ${DS.ease.smooth}`,
                 }}>{t}</button>
               ))}
             </div>
@@ -1254,6 +2312,81 @@ const ProductPage = memo(() => {
         </div>
       </div>
     </div>
+    {previewOpen&&(
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={selectedPreview.title}
+        onClick={()=>setPreviewOpen(false)}
+        style={{
+          position:"fixed",
+          inset:0,
+          zIndex:1200,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          padding:"24px",
+          background:"rgba(15,23,42,0.54)",
+          backdropFilter:"blur(18px) saturate(145%)",
+          WebkitBackdropFilter:"blur(18px) saturate(145%)",
+        }}
+      >
+        <div
+          className="glass-card"
+          onClick={e=>e.stopPropagation()}
+          style={{
+            position:"relative",
+            width:"min(94vw, 1180px)",
+            maxHeight:"88vh",
+            borderRadius:DS.radius["3xl"],
+            padding:"14px",
+            overflow:"hidden",
+            border:"1px solid rgba(255,255,255,0.76)",
+            boxShadow:"0 36px 110px rgba(15,23,42,0.30), 0 18px 54px rgba(79,70,229,0.22), inset 0 1px 0 rgba(255,255,255,0.92)",
+          }}
+        >
+          <button
+            type="button"
+            aria-label="Close dashboard preview"
+            onClick={()=>setPreviewOpen(false)}
+            className="premium-btn"
+            style={{
+              position:"absolute",
+              top:18,
+              right:18,
+              width:42,
+              height:42,
+              borderRadius:DS.radius.pill,
+              border:"1px solid rgba(255,255,255,0.82)",
+              background:"linear-gradient(145deg, rgba(255,255,255,0.95), rgba(219,234,254,0.76))",
+              display:"inline-flex",
+              alignItems:"center",
+              justifyContent:"center",
+              cursor:"pointer",
+              zIndex:3,
+              boxShadow:"0 14px 32px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.96)",
+            }}
+          >
+            <Icon name="close" size={19} color="#0f172a"/>
+          </button>
+          <img
+            src={selectedPreview.src}
+            alt={selectedPreview.alt}
+            style={{
+              display:"block",
+              width:"100%",
+              height:"auto",
+              maxHeight:"calc(88vh - 28px)",
+              objectFit:"contain",
+              borderRadius:24,
+              background:"#ffffff",
+              boxShadow:"inset 0 0 0 1px rgba(255,255,255,0.90)",
+            }}
+          />
+        </div>
+      </div>
+    )}
+    </>
   );
 });
 
@@ -1398,7 +2531,12 @@ const CheckoutPage = memo(() => {
 
   const inp = field=>({width:"100%",padding:"13px 16px",borderRadius:DS.radius.lg,border:`1.5px solid ${errors[field]?"#ef4444":DS.color.border}`,fontSize:DS.type.body,color:DS.color.navy,background:"rgba(255,255,255,0.80)",transition:`all 0.2s ${DS.ease.smooth}`,fontFamily:"inherit",backdropFilter:"blur(8px)"});
   const payMethods=[{id:"upi",label:"UPI",icon:"phone"},{id:"card",label:"Card",icon:"creditCard"},{id:"netbanking",label:"Net Banking",icon:"building"}];
-  const upiApps=[{id:"googlepay",label:"Google Pay"},{id:"phonepe",label:"PhonePe"},{id:"paytm",label:"Paytm"},{id:"bhim",label:"BHIM UPI"}];
+  const upiApps=[
+    {id:"googlepay",label:"Google Pay",mark:"G"},
+    {id:"phonepe",label:"PhonePe",mark:"Pe"},
+    {id:"paytm",label:"Paytm",mark:"Pay"},
+    {id:"bhim",label:"BHIM UPI",mark:"BH"},
+  ];
 
   return (
     <div style={{background:DS.grad.section,minHeight:"100vh"}}>
@@ -1424,9 +2562,9 @@ const CheckoutPage = memo(() => {
         </div>
 
         {/* Plan toggle */}
-        <div className="glass-card" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:4,marginBottom:32,maxWidth:400}}>
+        <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:32,maxWidth:430}}>
           {[{id:"monthly",label:"Monthly",price:"₹19"},{id:"yearly",label:"Full Year",price:"₹49"}].map(p=>(
-            <button key={p.id} onClick={()=>setSelectedPlan(p.id)} style={{flex:1,padding:"11px 14px",borderRadius:DS.radius.lg,border:"none",cursor:"pointer",fontWeight:700,fontSize:DS.type.sm,fontFamily:"inherit",background:selectedPlan===p.id?DS.grad.cta:"transparent",color:selectedPlan===p.id?"#fff":DS.color.slateLight,boxShadow:selectedPlan===p.id?"0 4px 16px rgba(99,102,241,0.30)":"none",transition:`all 0.22s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+            <button key={p.id} className={`premium-btn checkout-glass-button ${selectedPlan===p.id?"active":""}`} onClick={()=>setSelectedPlan(p.id)} style={{flex:1,padding:"11px 14px",borderRadius:DS.radius.lg,cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",color:selectedPlan===p.id?"#fff":DS.color.slate,transition:`all 0.22s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
               {p.label}<span style={{fontFamily:DS.font.number,fontWeight:900}}>{p.price}</span>
             </button>
           ))}
@@ -1435,7 +2573,7 @@ const CheckoutPage = memo(() => {
         <div className="checkout-grid" style={{display:"grid",gridTemplateColumns:"1fr 360px",gap:28}}>
           {/* Form */}
           <div style={{display:"grid",gap:20}}>
-            <div className="glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
+            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
               <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Personal Information</h3>
               <div style={{display:"grid",gap:18}}>
                 {[{key:"name",label:"Full Name",placeholder:"Rahul Sharma",hint:null,maxLength:60},{key:"email",label:"Email Address",placeholder:"rahul@email.com",hint:"Your download link will be sent here",maxLength:100},{key:"phone",label:"Mobile Number",placeholder:"9876543210",hint:null,maxLength:10}].map(({key,label,placeholder,hint,maxLength})=>(
@@ -1449,12 +2587,12 @@ const CheckoutPage = memo(() => {
               </div>
             </div>
 
-            <div className="glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
+            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
               <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Payment Method</h3>
               <div style={{display:"flex",gap:8,marginBottom:22}}>
                 {payMethods.map(m=>(
-                  <button key={m.id} onClick={()=>setPayMethod(m.id)} style={{flex:1,padding:"13px 10px",borderRadius:DS.radius.lg,border:`1.5px solid ${payMethod===m.id?"rgba(99,102,241,0.40)":DS.color.border}`,background:payMethod===m.id?"rgba(99,102,241,0.07)":"rgba(255,255,255,0.60)",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:7,transition:`all 0.2s ${DS.ease.smooth}`}}>
-                    <Icon name={m.icon} size={20} color={payMethod===m.id?"#4338ca":DS.color.slateLight}/><span style={{fontSize:DS.type.xs,fontWeight:700,color:payMethod===m.id?"#4338ca":DS.color.slateLight}}>{m.label}</span>
+                  <button key={m.id} className={`checkout-glass-button ${payMethod===m.id?"active":""}`} onClick={()=>setPayMethod(m.id)} style={{flex:1,padding:"13px 10px",borderRadius:DS.radius.lg,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:7,transition:`all 0.2s ${DS.ease.smooth}`}}>
+                    <Icon name={m.icon} size={20} color={payMethod===m.id?"#fff":"#4f46e5"}/><span style={{fontSize:DS.type.xs,fontWeight:800,color:payMethod===m.id?"#fff":DS.color.slate}}>{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -1463,7 +2601,10 @@ const CheckoutPage = memo(() => {
                   <label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:10}}>Select UPI App</label>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
                     {upiApps.map(a=>(
-                      <button key={a.id} onClick={()=>setUpiApp(a.id)} style={{padding:"11px 14px",borderRadius:DS.radius.lg,border:`1.5px solid ${upiApp===a.id?"rgba(99,102,241,0.35)":DS.color.border}`,background:upiApp===a.id?"rgba(99,102,241,0.07)":"rgba(255,255,255,0.60)",cursor:"pointer",fontWeight:700,fontSize:DS.type.sm,fontFamily:"inherit",color:upiApp===a.id?"#4338ca":DS.color.slateLight,transition:`all 0.18s ${DS.ease.smooth}`}}>{a.label}</button>
+                      <button key={a.id} className={`checkout-glass-button ${upiApp===a.id?"active":""}`} onClick={()=>setUpiApp(a.id)} style={{padding:"10px 12px",borderRadius:DS.radius.lg,cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",color:upiApp===a.id?"#fff":DS.color.slate,transition:`all 0.18s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:9}}>
+                        <span className={`upi-symbol ${a.id}`}>{a.mark}</span>
+                        <span>{a.label}</span>
+                      </button>
                     ))}
                   </div>
                   <input style={inp("upi")} placeholder="yourname@upi"/>
@@ -1492,7 +2633,7 @@ const CheckoutPage = memo(() => {
 
           {/* Order summary */}
           <div style={{position:"sticky",top:20}}>
-            <div className="glass-card" style={{borderRadius:DS.radius["2xl"],border:"1.5px solid rgba(99,102,241,0.18)"}}>
+            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],border:"1.5px solid rgba(99,102,241,0.18)"}}>
               <div style={{padding:"20px"}}>
                 <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Order Summary</h3>
                 <div style={{display:"flex",gap:12,alignItems:"center",padding:14,background:"rgba(99,102,241,0.05)",borderRadius:DS.radius.xl,marginBottom:18,border:"1px solid rgba(99,102,241,0.10)"}}>
@@ -1832,7 +2973,7 @@ const Footer = memo(() => {
         </div>
         <Divider style={{marginBottom:22}}/>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
-          <div style={{fontSize:DS.type.sm,color:DS.color.slateLight}}>© 2026 BudgetPro. Made with ❤️ in India.</div>
+          <div style={{fontSize:15,color:DS.color.slateLight,fontWeight:650}}>© 2026 BudgetPro. Made with ❤️ in India.</div>
           <div style={{fontSize:DS.type.sm,color:DS.color.slateLight}}>Payments secured by <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontWeight:700}}>Razorpay</span> · All prices in INR · GST inclusive</div>
         </div>
       </div>
