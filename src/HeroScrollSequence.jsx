@@ -16,13 +16,11 @@ const FRAME_FIT = "cover";
 const FRAME_NARROW_SCALE = 1.04;
 const FRAME_WIDE_SCALE = 1.01;
 const VISIBLE_FRAME_COUNT = FRAME_COUNT - FRAME_START + 1;
-const PRELOAD_BATCH_SIZE = 5;
-const PRELOAD_BATCH_DELAY = 42;
+const PRELOAD_BATCH_SIZE = 3;
+const PRELOAD_BATCH_DELAY = 90;
 const INTRO_AMBIENT_END = FRAME_START + 12;
-const HERO_CANVAS_MIN_DPR = 2.35;
-const HERO_CANVAS_MAX_DPR = 3;
-const OPENING_FRAME_FILTER = "contrast(1.24) saturate(1.14) brightness(1.025)";
-const SEQUENCE_FRAME_FILTER = "contrast(1.14) saturate(1.08) brightness(1.02)";
+const HERO_CANVAS_MIN_DPR = 1;
+const HERO_CANVAS_MAX_DPR = 1.65;
 
 const frameSrc = (index) =>
   `/frames/frame_${String(index).padStart(4, "0")}.webp`;
@@ -65,6 +63,7 @@ export default function HeroScrollSequence() {
   const resizeObserverRef = useRef(null);
   const cleanupTimersRef = useRef([]);
   const isMountedRef = useRef(false);
+  const canvasStateRef = useRef(null);
   const [status, setStatus] = useState("loading");
 
   const { scrollYProgress } = useScroll({
@@ -102,6 +101,18 @@ export default function HeroScrollSequence() {
     const pixelWidth = Math.round(cssWidth * dpr);
     const pixelHeight = Math.round(cssHeight * dpr);
 
+    const existingState = canvasStateRef.current;
+    if (
+      existingState &&
+      existingState.width === cssWidth &&
+      existingState.height === cssHeight &&
+      existingState.dpr === dpr &&
+      canvas.width === pixelWidth &&
+      canvas.height === pixelHeight
+    ) {
+      return existingState;
+    }
+
     if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
@@ -110,19 +121,29 @@ export default function HeroScrollSequence() {
     const ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+    ctx.imageSmoothingQuality = "medium";
 
-    return { ctx, width: cssWidth, height: cssHeight };
+    const nextState = { ctx, width: cssWidth, height: cssHeight, dpr };
+    canvasStateRef.current = nextState;
+    return nextState;
   }, []);
 
   const drawFrame = useCallback((requestedFrame) => {
     const frameNumber = findNearestLoadedFrame(requestedFrame);
     if (!frameNumber) return;
 
+    if (
+      canvasStateRef.current &&
+      frameNumber === currentFrameRef.current &&
+      requestedFrame === targetFrameRef.current
+    ) {
+      return;
+    }
+
     const img = imagesRef.current[frameNumber - 1];
     if (!img || !img.complete || img.naturalWidth === 0) return;
 
-    const canvasState = resizeCanvasToDisplaySize();
+    const canvasState = canvasStateRef.current || resizeCanvasToDisplaySize();
     if (!canvasState) return;
 
     const { ctx, width, height } = canvasState;
@@ -134,12 +155,7 @@ export default function HeroScrollSequence() {
     );
 
     ctx.clearRect(0, 0, width, height);
-    ctx.filter =
-      frameNumber <= INTRO_AMBIENT_END
-        ? OPENING_FRAME_FILTER
-        : SEQUENCE_FRAME_FILTER;
     ctx.drawImage(img, x, y, drawWidth, drawHeight);
-    ctx.filter = "none";
     currentFrameRef.current = frameNumber;
 
     window.__budgetProHeroSequence = {
@@ -217,14 +233,23 @@ export default function HeroScrollSequence() {
         loadImage(nextFrame);
       }
 
-      const timer = window.setTimeout(preloadBatch, PRELOAD_BATCH_DELAY);
+      const timer = window.setTimeout(() => {
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(preloadBatch, { timeout: 240 });
+        } else {
+          preloadBatch();
+        }
+      }, PRELOAD_BATCH_DELAY);
       cleanupTimersRef.current.push(timer);
     };
 
     const firstBatchTimer = window.setTimeout(preloadBatch, 130);
     cleanupTimersRef.current.push(firstBatchTimer);
 
-    const onResize = () => scheduleDraw(currentFrameRef.current);
+    const onResize = () => {
+      canvasStateRef.current = null;
+      scheduleDraw(currentFrameRef.current);
+    };
 
     ambientTimerRef.current = window.setInterval(() => {
       if (!isMountedRef.current) return;
