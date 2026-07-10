@@ -1082,6 +1082,7 @@ const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "conta
 // Kept as a thin backward-compatible alias — some older sections below
 // referenced TrackerScreenshot directly; both names now point to the
 // same real-image component so nothing breaks if either name is used.
+// eslint-disable-next-line no-unused-vars
 const TrackerScreenshot = memo(({ fit="contain", position="top" }) => (
   <DashboardImage type="monthly" loading="eager" fit={fit} position={position} />
 ));
@@ -1640,6 +1641,7 @@ const MONTH_DATA = {
 const CHART_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const CAT_COLORS = ["#6366f1","#f59e0b","#3b82f6","#ec4899"];
 
+// eslint-disable-next-line no-unused-vars
 const DashboardPreview = memo(({ selectedMonth="Jun", onMonthChange }) => {
   const data = MONTH_DATA[selectedMonth];
   const savings = data.income - data.expenses;
