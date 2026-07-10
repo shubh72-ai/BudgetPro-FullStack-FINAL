@@ -790,6 +790,22 @@ const GlobalStyles = () => (
       }
     }
     @media (max-width: 768px) {
+      html, body, #root {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      section:not([data-hero-scroll-sequence]) {
+        padding: 64px 16px !important;
+      }
+      .glass-card {
+        border-radius: 22px !important;
+      }
+      .premium-btn:hover,
+      .card-lift:hover,
+      .glass-trust-card:hover {
+        transform: none !important;
+      }
       .pricing-grid   { grid-template-columns: 1fr !important; }
       .benefits-grid  { grid-template-columns: 1fr 1fr !important; }
       .checkout-grid  { grid-template-columns: 1fr !important; }
@@ -815,14 +831,87 @@ const GlobalStyles = () => (
       .hero-dashboard-frame {
         border-radius: 24px !important;
       }
+      .sticky-cta {
+        display: none !important;
+      }
+      .pricing-grid {
+        gap: 18px !important;
+      }
+      .pricing-price-vivid {
+        font-size: 48px !important;
+      }
+      .dashboard-demo-3d {
+        max-width: 100% !important;
+        box-shadow: 0 18px 48px rgba(67,56,202,0.10) !important;
+      }
+      .dashboard-demo-frame {
+        border-radius: 22px !important;
+      }
+      .dashboard-demo-frame img {
+        object-fit: contain !important;
+      }
+      .product-media-glass-panel {
+        padding: 10px !important;
+        border-radius: 28px !important;
+        box-shadow: 0 16px 42px rgba(99,102,241,0.10), inset 0 1px 0 rgba(255,255,255,0.76) !important;
+      }
+      .product-preview-shell {
+        transform: none !important;
+        box-shadow: 0 20px 54px rgba(79,70,229,0.16) !important;
+      }
+      .product-preview-shell::before {
+        inset: -8px !important;
+        opacity: 0.32 !important;
+      }
+      .product-preview-image-wrap {
+        transform: none !important;
+        border-radius: 20px !important;
+      }
+      .product-preview-image-wrap img {
+        filter: contrast(1.14) saturate(1.10) brightness(0.99) !important;
+      }
+      .product-title-premium {
+        font-size: clamp(31px, 9vw, 39px) !important;
+        line-height: 1.06 !important;
+      }
+      .glass-segment {
+        transform: none !important;
+        border-radius: 20px !important;
+      }
+      .plan-segment-btn {
+        padding: 10px 8px !important;
+        gap: 4px !important;
+      }
+      .plan-segment-btn .plan-badge {
+        display: none !important;
+      }
+      .checkout-glass-card {
+        padding: 18px !important;
+        border-radius: 24px !important;
+      }
+      .checkout-glass-button,
+      .glass-segment-btn,
+      .glass-tab-btn {
+        min-height: 44px;
+      }
     }
     @media (max-width: 640px) {
       .hero-right { transform: none !important; }
       .glass-bubble { opacity: 0.25; }
+      .brand-wordmark-3d {
+        font-size: 19px !important;
+      }
     }
     @media (max-width: 480px) {
       .benefits-grid  { grid-template-columns: 1fr !important; }
       .footer-grid    { grid-template-columns: 1fr !important; }
+      section:not([data-hero-scroll-sequence]) {
+        padding-top: 56px !important;
+        padding-bottom: 56px !important;
+      }
+      .pricing-price-vivid {
+        font-size: 44px !important;
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -1845,7 +1934,7 @@ const StickyCTA = memo(({ visible }) => {
   const navigate = useNavigate();
   const goTo = p => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); };
   return (
-    <div style={{
+    <div className="sticky-cta" style={{
       position:"fixed",bottom:24,right:24,zIndex:300,
       display:visible?"flex":"none",
       background:"rgba(255,255,255,0.92)",
