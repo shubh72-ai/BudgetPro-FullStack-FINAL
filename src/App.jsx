@@ -3,9 +3,14 @@ import {
   BrowserRouter, Routes, Route, useNavigate,
   useLocation, useSearchParams, Navigate,
 } from "react-router-dom";
-import HeroScrollSequence from "./HeroScrollSequence";
+import HeroScrollSequence, { HeroSequenceCopy } from "./HeroScrollSequence";
 import monthlyDashboardPreview from "./assets/monthly-dashboard-preview.png";
 import annualDashboardPreview from "./assets/annual-dashboard-preview.png";
+import ProductStory from "./components/commerce/ProductStory";
+import StickyPurchaseDock from "./components/commerce/StickyPurchaseDock";
+import CheckoutSessionTimer, { useCheckoutSessionTimer } from "./components/commerce/CheckoutSessionTimer";
+import PaymentTrustRow from "./components/commerce/PaymentTrustRow";
+import { GlassBadge, GlassButton } from "./components/ui/GlassSurface";
 
 // ═══════════════════════════════════════════════════════════════════
 //  DESIGN SYSTEM — Luxury Liquid Glass / Apple-inspired white SaaS
@@ -42,9 +47,9 @@ const DS = {
     white:       "#ffffff",
   },
   font: {
-    body:    "'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-    heading: "'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    number:  "'Space Grotesk', 'Inter', -apple-system, sans-serif",
+    body:    "'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    heading: "'Playfair Display', Georgia, 'Times New Roman', serif",
+    number:  "'Space Grotesk', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif",
   },
   type: {
     display: "clamp(38px,5.5vw,68px)",
@@ -116,20 +121,93 @@ const SUPPORT_MAILTO = "mailto:theunseenworld2@gmail.com?subject=BudgetPro%20Sup
 // ═══════════════════════════════════════════════════════════════════
 const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bp-bg: #F7F9FF;
+      --bp-surface: rgba(255,255,255,0.52);
+      --bp-surface-strong: rgba(255,255,255,0.72);
+      --bp-border: rgba(255,255,255,0.78);
+      --bp-border-soft: rgba(99,102,241,0.14);
+      --bp-text: #0B1220;
+      --bp-text-secondary: #475569;
+      --bp-text-muted: #8090AA;
+      --bp-blue: #3B82F6;
+      --bp-indigo: #6366F1;
+      --bp-purple: #8B5CF6;
+      --bp-lilac: #EDE9FE;
+      --bp-sky: #DBEAFE;
+      --bp-success: #059669;
+      --bp-warning: #D97706;
+      --bp-gradient: linear-gradient(135deg, #3B82F6 0%, #6366F1 48%, #8B5CF6 100%);
+      --bp-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      --bp-body: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --bp-number: 'Space Grotesk', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
     html { scroll-behavior: smooth; }
+    html,
     body {
       background: #ffffff;
-      font-family: ${DS.font.body};
+      font-family: var(--bp-body);
       color: ${DS.color.text};
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
       overflow-x: hidden;
     }
-    h1, h2, h3, h4 { font-family: ${DS.font.heading}; }
-    .number-font, .price-font, .kpi-number { font-family: ${DS.font.number}; font-variant-numeric: tabular-nums; }
+    button,
+    input,
+    select,
+    textarea {
+      font-family: var(--bp-body);
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    .bp-display-heading,
+    .bp-product-title,
+    .bp-section-heading h2,
+    .bp-checkout-title h1,
+    .reviews-heading-premium,
+    .product-title-premium,
+    .pricing-title-gradient {
+      font-family: var(--bp-display);
+    }
+    h1,
+    .bp-product-title,
+    .product-title-premium {
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 0.98;
+    }
+    h2,
+    .bp-section-heading h2,
+    .bp-checkout-title h1,
+    .reviews-heading-premium,
+    .pricing-title-gradient {
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.04;
+    }
+    h3,
+    h4 {
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+    .number-font,
+    .price-font,
+    .kpi-number,
+    .bp-price-block__price,
+    .bp-compare-card__price,
+    .bp-purchase-dock__price,
+    .bp-session-timer__time,
+    .bp-summary-total strong,
+    .bp-summary-line strong,
+    .pricing-price-vivid {
+      font-family: var(--bp-number);
+      font-variant-numeric: tabular-nums;
+    }
 
     /* ── Keyframes ── */
     @keyframes spin        { to { transform: rotate(360deg); } }
@@ -531,41 +609,38 @@ const GlobalStyles = () => (
       backface-visibility: hidden;
     }
     .reviews-heading-premium {
-      font-family: 'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-      font-weight: 900 !important;
-      letter-spacing: 0 !important;
-      line-height: 1.02 !important;
+      font-family: var(--bp-display) !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.025em !important;
+      line-height: 1.04 !important;
       text-shadow:
-        0 1px 0 rgba(255,255,255,0.95),
-        0 8px 22px rgba(15,23,42,0.10),
-        0 18px 42px rgba(99,102,241,0.12);
+        0 1px 0 rgba(255,255,255,0.92),
+        0 12px 30px rgba(67,56,202,0.10);
     }
     @keyframes dashboardFloat3d {
       0%, 100% { transform: perspective(1200px) rotateX(2deg) rotateY(-3deg) translateY(0); }
       50% { transform: perspective(1200px) rotateX(3.4deg) rotateY(-4.2deg) translateY(-12px); }
     }
     .text-3d-heading {
+      font-family: var(--bp-display) !important;
       color: #0f172a !important;
-      letter-spacing: 0 !important;
+      letter-spacing: -0.035em !important;
       text-shadow:
         0 1px 0 rgba(255,255,255,0.95),
-        0 3px 0 rgba(99,102,241,0.10),
-        0 12px 26px rgba(15,23,42,0.18),
-        0 24px 48px rgba(79,70,229,0.16);
+        0 12px 30px rgba(67,56,202,0.10);
       transform: perspective(900px) rotateX(1.2deg);
       transform-origin: left center;
       filter: drop-shadow(0 14px 22px rgba(99,102,241,0.10));
     }
     .product-title-premium {
-      font-family: 'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-family: var(--bp-display) !important;
       font-weight: 700 !important;
       line-height: 1.02 !important;
-      letter-spacing: 0 !important;
+      letter-spacing: -0.035em !important;
       color: #0b1222 !important;
       text-shadow:
         0 1px 0 rgba(255,255,255,0.98),
-        0 8px 18px rgba(15,23,42,0.11),
-        0 20px 46px rgba(79,70,229,0.14) !important;
+        0 12px 30px rgba(67,56,202,0.10) !important;
       transform: none !important;
       filter: none !important;
     }
@@ -602,6 +677,1400 @@ const GlobalStyles = () => (
         0 10px 24px rgba(15,23,42,0.11),
         inset 0 1px 0 rgba(255,255,255,0.98),
         inset 0 -16px 28px rgba(124,58,237,0.15) !important;
+    }
+
+    /* Commerce redesign primitives */
+    .bp-commerce-page {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      color: var(--bp-text);
+      font-family: var(--bp-body);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(59,130,246,0.10), transparent 34%),
+        radial-gradient(circle at 82% 16%, rgba(99,102,241,0.16), transparent 34%),
+        radial-gradient(circle at 62% 70%, rgba(139,92,246,0.10), transparent 42%),
+        linear-gradient(180deg, #FFFFFF 0%, #F7F9FF 45%, #F2F3FF 100%);
+    }
+    .bp-commerce-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image:
+        linear-gradient(rgba(15,23,42,0.65) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.65) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    }
+    .bp-commerce-page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.026;
+      background-image: radial-gradient(circle at 1px 1px, #0f172a 1px, transparent 0);
+      background-size: 16px 16px;
+      mix-blend-mode: multiply;
+    }
+    .bp-commerce-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 42px 24px 110px;
+    }
+    .bp-glass {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(255,255,255,0.64), rgba(255,255,255,0.32));
+      border: 1px solid rgba(255,255,255,0.76);
+      box-shadow:
+        0 18px 60px rgba(67,56,202,0.10),
+        0 4px 16px rgba(15,23,42,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.92),
+        inset 0 -1px 0 rgba(99,102,241,0.08);
+      backdrop-filter: blur(28px) saturate(175%);
+      -webkit-backdrop-filter: blur(28px) saturate(175%);
+    }
+    .bp-glass::before,
+    .bp-glass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .bp-glass::before {
+      background: linear-gradient(135deg, rgba(255,255,255,0.72), rgba(255,255,255,0) 33%);
+    }
+    .bp-glass::after {
+      background: radial-gradient(circle at 92% 92%, rgba(99,102,241,0.10), transparent 40%);
+    }
+    .bp-glass > * {
+      position: relative;
+      z-index: 1;
+    }
+    .bp-glass-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 32px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      color: #4338ca;
+      font-family: var(--bp-body);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(255,255,255,0.82);
+      box-shadow: 0 8px 22px rgba(67,56,202,0.08), inset 0 1px 0 rgba(255,255,255,0.92);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+    }
+    .bp-glass-button {
+      min-height: 48px;
+      border: 1px solid rgba(255,255,255,0.72);
+      border-radius: 999px;
+      padding: 13px 22px;
+      cursor: pointer;
+      font-family: var(--bp-body);
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .bp-glass-button::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0.08) 56%, rgba(59,130,246,0.08));
+      z-index: -1;
+    }
+    .bp-glass-button::after {
+      content: "";
+      position: absolute;
+      top: -60%;
+      bottom: -60%;
+      left: -52%;
+      width: 38%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.48), transparent);
+      transform: rotate(14deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .bp-glass-button:hover {
+      transform: translateY(-2px) scale(1.006);
+      filter: brightness(1.03);
+    }
+    .bp-glass-button:hover::after {
+      opacity: 1;
+      animation: shine 0.7s ${DS.ease.out} both;
+    }
+    .bp-glass-button:focus-visible,
+    .bp-plan-pill:focus-visible,
+    .bp-plan-chip:focus-visible,
+    .bp-product-preview-option:focus-visible,
+    .bp-purchase-dock__close:focus-visible {
+      outline: 2px solid var(--bp-blue);
+      outline-offset: 3px;
+    }
+    .bp-glass-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      filter: grayscale(0.2);
+    }
+    .bp-glass-button--primary {
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(59,130,246,0.96), rgba(99,102,241,0.96) 48%, rgba(139,92,246,0.95));
+      box-shadow:
+        0 18px 42px rgba(79,70,229,0.24),
+        0 6px 16px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.52),
+        inset 0 -14px 24px rgba(29,78,216,0.18);
+    }
+    .bp-glass-button--secondary {
+      color: var(--bp-text);
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(99,102,241,0.22);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.88);
+    }
+    .bp-product-hero {
+      min-height: calc(100vh - 66px);
+      display: flex;
+      align-items: center;
+      padding: 26px 0 72px;
+    }
+    .bp-product-hero__inner {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.36fr) minmax(390px, 0.94fr);
+      gap: clamp(28px, 4vw, 52px);
+      align-items: start;
+    }
+    .bp-product-theatre {
+      position: relative;
+      min-width: 0;
+    }
+    .bp-product-orb {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 999px;
+      background: radial-gradient(circle at 32% 24%, rgba(255,255,255,0.92), rgba(255,255,255,0.24) 36%, rgba(99,102,241,0.16));
+      border: 1px solid rgba(255,255,255,0.66);
+      box-shadow: inset 0 1px 12px rgba(255,255,255,0.78), 0 24px 52px rgba(67,56,202,0.10);
+      opacity: 0.65;
+    }
+    .bp-product-orb--one { width: 112px; height: 112px; left: -36px; top: 9%; }
+    .bp-product-orb--two { width: 68px; height: 68px; right: 9%; bottom: -24px; }
+    .bp-product-stage {
+      border-radius: 36px;
+      padding: clamp(18px, 2.2vw, 28px);
+      transition: transform 0.18s ease-out;
+      will-change: transform;
+    }
+    .bp-product-stage__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .bp-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--bp-success);
+      box-shadow: 0 0 0 5px rgba(5,150,105,0.10);
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .bp-product-preview-button {
+      width: 100%;
+      border: 0;
+      padding: 12px;
+      cursor: zoom-in;
+      display: block;
+      background: rgba(255,255,255,0.84);
+      border-radius: 28px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.92), 0 18px 42px rgba(15,23,42,0.08);
+      appearance: none;
+      position: relative;
+    }
+    .bp-product-preview-button img {
+      width: 100%;
+      aspect-ratio: 1536 / 1024;
+      object-fit: contain;
+      object-position: center top;
+      display: block;
+      border-radius: 20px;
+      background: #ffffff;
+      filter: contrast(1.06) saturate(1.05) brightness(1.01);
+    }
+    .bp-product-preview-zoom {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #4338ca;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.88);
+      box-shadow: 0 12px 28px rgba(79,70,229,0.14), inset 0 1px 0 rgba(255,255,255,0.94);
+    }
+    .bp-product-preview-selector {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .bp-product-preview-option,
+    .bp-plan-pill,
+    .bp-plan-chip {
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,0.72);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.48);
+      color: var(--bp-text-secondary);
+      cursor: pointer;
+      font-family: var(--bp-body);
+      font-size: 12px;
+      font-weight: 850;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 8px 18px rgba(67,56,202,0.06);
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+    .bp-product-preview-option[aria-pressed="true"],
+    .bp-plan-pill[aria-pressed="true"],
+    .bp-plan-chip.is-active {
+      color: #ffffff;
+      background: var(--bp-gradient);
+      border-color: rgba(255,255,255,0.62);
+      box-shadow: 0 14px 28px rgba(79,70,229,0.20), inset 0 1px 0 rgba(255,255,255,0.46);
+    }
+    .bp-product-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .bp-product-trust-card {
+      border-radius: 22px;
+      padding: 16px;
+      min-height: 112px;
+    }
+    .bp-product-trust-card strong,
+    .bp-value-card h3,
+    .bp-step-card h3 {
+      display: block;
+      color: var(--bp-text);
+      font-size: 14px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      font-weight: 850;
+    }
+    .bp-product-trust-card span,
+    .bp-value-card p,
+    .bp-step-card p {
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 650;
+    }
+    .bp-purchase-panel {
+      border-radius: 34px;
+      padding: clamp(24px, 3vw, 34px);
+    }
+    .bp-product-title {
+      margin: 14px 0 16px;
+      color: var(--bp-text);
+      font-family: var(--bp-display);
+      font-size: clamp(42px, 5vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 0.99;
+    }
+    .bp-product-description {
+      color: var(--bp-text-secondary);
+      font-size: 17px;
+      line-height: 1.75;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .bp-trust-note {
+      border-radius: 20px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.46);
+      border: 1px solid rgba(255,255,255,0.70);
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .bp-plan-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .bp-price-block {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 12px 0 18px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.48);
+      border: 1px solid rgba(255,255,255,0.72);
+    }
+    .bp-price-block__price {
+      font-family: var(--bp-number);
+      font-size: clamp(48px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 0.92;
+      color: var(--bp-text);
+      font-variant-numeric: tabular-nums;
+    }
+    .bp-price-block__meta {
+      text-align: right;
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      font-weight: 750;
+    }
+    .bp-included-list {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 22px;
+      list-style: none;
+    }
+    .bp-included-list li {
+      display: flex;
+      gap: 10px;
+      color: var(--bp-text-secondary);
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+    .bp-included-list li::before {
+      content: "✓";
+      color: var(--bp-success);
+      font-weight: 900;
+    }
+    .bp-commerce-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 88px 24px;
+    }
+    .bp-section-heading {
+      max-width: 760px;
+      margin: 0 auto 42px;
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+    }
+    .bp-section-heading h2,
+    .bp-story-copy h2,
+    .bp-checkout-title h1 {
+      font-family: var(--bp-display);
+      color: var(--bp-text);
+      font-size: clamp(30px, 3.8vw, 52px);
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      font-weight: 700;
+    }
+    .bp-section-heading p,
+    .bp-checkout-title p {
+      color: var(--bp-text-secondary);
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+    .bp-story-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 0.82fr);
+      gap: 48px;
+      align-items: start;
+    }
+    .bp-story-preview {
+      position: sticky;
+      top: 92px;
+      border-radius: 34px;
+      padding: 18px;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.72);
+      box-shadow: 0 18px 52px rgba(67,56,202,0.08);
+    }
+    .bp-story-preview__frame {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .bp-story-preview img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1536 / 1024;
+      object-fit: contain;
+      filter: contrast(1.05) saturate(1.04);
+    }
+    .bp-story-preview p {
+      margin: 14px 4px 0;
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .bp-story-annotation {
+      position: absolute;
+      border: 2px solid rgba(99,102,241,0.55);
+      border-radius: 12px;
+      background: rgba(99,102,241,0.08);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      box-shadow: 0 12px 28px rgba(67,56,202,0.12);
+    }
+    .bp-story-annotation.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .bp-story-annotation--1 { left: 7%; top: 8%; width: 46%; height: 16%; }
+    .bp-story-annotation--2 { left: 57%; top: 30%; width: 34%; height: 34%; }
+    .bp-story-annotation--3 { left: 9%; top: 64%; width: 82%; height: 24%; }
+    .bp-story-copy {
+      display: grid;
+      gap: 18px;
+    }
+    .bp-story-card {
+      padding: 24px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.68);
+      opacity: 0.74;
+      transform: translateY(8px);
+      transition: opacity 0.26s ease, transform 0.26s ease, box-shadow 0.26s ease;
+    }
+    .bp-story-card.is-active {
+      opacity: 1;
+      transform: translateY(0);
+      box-shadow: 0 18px 48px rgba(67,56,202,0.10);
+    }
+    .bp-story-card span {
+      color: var(--bp-indigo);
+      font-family: var(--bp-number);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .bp-story-card h3,
+    .bp-compare-card h3,
+    .bp-faq-item summary {
+      color: var(--bp-text);
+      font-size: 20px;
+      line-height: 1.18;
+      margin: 8px 0 8px;
+      font-weight: 850;
+    }
+    .bp-story-card p,
+    .bp-compare-card p,
+    .bp-faq-item p,
+    .bp-review-card p {
+      color: var(--bp-text-secondary);
+      font-size: 15px;
+      line-height: 1.72;
+      font-weight: 600;
+    }
+    .bp-comparison-grid,
+    .bp-value-grid,
+    .bp-review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+    .bp-value-grid,
+    .bp-review-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .bp-compare-card {
+      border-radius: 32px;
+      padding: 28px;
+    }
+    .bp-compare-card.is-recommended {
+      border-color: rgba(99,102,241,0.28);
+      box-shadow: 0 22px 64px rgba(79,70,229,0.14), inset 0 1px 0 rgba(255,255,255,0.92);
+    }
+    .bp-compare-card__ribbon {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(99,102,241,0.10);
+      color: #4338ca;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .bp-compare-card__price {
+      margin: 18px 0;
+      font-family: var(--bp-number);
+      color: var(--bp-text);
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .bp-compare-card ul {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 24px;
+      list-style: none;
+    }
+    .bp-compare-card li {
+      color: var(--bp-text-secondary);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .bp-compare-card li::before {
+      content: "✓ ";
+      color: var(--bp-success);
+      font-weight: 900;
+    }
+    .bp-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      position: relative;
+    }
+    .bp-steps::before {
+      content: "";
+      position: absolute;
+      left: 15%;
+      right: 15%;
+      top: 34px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.28), transparent);
+    }
+    .bp-step-card,
+    .bp-value-card,
+    .bp-review-card {
+      border-radius: 28px;
+      padding: 24px;
+      background: rgba(255,255,255,0.48);
+      border: 1px solid rgba(255,255,255,0.70);
+      position: relative;
+    }
+    .bp-step-card > span {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      color: #fff;
+      background: var(--bp-gradient);
+      font-family: var(--bp-number);
+      font-weight: 900;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 24px rgba(79,70,229,0.22);
+    }
+    .bp-review-card__top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .bp-review-card__top strong {
+      display: block;
+      color: var(--bp-text);
+      font-weight: 850;
+    }
+    .bp-review-card__top span,
+    .bp-review-card__meta {
+      color: var(--bp-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .bp-review-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--bp-gradient);
+      font-weight: 900;
+    }
+    .bp-review-card__meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .bp-faq-list {
+      display: grid;
+      gap: 12px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .bp-faq-item {
+      border-radius: 22px;
+      padding: 4px 20px;
+    }
+    .bp-faq-item summary {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .bp-faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+    .bp-faq-item p {
+      padding: 0 0 20px;
+    }
+    .bp-faq-cta {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .bp-purchase-dock {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 980;
+      width: min(920px, calc(100vw - 40px));
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto 32px;
+      align-items: center;
+      gap: 18px;
+      padding: 12px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.64);
+      border: 1px solid rgba(255,255,255,0.78);
+      box-shadow: 0 24px 70px rgba(15,23,42,0.16), inset 0 1px 0 rgba(255,255,255,0.92);
+      backdrop-filter: blur(26px) saturate(170%);
+      -webkit-backdrop-filter: blur(26px) saturate(170%);
+    }
+    .bp-purchase-dock__product,
+    .bp-purchase-dock__action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .bp-purchase-dock__thumb {
+      width: 58px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid rgba(255,255,255,0.88);
+    }
+    .bp-purchase-dock__name {
+      color: var(--bp-text);
+      font-size: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bp-purchase-dock__meta {
+      color: var(--bp-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .bp-purchase-dock__plans {
+      display: flex;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px;
+      background: rgba(255,255,255,0.48);
+      border: 1px solid rgba(255,255,255,0.72);
+    }
+    .bp-plan-chip {
+      border-radius: 999px;
+      min-height: 38px;
+      padding: 0 14px;
+    }
+    .bp-purchase-dock__price {
+      font-family: var(--bp-number);
+      color: var(--bp-text);
+      font-size: 28px;
+      font-weight: 900;
+    }
+    .bp-purchase-dock__button {
+      min-height: 44px;
+      padding: 11px 18px;
+    }
+    .bp-purchase-dock__close {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 999px;
+      color: var(--bp-text-muted);
+      background: rgba(255,255,255,0.50);
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .bp-preview-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15,23,42,0.56);
+      backdrop-filter: blur(18px) saturate(145%);
+      -webkit-backdrop-filter: blur(18px) saturate(145%);
+    }
+    .bp-preview-modal__panel {
+      width: min(94vw, 1180px);
+      max-height: 88vh;
+      border-radius: 32px;
+      padding: 14px;
+    }
+    .bp-preview-modal__close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 3;
+    }
+    .bp-preview-modal img {
+      display: block;
+      width: 100%;
+      max-height: calc(88vh - 28px);
+      object-fit: contain;
+      border-radius: 22px;
+      background: #ffffff;
+    }
+    .bp-checkout-page {
+      padding-bottom: 80px;
+    }
+    .bp-checkout-header {
+      position: relative;
+      z-index: 1;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.52);
+      background: linear-gradient(135deg, rgba(59,130,246,0.92), rgba(99,102,241,0.90), rgba(139,92,246,0.88));
+      color: #fff;
+    }
+    .bp-checkout-header__inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .bp-checkout-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 38px 24px;
+    }
+    .bp-checkout-title {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+    .bp-session-timer {
+      max-width: 720px;
+      margin: 0 auto 26px;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(255,255,255,0.78);
+      box-shadow: 0 14px 40px rgba(67,56,202,0.10), inset 0 1px 0 rgba(255,255,255,0.92);
+      backdrop-filter: blur(22px) saturate(170%);
+      -webkit-backdrop-filter: blur(22px) saturate(170%);
+    }
+    .bp-session-timer.is-low {
+      border-color: rgba(217,119,6,0.32);
+    }
+    .bp-session-timer.is-expired {
+      border-color: rgba(220,38,38,0.28);
+      background: rgba(255,255,255,0.72);
+    }
+    .bp-session-timer__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #4338ca;
+      background: rgba(99,102,241,0.10);
+      font-size: 24px;
+    }
+    .bp-session-timer__copy {
+      display: grid;
+      gap: 3px;
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+    .bp-session-timer__copy strong {
+      color: var(--bp-text);
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .bp-session-timer__time {
+      font-family: var(--bp-number);
+      color: #4338ca;
+      font-size: 30px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    .bp-session-timer.is-low .bp-session-timer__time {
+      color: var(--bp-warning);
+    }
+    .bp-session-timer__restart {
+      min-height: 42px;
+      border: 1px solid rgba(217,119,6,0.24);
+      border-radius: 999px;
+      padding: 0 14px;
+      color: #92400e;
+      background: rgba(254,243,199,0.62);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .bp-checkout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+      gap: 34px;
+      align-items: start;
+    }
+    .bp-checkout-card,
+    .bp-checkout-summary {
+      border-radius: 32px;
+      padding: 28px;
+    }
+    .bp-checkout-card h2,
+    .bp-checkout-summary h2,
+    .bp-razorpay-panel h2 {
+      color: var(--bp-text);
+      font-family: var(--bp-display);
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+    .bp-field-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .bp-field label {
+      display: block;
+      color: var(--bp-text-secondary);
+      font-size: 14px;
+      font-weight: 850;
+      margin-bottom: 8px;
+    }
+    .bp-field input {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 18px;
+      border: 1.5px solid rgba(99,102,241,0.14);
+      color: var(--bp-text);
+      background: rgba(255,255,255,0.66);
+      padding: 0 16px;
+      font-family: var(--bp-body);
+      font-size: 16px;
+      font-weight: 650;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+    .bp-field input[aria-invalid="true"] {
+      border-color: rgba(220,38,38,0.48);
+    }
+    .bp-field__hint,
+    .bp-field__error {
+      margin-top: 7px;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+    .bp-field__hint {
+      color: var(--bp-text-muted);
+    }
+    .bp-field__error {
+      color: #dc2626;
+    }
+    .bp-plan-toggle {
+      max-width: 480px;
+      margin: 0 auto 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(255,255,255,0.76);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.92), 0 12px 32px rgba(67,56,202,0.08);
+    }
+    .bp-razorpay-panel {
+      margin-top: 20px;
+      border-radius: 32px;
+      padding: 26px;
+    }
+    .bp-razorpay-panel p {
+      color: var(--bp-text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+      font-weight: 650;
+      margin-bottom: 14px;
+    }
+    .bp-security-note {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      color: var(--bp-text-secondary);
+      background: rgba(5,150,105,0.08);
+      border: 1px solid rgba(5,150,105,0.14);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 750;
+    }
+    .bp-trust-timeline {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .bp-trust-timeline div {
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(255,255,255,0.48);
+      border: 1px solid rgba(255,255,255,0.72);
+      color: var(--bp-text-secondary);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 800;
+    }
+    .bp-trust-timeline span {
+      display: block;
+      width: 26px;
+      height: 26px;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--bp-gradient);
+      display: grid;
+      place-items: center;
+      font-family: var(--bp-number);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .bp-checkout-summary {
+      position: sticky;
+      top: 20px;
+    }
+    .bp-summary-product {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(255,255,255,0.76);
+      margin-bottom: 20px;
+    }
+    .bp-summary-product img {
+      width: 104px;
+      height: 72px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: #fff;
+    }
+    .bp-summary-product strong {
+      display: block;
+      color: var(--bp-text);
+      font-size: 15px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+    .bp-summary-product span {
+      display: block;
+      margin-top: 5px;
+      color: var(--bp-text-muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .bp-summary-features {
+      display: grid;
+      gap: 9px;
+      margin: 0 0 20px;
+      list-style: none;
+    }
+    .bp-summary-features li {
+      color: var(--bp-text-secondary);
+      font-size: 13px;
+      font-weight: 750;
+    }
+    .bp-summary-features li::before {
+      content: "✓ ";
+      color: var(--bp-success);
+      font-weight: 900;
+    }
+    .bp-summary-lines {
+      display: grid;
+      gap: 11px;
+      border-top: 1px solid rgba(99,102,241,0.12);
+      border-bottom: 1px solid rgba(99,102,241,0.12);
+      padding: 17px 0;
+      margin-bottom: 18px;
+    }
+    .bp-summary-line,
+    .bp-summary-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--bp-text-secondary);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .bp-summary-line strong,
+    .bp-summary-total strong {
+      color: var(--bp-text);
+      font-family: var(--bp-number);
+      font-variant-numeric: tabular-nums;
+    }
+    .bp-summary-line .is-discount {
+      color: var(--bp-success);
+    }
+    .bp-summary-total {
+      align-items: baseline;
+      color: var(--bp-text);
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+    .bp-summary-total strong {
+      font-size: 36px;
+      background: var(--bp-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bp-payment-error {
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      color: #b91c1c;
+      background: rgba(254,226,226,0.68);
+      border: 1px solid rgba(248,113,113,0.24);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+    .bp-payment-trust {
+      margin-top: 18px;
+      text-align: center;
+    }
+    .bp-payment-trust__label {
+      color: var(--bp-text-secondary);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 10px;
+    }
+    .bp-payment-trust__logos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px;
+    }
+    .bp-payment-logo {
+      min-width: 58px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 13px;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(255,255,255,0.78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.90), 0 6px 14px rgba(15,23,42,0.04);
+      overflow: hidden;
+    }
+    .bp-payment-logo img {
+      max-width: 88px;
+      max-height: 28px;
+      display: block;
+    }
+    .bp-payment-trust p,
+    .bp-delivery-copy {
+      margin-top: 10px;
+      color: var(--bp-text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+    .bp-legal-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .bp-legal-links a {
+      color: #4338ca;
+      text-decoration: none;
+    }
+    .bp-checkout-mobile-cta {
+      display: none;
+    }
+    @media (max-width: 1180px) {
+      .bp-product-hero__inner {
+        grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.92fr);
+        gap: 28px;
+      }
+      .bp-commerce-shell {
+        padding-inline: 20px;
+      }
+    }
+    @media (max-width: 980px) {
+      .bp-product-hero {
+        min-height: 0;
+        padding-top: 22px;
+      }
+      .bp-product-hero__inner,
+      .bp-story-grid,
+      .bp-checkout-grid {
+        grid-template-columns: 1fr;
+      }
+      .bp-story-preview,
+      .bp-checkout-summary {
+        position: relative;
+        top: auto;
+      }
+      .bp-purchase-dock {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        transform: none;
+        grid-template-columns: 1fr auto;
+        border-radius: 24px 24px 0 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      }
+      .bp-purchase-dock__product,
+      .bp-purchase-dock__plans,
+      .bp-purchase-dock__close {
+        display: none;
+      }
+      .bp-purchase-dock__action {
+        justify-content: space-between;
+        grid-column: 1 / -1;
+      }
+      .bp-purchase-dock__button {
+        flex: 1;
+      }
+      .bp-commerce-shell {
+        padding-bottom: 132px;
+      }
+    }
+    @media (max-width: 768px) {
+      .bp-commerce-shell,
+      .bp-commerce-section,
+      .bp-checkout-shell {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .bp-commerce-shell {
+        padding-top: 22px;
+      }
+      .bp-product-stage,
+      .bp-purchase-panel,
+      .bp-checkout-card,
+      .bp-checkout-summary,
+      .bp-razorpay-panel {
+        border-radius: 26px;
+        padding: 18px;
+      }
+      .bp-product-theatre {
+        order: 2;
+      }
+      .bp-purchase-panel {
+        order: 1;
+      }
+      .bp-product-title {
+        font-size: clamp(34px, 10vw, 42px);
+        line-height: 1.04;
+      }
+      .bp-product-description {
+        font-size: 16px;
+        max-width: 30ch;
+        overflow-wrap: break-word;
+      }
+      .bp-trust-note {
+        max-width: 31ch;
+        overflow-wrap: break-word;
+      }
+      .bp-product-preview-selector {
+        grid-template-columns: 1fr 1fr;
+      }
+      .bp-product-trust-grid,
+      .bp-steps,
+      .bp-value-grid,
+      .bp-review-grid,
+      .bp-trust-timeline {
+        grid-template-columns: 1fr;
+      }
+      .bp-comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      .bp-steps::before {
+        display: none;
+      }
+      .bp-section-heading {
+        margin-bottom: 28px;
+      }
+      .bp-section-heading h2,
+      .bp-story-copy h2,
+      .bp-checkout-title h1 {
+        font-size: clamp(28px, 8vw, 34px);
+        max-width: 100%;
+        overflow-wrap: break-word;
+        text-wrap: balance;
+      }
+      .bp-checkout-title p {
+        max-width: 28ch;
+        font-size: 15px;
+        overflow-wrap: break-word;
+      }
+      .bp-checkout-header__inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .bp-checkout-header__inner > div:last-child {
+        font-size: 12px;
+      }
+      .bp-session-timer {
+        grid-template-columns: 38px 1fr;
+      }
+      .bp-session-timer__time,
+      .bp-session-timer__restart {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        text-align: center;
+      }
+      .bp-summary-product {
+        grid-template-columns: 88px 1fr;
+      }
+      .bp-summary-product img {
+        width: 88px;
+        height: 64px;
+      }
+      .bp-checkout-page {
+        padding-bottom: 112px;
+      }
+      .bp-checkout-mobile-cta {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 990;
+        display: grid;
+        gap: 8px;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(255,255,255,0.78);
+        border-top: 1px solid rgba(255,255,255,0.82);
+        box-shadow: 0 -18px 52px rgba(15,23,42,0.12), inset 0 1px 0 rgba(255,255,255,0.92);
+        backdrop-filter: blur(24px) saturate(170%);
+        -webkit-backdrop-filter: blur(24px) saturate(170%);
+      }
+      .bp-checkout-mobile-cta__top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--bp-text);
+        font-size: 13px;
+        font-weight: 900;
+      }
+    }
+    @media (max-width: 520px) {
+      .bp-plan-selector,
+      .bp-plan-toggle {
+        grid-template-columns: 1fr;
+      }
+      .bp-price-block {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .bp-price-block__meta {
+        text-align: left;
+      }
+      .bp-product-preview-button {
+        padding: 8px;
+        border-radius: 22px;
+      }
+      .bp-product-preview-button img {
+        border-radius: 16px;
+      }
+      .bp-commerce-section {
+        padding-top: 58px;
+        padding-bottom: 58px;
+      }
+      .bp-payment-logo {
+        min-width: 54px;
+      }
+      .bp-payment-logo img {
+        max-width: 78px;
+      }
+      .bp-preview-modal {
+        padding: 12px;
+      }
+      .bp-preview-modal__panel {
+        padding: 8px;
+        border-radius: 24px;
+      }
+      .bp-preview-modal img {
+        border-radius: 18px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bp-product-stage,
+      .bp-story-card,
+      .bp-story-annotation,
+      .bp-glass-button {
+        transition: none !important;
+      }
+      .bp-glass-button::after {
+        display: none;
+      }
     }
 
     /* ── Liquid glass bubble — soft floating orb, sits behind content ── */
@@ -710,6 +2179,7 @@ const GlobalStyles = () => (
       text-shadow: 0 1px 0 rgba(255,255,255,0.90), 0 8px 18px rgba(99,102,241,0.12);
     }
     .pricing-title-gradient {
+      font-family: var(--bp-display) !important;
       color: #111827;
       text-shadow: 0 1px 0 rgba(255,255,255,0.95), 0 12px 26px rgba(30,64,175,0.13);
     }
@@ -730,6 +2200,368 @@ const GlobalStyles = () => (
         0 1px 0 rgba(255,255,255,0.95),
         0 12px 26px rgba(15,23,42,0.13),
         0 22px 44px rgba(79,70,229,0.14);
+    }
+
+    .bp-home-reviews {
+      position: relative;
+      overflow: hidden;
+      padding: 86px 20px 90px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(59,130,246,0.10), transparent 34%),
+        radial-gradient(circle at 88% 75%, rgba(139,92,246,0.10), transparent 36%),
+        linear-gradient(180deg, #ffffff 0%, #f8f9ff 100%);
+    }
+    .bp-home-reviews::before,
+    .bp-home-reviews::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(255,255,255,0.72), rgba(255,255,255,0.12) 38%, transparent 64%),
+        linear-gradient(145deg, rgba(219,234,254,0.28), rgba(237,233,254,0.20));
+      border: 1px solid rgba(255,255,255,0.62);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 26px 72px rgba(99,102,241,0.10);
+      filter: blur(0.2px);
+    }
+    .bp-home-reviews::before {
+      width: 240px;
+      height: 240px;
+      left: max(-90px, calc((100vw - 1180px) / 2 - 150px));
+      top: 72px;
+    }
+    .bp-home-reviews::after {
+      width: 180px;
+      height: 180px;
+      right: max(-72px, calc((100vw - 1180px) / 2 - 110px));
+      bottom: 84px;
+    }
+    .bp-home-reviews__inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .bp-home-reviews__header {
+      max-width: 720px;
+      margin: 0 auto 24px;
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+    }
+    .bp-home-reviews__header p {
+      color: var(--bp-text-secondary);
+      font-size: 16px;
+      line-height: 1.72;
+      font-weight: 600;
+    }
+    .bp-home-reviews__proof {
+      width: fit-content;
+      max-width: min(760px, 100%);
+      min-height: 52px;
+      margin: 0 auto 34px;
+      padding: 10px 16px 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      flex-wrap: wrap;
+      border-radius: 999px;
+      color: #334155;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255,255,255,0.98), rgba(255,255,255,0.50) 58%, rgba(255,255,255,0.28)),
+        linear-gradient(145deg, rgba(255,255,255,0.82), rgba(219,234,254,0.42), rgba(237,233,254,0.38));
+      border: 1px solid rgba(255,255,255,0.86);
+      box-shadow:
+        0 18px 54px rgba(79,70,229,0.13),
+        0 0 0 1px rgba(99,102,241,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.92);
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 800;
+      text-align: left;
+    }
+    .bp-proof-avatars {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      padding-left: 4px;
+    }
+    .bp-proof-avatars span {
+      width: 30px;
+      height: 30px;
+      margin-left: -7px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--bp-gradient);
+      border: 2px solid rgba(255,255,255,0.88);
+      box-shadow: 0 8px 18px rgba(79,70,229,0.18);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .bp-proof-avatars span:first-child {
+      margin-left: 0;
+    }
+    .bp-proof-stat,
+    .bp-proof-weekly {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      color: #334155;
+      white-space: nowrap;
+    }
+    .bp-proof-stat strong,
+    .bp-proof-weekly strong {
+      color: #111827;
+      font-family: var(--bp-number);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .bp-proof-divider {
+      width: 1px;
+      height: 22px;
+      flex: 0 0 auto;
+      background: rgba(99,102,241,0.18);
+    }
+    .bp-proof-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      background: #16a34a;
+      box-shadow: 0 0 0 4px rgba(22,163,74,0.10);
+    }
+    .bp-proof-fallback {
+      color: #334155;
+      font-weight: 800;
+    }
+    .bp-home-reviews__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      max-width: 940px;
+      margin: 0 auto;
+      align-items: stretch;
+    }
+    .bp-home-review-card {
+      position: relative;
+      min-width: 0;
+      height: 100%;
+      min-height: 306px;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: 18px;
+      align-content: stretch;
+      border-radius: 28px;
+      padding: 26px;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.70), rgba(255,255,255,0.38));
+      border: 1px solid rgba(255,255,255,0.80);
+      box-shadow:
+        0 20px 55px rgba(67,56,202,0.09),
+        0 5px 16px rgba(15,23,42,0.05),
+        inset 0 1px 0 rgba(255,255,255,0.94);
+      backdrop-filter: blur(24px) saturate(165%);
+      -webkit-backdrop-filter: blur(24px) saturate(165%);
+      transition: transform 0.22s var(--bp-ease, cubic-bezier(0.4,0,0.2,1)), box-shadow 0.22s var(--bp-ease, cubic-bezier(0.4,0,0.2,1));
+    }
+    .bp-home-review-card::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(255,255,255,0.86), transparent 32%),
+        linear-gradient(160deg, rgba(59,130,246,0.08), transparent 38%, rgba(139,92,246,0.08));
+    }
+    .bp-home-review-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    .bp-home-review-card__quote {
+      position: absolute;
+      top: 10px;
+      right: 22px;
+      z-index: 0;
+      font-family: var(--bp-display);
+      font-size: 92px;
+      line-height: 1;
+      color: rgba(99,102,241,0.12);
+      pointer-events: none;
+    }
+    .bp-home-review-card__rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      align-self: start;
+      min-height: 18px;
+      color: #f59e0b;
+    }
+    .bp-home-review-card__star {
+      display: inline-flex;
+      color: rgba(203,213,225,0.92);
+    }
+    .bp-home-review-card__star.is-filled {
+      color: #f59e0b;
+    }
+    .bp-home-review-card__text {
+      color: var(--bp-text);
+      font-family: var(--bp-body);
+      font-size: clamp(15px, 1.5vw, 16.5px);
+      line-height: 1.75;
+      font-weight: 600;
+      margin: 0;
+      align-self: start;
+    }
+    .bp-home-review-card__footer {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(99,102,241,0.12);
+      min-width: 0;
+      align-self: end;
+    }
+    .bp-home-review-card__avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #ffffff;
+      background: var(--bp-gradient);
+      font-family: var(--bp-body);
+      font-size: 12px;
+      font-weight: 850;
+      box-shadow: 0 10px 22px rgba(79,70,229,0.24), inset 0 1px 0 rgba(255,255,255,0.36);
+    }
+    .bp-home-review-card__person {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+    .bp-home-review-card__person strong {
+      color: var(--bp-text);
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+    .bp-home-review-card__person span {
+      color: var(--bp-text-muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .bp-home-review-card__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .bp-home-review-card__pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: #4338ca;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.14);
+      font-size: 11px;
+      font-weight: 850;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .bp-home-review-card:hover {
+        transform: translateY(-4px) scale(1.005);
+        box-shadow:
+          0 26px 64px rgba(67,56,202,0.12),
+          0 7px 20px rgba(15,23,42,0.07),
+          inset 0 1px 0 rgba(255,255,255,0.96);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bp-home-review-card {
+        transition: none;
+      }
+      .bp-home-review-card:hover {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .bp-home-reviews__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 768px) {
+      .bp-home-reviews {
+        padding: 72px 16px 78px;
+      }
+      .bp-home-reviews__header {
+        margin-bottom: 22px;
+      }
+      .bp-home-reviews__proof {
+        width: 100%;
+        margin-bottom: 24px;
+        border-radius: 24px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 12px 14px;
+        font-size: 13px;
+      }
+      .bp-proof-stat,
+      .bp-proof-weekly {
+        white-space: normal;
+      }
+      .bp-proof-divider {
+        display: none;
+      }
+      .bp-home-reviews__grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .bp-home-review-card {
+        padding: 22px;
+        border-radius: 26px;
+      }
+      .bp-home-review-card__quote {
+        top: 8px;
+        right: 18px;
+        font-size: 72px;
+      }
+    }
+    @media (max-width: 390px) {
+      .bp-home-review-card {
+        padding: 20px;
+      }
+      .bp-home-reviews__proof {
+        display: grid;
+        grid-template-columns: auto 1fr;
+      }
+      .bp-proof-stat,
+      .bp-proof-weekly,
+      .bp-proof-fallback {
+        grid-column: 2;
+      }
+      .bp-home-reviews__header p {
+        font-size: 15px;
+      }
+      .bp-home-review-card__footer {
+        align-items: flex-start;
+      }
     }
 
     /* ── Skeleton ── */
@@ -1161,7 +2993,7 @@ const DashboardImage = memo(({ type = "monthly", loading = "eager", fit = "conta
       alt={alt}
       loading={loading}
       decoding="async"
-      fetchPriority={loading === "eager" ? "high" : "auto"}
+      fetchpriority={loading === "eager" ? "high" : "auto"}
       onError={()=>setErrored(true)}
       style={{ width:"100%", height:"100%", objectFit:fit, objectPosition:position, display:"block", imageRendering:"auto", ...style }}
     />
@@ -1551,11 +3383,11 @@ const HeroSection = memo(({ onNavigate }) => {
           <div style={{flex:"0 0 40%",display:"flex",flexDirection:"column",gap:24,minWidth:0}}>
             {/* Badges */}
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-              <Badge color="rgba(239,68,68,0.10)" text="#dc2626" style={{border:"1px solid rgba(239,68,68,0.18)"}}>
-                🔥 Limited-time Pricing
+              <Badge color="rgba(99,102,241,0.10)" text="#4338ca" style={{border:"1px solid rgba(99,102,241,0.18)"}}>
+                Instant spreadsheet setup
               </Badge>
-              <Badge color="rgba(245,158,11,0.10)" text="#b45309" style={{border:"1px solid rgba(245,158,11,0.20)"}}>
-                ⭐ 4.9 Rating · 5,000+ Buyers
+              <Badge color="rgba(5,150,105,0.10)" text="#047857" style={{border:"1px solid rgba(5,150,105,0.18)"}}>
+                Private Excel + Google Sheets
               </Badge>
             </div>
 
@@ -1744,7 +3576,7 @@ const DashboardPreview = memo(({ selectedMonth="Jun", onMonthChange }) => {
       {/* Header */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <div>
-          <div style={{fontFamily:DS.font.heading,fontSize:14,fontWeight:800,color:DS.color.navy,letterSpacing:"-0.01em"}}>Smart Expense Tracker</div>
+          <div style={{fontFamily:DS.font.body,fontSize:14,fontWeight:800,color:DS.color.navy,letterSpacing:"-0.01em"}}>Smart Expense Tracker</div>
           <div style={{fontSize:10,color:DS.color.slateLight,marginTop:2}}>{selectedMonth} 2026 · Income, expenses, savings</div>
         </div>
         {onMonthChange?(
@@ -1872,7 +3704,7 @@ const Nav = memo(() => {
               fontSize:17,
               boxShadow:"0 4px 14px rgba(99,102,241,0.35)",
             }}>📊</div>
-            <span className="brand-wordmark-3d" style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:0}}>
+            <span className="brand-wordmark-3d" style={{fontFamily:DS.font.body,fontWeight:900,fontSize:20,color:DS.color.navy,letterSpacing:0}}>
               Budget<span className="brand-pro-outline" style={{color:"#4f46e5",WebkitTextFillColor:"#4f46e5"}}>Pro</span>
             </span>
           </button>
@@ -2019,22 +3851,115 @@ const PricingCard = memo(({ plan }) => {
   );
 });
 
-// Testimonial
-const TestimonialCard = memo(({ t }) => (
-  <div className="glass-card card-lift" style={{borderRadius:DS.radius["2xl"],padding:24,display:"flex",flexDirection:"column",gap:14}}>
-    <div style={{display:"flex",gap:2}}>{[1,2,3,4,5].map(s=><Icon key={s} name="star" size={14} color={DS.color.gold} filled/>)}</div>
-    <p style={{color:DS.color.slate,fontSize:DS.type.sm,lineHeight:1.8,fontStyle:"italic",flex:1}}>"{t.text}"</p>
-    <div style={{display:"flex",alignItems:"center",gap:12,paddingTop:14,borderTop:`1px solid ${DS.color.border}`}}>
-      <div style={{width:44,height:44,borderRadius:"50%",background:DS.grad.cta,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,flexShrink:0,boxShadow:"0 4px 12px rgba(99,102,241,0.30)"}}>{t.avatar}</div>
-      <div>
-        <div style={{fontWeight:700,fontSize:14,color:DS.color.navy}}>{t.name}</div>
-        <div style={{fontSize:DS.type.xs,color:DS.color.slateLight,marginTop:1}}>{t.role}</div>
-      </div>
-    </div>
-  </div>
-));
-
 // ═══════════════════════════════════════════════════════════════════
+const homeTestimonials = [
+  {
+    id: "priya-sharma",
+    name: "Priya Sharma",
+    initials: "PS",
+    role: "Homemaker, Mumbai",
+    city: "",
+    text: "This dashboard changed how I manage our family budget. I finally know where every rupee goes. Worth 10x the price!",
+    rating: 5,
+    plan: null,
+    verified: false,
+    approved: true,
+    date: null,
+  },
+  {
+    id: "rahul-verma",
+    name: "Rahul Verma",
+    initials: "RV",
+    role: "Software Engineer, Bangalore",
+    city: "",
+    text: "Worth every rupee. My savings went from 8% to 31% in just 4 months. Smart Expense Tracker is a game changer.",
+    rating: 5,
+    plan: null,
+    verified: false,
+    approved: true,
+    date: null,
+  },
+  {
+    id: "ananya-patel",
+    name: "Ananya Patel",
+    initials: "AP",
+    role: "Freelancer, Ahmedabad",
+    city: "",
+    text: "Finally an expense tracker that doesn't feel overwhelming. Set it up in 10 minutes and I've been using it every day.",
+    rating: 5,
+    plan: null,
+    verified: false,
+    approved: true,
+    date: null,
+  },
+  {
+    id: "deepak-singh",
+    name: "Deepak Singh",
+    initials: "DS",
+    role: "Teacher, Delhi",
+    city: "",
+    text: "My savings rate went from 10% to 28% in 3 months! I could finally afford my dream vacation.",
+    rating: 5,
+    plan: null,
+    verified: false,
+    approved: true,
+    date: null,
+  },
+];
+
+const VERIFIED_PURCHASE_COUNT = Number(
+  process.env.REACT_APP_VERIFIED_PURCHASE_COUNT || 0
+);
+
+const VERIFIED_WEEKLY_PURCHASE_COUNT = Number(
+  process.env.REACT_APP_VERIFIED_WEEKLY_PURCHASE_COUNT || 0
+);
+
+const TestimonialCard = memo(({ t }) => {
+  const numericRating = Number(t.rating);
+  const rating = Number.isFinite(numericRating) ? Math.max(0, Math.min(5, numericRating)) : null;
+  const metadata = [t.role, t.city].filter(Boolean).join(" | ");
+  const initials = t.initials || t.avatar || t.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+  const quote = t.quote || t.text;
+
+  return (
+    <article className="bp-home-review-card" aria-label={`Customer story from ${t.name}`}>
+      <div className="bp-home-review-card__quote" aria-hidden="true">"</div>
+      {rating !== null && (
+        <div className="bp-home-review-card__rating" aria-label={`${rating} out of 5 stars`}>
+          {Array.from({ length: 5 }, (_, index) => {
+            const isFilled = index < Math.round(rating);
+
+            return (
+              <span
+                key={index}
+                className={`bp-home-review-card__star ${isFilled ? "is-filled" : "is-empty"}`}
+                aria-hidden="true"
+              >
+                <Icon name="star" size={15} color="currentColor" filled={isFilled} />
+              </span>
+            );
+          })}
+        </div>
+      )}
+      <p className="bp-home-review-card__text">"{quote}"</p>
+      <div className="bp-home-review-card__footer">
+        <div className="bp-home-review-card__avatar" aria-hidden="true">{initials}</div>
+        <div className="bp-home-review-card__person">
+          <strong>{t.name}</strong>
+          {metadata && <span>{metadata}</span>}
+        </div>
+      </div>
+      {(t.verified === true || t.plan) && (
+        <div className="bp-home-review-card__meta">
+          {t.verified === true && <span className="bp-home-review-card__pill">Verified Purchase</span>}
+          {t.plan && <span className="bp-home-review-card__pill">{t.plan}</span>}
+        </div>
+      )}
+    </article>
+  );
+});
+
 //  HOME PAGE
 // ═══════════════════════════════════════════════════════════════════
 const HomePage = memo(() => {
@@ -2059,12 +3984,16 @@ const HomePage = memo(() => {
     };
   },[]);
 
-  const testimonials=[
-    {name:"Priya Sharma", role:"Homemaker, Mumbai",            text:"This dashboard changed how I manage our family budget. I finally know where every rupee goes. Worth 10x the price!",  avatar:"PS"},
-    {name:"Rahul Verma",  role:"Software Engineer, Bangalore", text:"Worth every rupee. My savings went from 8% to 31% in just 4 months. Smart Expense Tracker is a game changer.",        avatar:"RV"},
-    {name:"Ananya Patel", role:"Freelancer, Ahmedabad",        text:"Finally an expense tracker that doesn't feel overwhelming. Set it up in 10 minutes and I've been using it every day.", avatar:"AP"},
-    {name:"Deepak Singh", role:"Teacher, Delhi",               text:"My savings rate went from 10% to 28% in 3 months! I could finally afford my dream vacation.",                          avatar:"DS"},
-  ];
+  const approvedTestimonials = homeTestimonials.filter((t) => t.approved !== false);
+  const hasVerifiedPurchaseCount =
+    Number.isFinite(VERIFIED_PURCHASE_COUNT) && VERIFIED_PURCHASE_COUNT > 0;
+  const hasVerifiedWeeklyPurchaseCount =
+    Number.isFinite(VERIFIED_WEEKLY_PURCHASE_COUNT) && VERIFIED_WEEKLY_PURCHASE_COUNT > 0;
+  const hasPurchaseActivity = hasVerifiedPurchaseCount || hasVerifiedWeeklyPurchaseCount;
+  const purchaseFormatter = new Intl.NumberFormat("en-IN");
+  const proofInitials = approvedTestimonials
+    .slice(0, 3)
+    .map((t) => t.initials || t.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase());
 
   const benefits=[
     {icon:"trending",title:"Track Every Rupee",       desc:"See exactly where your money goes with automatic categorization. No more month-end surprises."},
@@ -2093,10 +4022,12 @@ const HomePage = memo(() => {
       {/* HERO */}
       <HeroScrollSequence />
 
-      {/* URGENCY STRIP */}
+      {/* VALUE STRIP */}
       <div style={{background:"linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899,#8b5cf6,#6366f1)",backgroundSize:"300% 100%",animation:"gradShift 5s ease infinite",padding:"13px 20px",textAlign:"center"}}>
-        <span style={{color:"#fff",fontSize:DS.type.sm,fontWeight:700}}>⚡ <strong>Limited-time pricing</strong> — save up to 95% today. Price going up soon!</span>
+        <span style={{color:"#fff",fontSize:DS.type.sm,fontWeight:700}}><strong>Instant download</strong> with GST included and payment handled securely by Razorpay.</span>
       </div>
+
+      <HeroSequenceCopy />
 
       {/* PRICING */}
       <section id="pricing" style={{padding:"96px 20px",background:DS.grad.section}}>
@@ -2122,7 +4053,7 @@ const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* LIVE DEMO — real Annual Dashboard preview, not the fake animated chart */}
+      {/* LIVE DEMO — real Annual Dashboard preview */}
       <section style={{padding:"80px 20px",background:"#ffffff",position:"relative",overflow:"hidden"}}>
         <GlassBubble size={160} style={{ top:"12%", right:"6%" }} />
         <GlassBubble size={70}  style={{ bottom:"8%", left:"4%", animationDelay:"2s" }} />
@@ -2180,15 +4111,47 @@ const HomePage = memo(() => {
       </section>
 
       {/* TESTIMONIALS */}
-      <section style={{padding:"80px 20px",background:"#ffffff"}}>
-        <div style={{maxWidth:980,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:52}}>
-            <Badge style={{marginBottom:16}}>Real Reviews</Badge>
-            <h2 className="reviews-heading-premium" style={{fontFamily:DS.font.number,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,letterSpacing:0,marginBottom:8}}>Loved by Thousands of Indians</h2>
-            <p style={{color:DS.color.slateLight,fontSize:16}}>People just like you who took control of their money</p>
+      <section className="bp-home-reviews" aria-labelledby="home-reviews-title">
+        <div className="bp-home-reviews__inner">
+          <div className="bp-home-reviews__header">
+            <Badge>Customer Stories</Badge>
+            <h2 id="home-reviews-title" className="reviews-heading-premium" style={{fontSize:DS.type.h2,color:DS.color.navy,margin:0}}>
+              What BudgetPro Customers Say
+            </h2>
+            <p>Real experiences from people using BudgetPro to understand their monthly spending and plan with greater clarity.</p>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:22}}>
-            {testimonials.map(t=><TestimonialCard key={t.name} t={t}/>)}
+          <div className="bp-home-reviews__proof" aria-label="BudgetPro purchase activity">
+            <span className="bp-proof-avatars" aria-hidden="true">
+              {proofInitials.map((initials) => (
+                <span key={initials}>{initials}</span>
+              ))}
+            </span>
+            {hasVerifiedPurchaseCount && (
+              <span className="bp-proof-stat">
+                <strong>{purchaseFormatter.format(VERIFIED_PURCHASE_COUNT)}+</strong>
+                people have purchased this template
+              </span>
+            )}
+            {hasVerifiedPurchaseCount && hasVerifiedWeeklyPurchaseCount && (
+              <span className="bp-proof-divider" aria-hidden="true" />
+            )}
+            {hasVerifiedWeeklyPurchaseCount && (
+              <span className="bp-proof-weekly">
+                <span className="bp-proof-live-dot" aria-hidden="true" />
+                <strong>{purchaseFormatter.format(VERIFIED_WEEKLY_PURCHASE_COUNT)}</strong>
+                purchased this week
+              </span>
+            )}
+            {!hasPurchaseActivity && (
+              <span className="bp-proof-fallback">
+                Helping BudgetPro customers build clearer money habits.
+              </span>
+            )}
+          </div>
+          <div className="bp-home-reviews__grid">
+            {approvedTestimonials.map((t) => (
+              <TestimonialCard key={t.id} t={t} />
+            ))}
           </div>
         </div>
       </section>
@@ -2230,7 +4193,7 @@ const HomePage = memo(() => {
           <h2 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,marginBottom:18,letterSpacing:"-0.02em",lineHeight:1.15}}>
             Ready to <span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>transform your finances</span>?
           </h2>
-          <p style={{color:DS.color.slateLight,fontSize:17,marginBottom:44,lineHeight:1.75}}>Join 5,000+ Indians already using BudgetPro to save more, spend smarter, and stress less about money.</p>
+          <p style={{color:DS.color.slateLight,fontSize:17,marginBottom:44,lineHeight:1.75}}>Start with a private spreadsheet dashboard built for monthly clarity, annual planning, and faster money reviews.</p>
           <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
             <LiquidBtn variant="white" size="lg" onClick={()=>goTo("/checkout?plan=monthly")} style={{minWidth:200,justifyContent:"center"}}>Start Monthly for ₹19</LiquidBtn>
             <LiquidBtn variant="cta"   size="lg" onClick={()=>goTo("/checkout?plan=yearly")}  style={{minWidth:220,justifyContent:"center",animation:"pulse 2s infinite"}}>Get Full Year for ₹49</LiquidBtn>
@@ -2247,216 +4210,264 @@ const HomePage = memo(() => {
 // ═══════════════════════════════════════════════════════════════════
 const ProductPage = memo(() => {
   const navigate = useNavigate();
-  const goTo = p => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); };
-  const [activeTab,setActiveTab] = useState("features");
+  const goTo = useCallback((p) => { navigate(p); window.scrollTo({top:0,behavior:"smooth"}); }, [navigate]);
   const [selectedPlan,setSelectedPlan] = useState("yearly");
+  const [activePreview,setActivePreview] = useState("annual");
   const [previewOpen,setPreviewOpen] = useState(false);
-  const previewType = selectedPlan === "monthly" ? "monthly" : "annual";
+  const [dockVisible,setDockVisible] = useState(false);
+  const [livePrices,setLivePrices] = useState({
+    monthly:{price:19,original:299,discount:"94% OFF",desc:"One monthly tracker with core income, expense, category, and savings views.",label:"Monthly Smart Expense Tracker"},
+    yearly: {price:49,original:999,discount:"95% OFF",desc:"12 monthly trackers plus one complete annual dashboard.",label:"Full Year Smart Expense Tracker"},
+  });
+  const stageRef = useRef(null);
+  const primaryCtaRef = useRef(null);
+  const previewTriggerRef = useRef(null);
+  const lastFocusedRef = useRef(null);
+  const modalPanelRef = useRef(null);
+  const modalCloseRef = useRef(null);
+  const previewType = activePreview === "monthly" ? "monthly" : "annual";
   const selectedPreview = DASHBOARD_PREVIEWS[previewType];
+  const previewViews = [
+    {id:"monthly",label:"Monthly Dashboard",type:"monthly"},
+    {id:"annual",label:"Annual Dashboard",type:"annual"},
+    {id:"expense",label:"Expense Entry",type:"annual"},
+    {id:"savings",label:"Savings Overview",type:"annual"},
+  ];
+  const selectedPlanData = livePrices[selectedPlan];
+  const currentOriginal = selectedPlanData.original;
+  const currentPrice = selectedPlanData.price;
+  const currentDiscount = currentOriginal - currentPrice;
+
+  useEffect(()=>{
+    fetch("/api/settings").then(r=>r.json()).then(data=>{
+      setLivePrices(prev=>({
+        monthly:{...prev.monthly,price:data?.monthly?.price??prev.monthly.price},
+        yearly: {...prev.yearly, price:data?.yearly?.price ??prev.yearly.price},
+      }));
+    }).catch(()=>{});
+  },[]);
+
+  useEffect(()=>{
+    if (!primaryCtaRef.current || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(([entry])=>{
+      setDockVisible(!entry.isIntersecting);
+    }, { threshold: 0.2 });
+    observer.observe(primaryCtaRef.current);
+    return ()=>observer.disconnect();
+  },[]);
+
+  const selectPlan = useCallback((planId)=>{
+    setSelectedPlan(planId);
+    setActivePreview(planId === "monthly" ? "monthly" : "annual");
+  },[]);
+
+  const buySelectedPlan = useCallback(()=>{
+    goTo(`/checkout?plan=${selectedPlan}`);
+  },[goTo,selectedPlan]);
+
+  const openPreview = useCallback(()=>{
+    lastFocusedRef.current = document.activeElement;
+    setPreviewOpen(true);
+  },[]);
+
+  const closePreview = useCallback(()=>{
+    setPreviewOpen(false);
+    window.setTimeout(()=>{
+      const target = lastFocusedRef.current || previewTriggerRef.current;
+      if (target && typeof target.focus === "function") target.focus();
+    }, 0);
+  },[]);
 
   useEffect(()=>{
     if(!previewOpen) return undefined;
     const prevOverflow = document.body.style.overflow;
     const onKeyDown = e => {
-      if(e.key === "Escape") setPreviewOpen(false);
+      if(e.key === "Escape") {
+        closePreview();
+        return;
+      }
+      if(e.key !== "Tab" || !modalPanelRef.current) return;
+      const focusable = modalPanelRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if(!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if(e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if(!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
+    window.setTimeout(()=>modalCloseRef.current?.focus(), 0);
     return ()=>{
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
+  },[closePreview,previewOpen]);
+
+  const handlePointerMove = useCallback((event)=>{
+    if(!stageRef.current || previewOpen) return;
+    if(window.matchMedia("(max-width: 1024px), (prefers-reduced-motion: reduce)").matches) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    stageRef.current.style.transform = `perspective(1200px) rotateX(${(-y * 2).toFixed(2)}deg) rotateY(${(x * 2).toFixed(2)}deg) translateY(-2px)`;
   },[previewOpen]);
 
-  const features=["Monthly income & expense tracker","Income vs Savings visualization charts","Category-wise expense breakdown","Savings goal progress tracker","Annual expense summary (Full Year only)","Beginner-friendly, no macros needed","Works on Excel 2016+ and Google Sheets","Indian Rupee (₹) formatted throughout","12-month rolling expense view (Full Year)","Print-ready monthly reports"];
-  const specs=[["Format","Excel (.xlsx) + Google Sheets link"],["Compatibility","Excel 2016, 2019, 2021, 365, Google Sheets"],["File Size","~2.4 MB (Monthly) / ~4.1 MB (Full Year)"],["Currency","Indian Rupee (₹), Dollar ($), Euro (€)"],["Language","English"],["Macros","No macros — 100% safe"],["Support","Email support included"]];
+  const resetPointer = useCallback(()=>{
+    if(stageRef.current) stageRef.current.style.transform = "";
+  },[]);
+
+  const included = selectedPlan === "yearly"
+    ? ["12 monthly trackers plus one complete annual dashboard.","Works in Excel and Google Sheets.","One-time purchase with lifetime template access.","Instant download after successful payment verification."]
+    : ["One monthly tracker to start quickly.","Works in Excel and Google Sheets.","One-time purchase with lifetime template access.","Instant download after successful payment verification."];
 
   return (
     <>
-    <div style={{background:DS.grad.section,minHeight:"100vh",padding:"60px 20px",position:"relative",overflow:"hidden"}}>
-      <GlassBubble size={130} style={{ top:"6%", right:"3%" }} />
-      <GlassBubble size={60}  style={{ bottom:"6%", left:"3%", animationDelay:"2.4s" }} />
-      <div style={{maxWidth:1160,margin:"0 auto",position:"relative",zIndex:2}}>
-        <div className="product-grid" style={{display:"grid",gridTemplateColumns:"1.08fr 1fr",gap:44,alignItems:"start"}}>
-          <div className="product-media-glass-panel">
-            <div className="product-preview-shell" style={{
-              boxShadow:"0 36px 92px rgba(79,70,229,0.24), 0 14px 34px rgba(15,23,42,0.12)",
-              borderRadius:DS.radius["3xl"],
-              overflow:"visible",
-              border:"none",
-              background:"transparent",
-              padding:0,
-            }}>
-              <button type="button" className="product-preview-image-wrap product-preview-hd" onClick={()=>setPreviewOpen(true)} title="Open dashboard preview" aria-label={`Open ${selectedPreview.title}`} style={{
-                width:"100%",
-                aspectRatio:"1536 / 1024",
-                borderRadius:26,
-                overflow:"hidden",
-                background:"#ffffff",
-                border:"none",
-                cursor:"zoom-in",
-                padding:0,
-                display:"block",
-                position:"relative",
-                appearance:"none",
-                boxShadow:"0 28px 70px rgba(67,56,202,0.15), 0 10px 24px rgba(15,23,42,0.08), inset 0 0 0 1px rgba(255,255,255,0.92)",
-              }}>
-                <DashboardImage className="dashboard-image-hd" type={previewType} loading="eager" fit="contain" position="center top" />
-                <span aria-hidden="true" style={{position:"absolute",right:14,bottom:14,width:40,height:40,borderRadius:DS.radius.pill,display:"inline-flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(145deg, rgba(255,255,255,0.94), rgba(219,234,254,0.70))",border:"1px solid rgba(255,255,255,0.86)",boxShadow:"0 12px 28px rgba(79,70,229,0.18), inset 0 1px 0 rgba(255,255,255,0.92)",zIndex:3}}>
-                  <Icon name="eye" size={18} color="#4338ca"/>
-                </span>
-              </button>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginTop:14}}>
-              {[{icon:"shield",text:"Secure Payment"},{icon:"zap",text:"Instant Download"},{icon:"check",text:"Lifetime Access"}].map(b=>(
-                <div key={b.text} className="glass-card glass-trust-card" style={{borderRadius:DS.radius.xl,padding:"14px 10px",textAlign:"center"}}>
-                  <Icon name={b.icon} size={18} color="#4f46e5"/><div style={{fontSize:11,color:DS.color.slate,marginTop:7,fontWeight:800}}>{b.text}</div>
+    <main className="bp-commerce-page bp-product-page">
+      <div className="bp-commerce-shell">
+        <section className="bp-product-hero" aria-labelledby="product-title">
+          <div className="bp-product-hero__inner">
+            <div className="bp-product-theatre" onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
+              <span className="bp-product-orb bp-product-orb--one" aria-hidden="true" />
+              <span className="bp-product-orb bp-product-orb--two" aria-hidden="true" />
+              <div className="bp-glass bp-product-stage" ref={stageRef}>
+                <div className="bp-product-stage__header">
+                  <span><span className="bp-live-dot" aria-hidden="true" />Interactive dashboard preview</span>
+                  <span>{activePreview === "monthly" ? "Monthly view" : "Annual view"}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <Badge style={{marginBottom:12}}>Best Seller</Badge>
-            <h1 className="text-3d-heading product-title-premium" style={{fontFamily:"'Space Grotesk', 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",fontSize:DS.type.h1,fontWeight:700,color:DS.color.navy,margin:"12px 0 10px",lineHeight:1.02,letterSpacing:0}}>
-              <span className="product-title-line">Ultimate Budget</span>
-              <span className="product-title-accent">Dashboard Template</span>
-            </h1>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
-              <div style={{display:"flex",gap:2}}>{[1,2,3,4,5].map(s=><Icon key={s} name="star" size={14} color={DS.color.gold} filled/>)}</div>
-              <span style={{color:DS.color.slate,fontSize:13,fontWeight:800}}>4.9 · 312 verified reviews</span>
-            </div>
-            <p style={{color:DS.color.slateLight,lineHeight:1.8,marginBottom:26,fontSize:DS.type.body}}>A professionally designed Excel & Google Sheets template that makes budgeting simple, beautiful, and actually useful.</p>
-
-            {/* Plan selector */}
-            <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:22}}>
-              {[{id:"monthly",label:"Monthly",price:"₹19"},{id:"yearly",label:"Full Year",price:"₹49"}].map(p=>(
-                <button key={p.id} className="premium-btn glass-segment-btn plan-segment-btn" onClick={()=>setSelectedPlan(p.id)} style={{
-                  flex:1,padding:"11px 12px",borderRadius:DS.radius.lg,border:"1px solid rgba(255,255,255,0.50)",cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",
-                  background:selectedPlan===p.id
-                    ? "linear-gradient(135deg, rgba(59,130,246,0.94), rgba(99,102,241,0.94) 48%, rgba(139,92,246,0.94))"
-                    : "linear-gradient(145deg, rgba(255,255,255,0.58), rgba(219,234,254,0.30))",
-                  color:selectedPlan===p.id?"#fff":DS.color.slate,
-                  boxShadow:selectedPlan===p.id
-                    ? "0 16px 34px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.46), inset 0 -12px 22px rgba(67,56,202,0.16)"
-                    : "inset 0 1px 0 rgba(255,255,255,0.66), 0 7px 16px rgba(99,102,241,0.08)",
-                  transition:`all 0.2s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:8,
-                }}>
-                  <span className="plan-label">{p.label}<span style={{fontFamily:DS.font.number,fontWeight:900}}>{p.price}</span></span>
-                  {p.id==="yearly"&&<Badge className="plan-badge" color={selectedPlan===p.id?"rgba(255,255,255,0.22)":"rgba(99,102,241,0.11)"} text={selectedPlan===p.id?"#ffffff":"#4f46e5"} style={{fontSize:9,padding:"2px 7px",border:"1px solid rgba(255,255,255,0.50)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.55), 0 5px 12px rgba(67,56,202,0.16)",textShadow:selectedPlan===p.id?"0 1px 2px rgba(67,56,202,0.35)":"none"}}>Best Value</Badge>}
+                <button
+                  type="button"
+                  className="bp-product-preview-button"
+                  onClick={openPreview}
+                  ref={(node)=>{ previewTriggerRef.current = node; }}
+                  aria-label={`Open ${selectedPreview.title}`}
+                >
+                  <DashboardImage className="dashboard-image-hd" type={previewType} loading="eager" fit="contain" position="center top" />
+                  <span className="bp-product-preview-zoom" aria-hidden="true">
+                    <Icon name="eye" size={18} color="#4338ca"/>
+                  </span>
                 </button>
-              ))}
-            </div>
 
-            <div className="glass-card" style={{borderRadius:DS.radius["2xl"],marginBottom:22,border:"1.5px solid rgba(99,102,241,0.18)"}}>
-              <div style={{padding:"18px 20px"}}>
-                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:20}}>
-                  <span style={{fontFamily:DS.font.number,fontSize:56,fontWeight:900,color:DS.color.navy,lineHeight:1,letterSpacing:"-0.03em"}}>{selectedPlan==="monthly"?"₹19":"₹49"}</span>
-                  <div>
-                    <div style={{fontFamily:DS.font.number,color:DS.color.slateLight,textDecoration:"line-through",fontSize:18}}>{selectedPlan==="monthly"?"₹299":"₹999"}</div>
-                    <Badge color="rgba(239,68,68,0.08)" text="#dc2626">{selectedPlan==="monthly"?"94% OFF":"95% OFF"}</Badge>
-                    {selectedPlan==="yearly"&&<div style={{color:DS.color.gold,fontSize:DS.type.xs,fontWeight:700,marginTop:5}}>⭐ Save ₹30 vs Monthly × 12</div>}
-                  </div>
+                <div className="bp-product-preview-selector" role="group" aria-label="Choose preview">
+                  {previewViews.map(view=>(
+                    <button
+                      key={view.id}
+                      type="button"
+                      className="bp-product-preview-option"
+                      aria-pressed={activePreview === view.id}
+                      onClick={()=>setActivePreview(view.id)}
+                    >
+                      {view.label}
+                    </button>
+                  ))}
                 </div>
-                <LiquidBtn variant="cta" size="lg" onClick={()=>goTo(`/checkout?plan=${selectedPlan}`)} style={{width:"100%",justifyContent:"center"}}>
-                  <Icon name="bag" size={18} color="#fff"/>{selectedPlan==="monthly"?"Buy Monthly — ₹19":"Buy Full Year — ₹49"}
-                </LiquidBtn>
-                <div style={{textAlign:"center",marginTop:10,color:DS.color.slateLight,fontSize:DS.type.xs}}>Secure · Instant delivery · Razorpay</div>
               </div>
-            </div>
 
-            {/* Tabs */}
-            <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:18}}>
-              {["features","specs"].map(t=>(
-                <button key={t} className="premium-btn glass-tab-btn" onClick={()=>setActiveTab(t)} style={{
-                  flex:1,padding:"9px 14px",borderRadius:DS.radius.lg,border:"1px solid rgba(255,255,255,0.50)",cursor:"pointer",
-                  fontWeight:700,fontSize:DS.type.sm,textTransform:"capitalize",fontFamily:"inherit",
-                  background:activeTab===t
-                    ? "linear-gradient(145deg, rgba(255,255,255,0.92), rgba(219,234,254,0.56), rgba(237,233,254,0.62))"
-                    : "linear-gradient(145deg, rgba(255,255,255,0.46), rgba(219,234,254,0.24))",
-                  color:activeTab===t?DS.color.navy:DS.color.slate,
-                  boxShadow:activeTab===t
-                    ? "0 12px 26px rgba(99,102,241,0.14), inset 0 1px 0 rgba(255,255,255,0.82)"
-                    : "inset 0 1px 0 rgba(255,255,255,0.54)",
-                  transition:`all 0.18s ${DS.ease.smooth}`,
-                }}>{t}</button>
-              ))}
-            </div>
-            {activeTab==="features"&&(
-              <div style={{display:"grid",gap:8}}>
-                {features.map(f=>(
-                  <div key={f} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-                    <div style={{background:"rgba(99,102,241,0.10)",borderRadius:"50%",width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}><Icon name="check" size={10} color="#4338ca"/></div>
-                    <span style={{color:DS.color.slate,fontSize:DS.type.sm,lineHeight:1.6}}>{f}</span>
-                  </div>
+              <div className="bp-product-trust-grid">
+                {[
+                  ["Instant digital download","Access appears after successful payment verification."],
+                  ["Lifetime template access","Use your purchased spreadsheet file without a subscription."],
+                  ["Private files on your device","Your budget entries stay inside your own spreadsheet."],
+                ].map(([title,text])=>(
+                  <article className="bp-glass bp-product-trust-card" key={title}>
+                    <strong>{title}</strong>
+                    <span>{text}</span>
+                  </article>
                 ))}
               </div>
-            )}
-            {activeTab==="specs"&&(
-              <div>{specs.map(([k,v])=>(
-                <div key={k} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:`1px solid ${DS.color.border}`}}>
-                  <span style={{color:DS.color.slateLight,fontSize:DS.type.sm}}>{k}</span>
-                  <span style={{color:DS.color.navy,fontSize:DS.type.sm,fontWeight:700,textAlign:"right",maxWidth:"55%"}}>{v}</span>
+            </div>
+
+            <aside className="bp-glass bp-purchase-panel" aria-label="Purchase BudgetPro">
+              <GlassBadge>BudgetPro Smart Expense Tracker</GlassBadge>
+              <h1 className="bp-product-title" id="product-title">See every rupee.<br/>Plan every month.</h1>
+              <p className="bp-product-description">A premium Excel and Google Sheets dashboard that turns everyday income and expenses into a clear monthly and annual plan.</p>
+              <div className="bp-trust-note">
+                No fabricated ratings or buyer counts. BudgetPro shows product details and real delivery/payment guarantees only.
+              </div>
+
+              <div className="bp-plan-selector" role="group" aria-label="Choose tracker plan">
+                {Object.entries(livePrices).map(([id, plan])=>(
+                  <button
+                    type="button"
+                    key={id}
+                    className="bp-plan-pill"
+                    aria-pressed={selectedPlan === id}
+                    onClick={()=>selectPlan(id)}
+                  >
+                    {id === "yearly" ? "Full Year" : "Monthly"} · ₹{plan.price}
+                  </button>
+                ))}
+              </div>
+
+              <div className="bp-price-block">
+                <div>
+                  <div className="bp-price-block__price">₹{currentPrice}</div>
+                  <div className="bp-price-block__meta" style={{textAlign:"left"}}>{selectedPlan === "yearly" ? "12 monthly trackers plus one complete annual dashboard." : "One monthly tracker to start quickly."}</div>
                 </div>
-              ))}</div>
-            )}
+                <div className="bp-price-block__meta">
+                  <div style={{textDecoration:"line-through"}}>₹{currentOriginal}</div>
+                  <div>Save ₹{currentDiscount}</div>
+                </div>
+              </div>
+
+              <ul className="bp-included-list">
+                {included.map(item=><li key={item}>{item}</li>)}
+              </ul>
+
+              <GlassButton ref={primaryCtaRef} onClick={buySelectedPlan} className="bp-product-primary-cta">
+                {selectedPlan === "yearly" ? `Get the Full Year Tracker — ₹${currentPrice}` : `Get the Monthly Tracker — ₹${currentPrice}`}
+              </GlassButton>
+              <p className="bp-delivery-copy">One-time purchase · Lifetime access · Secure Razorpay checkout · Instant digital delivery</p>
+            </aside>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+
+      <ProductStory
+        previewSrc={selectedPreview.src}
+        previewAlt={selectedPreview.alt}
+        plans={livePrices}
+        selectedPlan={selectedPlan}
+        onSelectPlan={selectPlan}
+        onBuy={buySelectedPlan}
+      />
+
+      <StickyPurchaseDock
+        visible={dockVisible && !previewOpen}
+        selectedPlan={selectedPlan}
+        plans={livePrices}
+        previewSrc={selectedPreview.src}
+        previewAlt={selectedPreview.alt}
+        onSelectPlan={selectPlan}
+        onBuy={buySelectedPlan}
+      />
+    </main>
+
     {previewOpen&&(
       <div
         role="dialog"
         aria-modal="true"
         aria-label={selectedPreview.title}
-        onClick={()=>setPreviewOpen(false)}
-        style={{
-          position:"fixed",
-          inset:0,
-          zIndex:1200,
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center",
-          padding:"24px",
-          background:"rgba(15,23,42,0.54)",
-          backdropFilter:"blur(18px) saturate(145%)",
-          WebkitBackdropFilter:"blur(18px) saturate(145%)",
-        }}
+        onClick={closePreview}
+        className="bp-preview-modal"
       >
         <div
-          className="glass-card"
+          className="bp-glass bp-preview-modal__panel"
+          ref={modalPanelRef}
           onClick={e=>e.stopPropagation()}
-          style={{
-            position:"relative",
-            width:"min(94vw, 1180px)",
-            maxHeight:"88vh",
-            borderRadius:DS.radius["3xl"],
-            padding:"14px",
-            overflow:"hidden",
-            border:"1px solid rgba(255,255,255,0.76)",
-            boxShadow:"0 36px 110px rgba(15,23,42,0.30), 0 18px 54px rgba(79,70,229,0.22), inset 0 1px 0 rgba(255,255,255,0.92)",
-          }}
         >
           <button
             type="button"
             aria-label="Close dashboard preview"
-            onClick={()=>setPreviewOpen(false)}
-            className="premium-btn"
-            style={{
-              position:"absolute",
-              top:18,
-              right:18,
-              width:42,
-              height:42,
-              borderRadius:DS.radius.pill,
-              border:"1px solid rgba(255,255,255,0.82)",
-              background:"linear-gradient(145deg, rgba(255,255,255,0.95), rgba(219,234,254,0.76))",
-              display:"inline-flex",
-              alignItems:"center",
-              justifyContent:"center",
-              cursor:"pointer",
-              zIndex:3,
-              boxShadow:"0 14px 32px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.96)",
-            }}
+            onClick={closePreview}
+            className="bp-glass-icon-button bp-preview-modal__close"
+            ref={modalCloseRef}
           >
             <Icon name="close" size={19} color="#0f172a"/>
           </button>
@@ -2557,15 +4568,15 @@ const CheckoutPage = memo(() => {
   const navigate = useNavigate();
   const [searchParams,setSearchParams] = useSearchParams();
   const planFromURL = searchParams.get("plan")==="monthly"?"monthly":"yearly";
-  const [form,setForm]             = useState({name:"",email:"",phone:""});
+  const [form,setForm] = useState({name:"",email:"",phone:""});
   const [selectedPlan,setSelectedPlan] = useState(planFromURL);
-  const [payMethod,setPayMethod]   = useState("upi");
-  const [upiApp,setUpiApp]         = useState("googlepay");
-  const [loading,setLoading]       = useState(false);
-  const [errors,setErrors]         = useState({});
+  const [loading,setLoading] = useState(false);
+  const [errors,setErrors] = useState({});
+  const [pageError,setPageError] = useState("");
+  const checkoutTimer = useCheckoutSessionTimer();
   const [livePrices,setLivePrices] = useState({
-    monthly:{price:19,original:299,discount:"94% OFF",desc:"Single-month expense tracking",label:"Monthly Smart Expense Tracker"},
-    yearly: {price:49,original:999,discount:"95% OFF",desc:"12 months + yearly expense overview",label:"Full Year Smart Expense Tracker"},
+    monthly:{price:19,original:299,discount:"94% OFF",desc:"One monthly tracker with core income, expense, category, and savings views.",label:"Monthly Smart Expense Tracker"},
+    yearly: {price:49,original:999,discount:"95% OFF",desc:"12 monthly trackers plus one complete annual dashboard.",label:"Full Year Smart Expense Tracker"},
   });
 
   useEffect(()=>{
@@ -2579,18 +4590,57 @@ const CheckoutPage = memo(() => {
   useEffect(()=>{ setSearchParams({plan:selectedPlan},{replace:true}); },[selectedPlan,setSearchParams]);
 
   const plan = livePrices[selectedPlan];
+  const previewImage = selectedPlan==="yearly" ? annualDashboardPreview : monthlyDashboardPreview;
+  const planFeatures = selectedPlan==="yearly"
+    ? ["12 monthly dashboards","Annual overview and savings view","Excel file plus Google Sheets-ready copy","Instant download after verified payment"]
+    : ["One monthly dashboard","Income, expenses, categories, and savings views","Excel file plus Google Sheets-ready copy","Instant download after verified payment"];
+  const summaryRows = [
+    ["Original price", "\u20B9"+plan.original, "muted"],
+    ["Discount ("+plan.discount+")", "-\u20B9"+(plan.original-plan.price), "discount"],
+    ["GST", "Included", "normal"],
+    ["Subtotal", "\u20B9"+plan.price, "normal"],
+  ];
+  const fieldData = [
+    {key:"name",label:"Full name",placeholder:"Rahul Sharma",autoComplete:"name",type:"text",maxLength:60},
+    {key:"email",label:"Email address",placeholder:"rahul@email.com",autoComplete:"email",type:"email",maxLength:100,hint:"Your verified download link is sent here."},
+    {key:"phone",label:"Mobile number",placeholder:"9876543210",autoComplete:"tel",type:"tel",maxLength:10,inputMode:"numeric",pattern:"[0-9]*"},
+  ];
+  const paymentDisabled = loading || checkoutTimer.expired;
+
+  const setField = useCallback((key,value)=>{
+    const nextValue = key==="phone" ? value.replace(/\D/g,"").slice(0,10) : value;
+    setForm(current=>({...current,[key]:nextValue}));
+    setErrors(current=>({...current,[key]:null}));
+    setPageError("");
+  },[]);
+
+  const validateCheckout = useCallback(() => {
+    const nextErrors = {};
+    const cleanForm = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+    };
+    if(!cleanForm.name) nextErrors.name = "Full name is required";
+    if(!cleanForm.email.match(/^[^@]+@[^@]+\.[^@]+$/)) nextErrors.email = "Valid email is required";
+    if(!cleanForm.phone.match(/^\d{10}$/)) nextErrors.phone = "10-digit mobile number required";
+    setErrors(nextErrors);
+    return { cleanForm, hasErrors: Object.keys(nextErrors).length > 0 };
+  },[form]);
 
   const handlePay = useCallback(()=>{
-    const e={};
-    const cf={name:form.name.trim(),email:form.email.trim(),phone:form.phone.trim()};
-    if(!cf.name)                         e.name ="Full name is required";
-    if(!cf.email.match(/^[^@]+@[^@]+\.[^@]+$/)) e.email="Valid email is required";
-    if(!cf.phone.match(/^\d{10}$/))     e.phone="10-digit mobile number required";
-    if(Object.keys(e).length){setErrors(e);return;}
+    if(loading) return;
+    if(checkoutTimer.expired){
+      setPageError("Your secure checkout session has expired. Start a new secure session before continuing.");
+      return;
+    }
+    const { cleanForm, hasErrors } = validateCheckout();
+    if(hasErrors) return;
+    setPageError("");
     setLoading(true);
     (async()=>{
       try{
-        const orderRes=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...cf,plan:selectedPlan})});
+        const orderRes=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...cleanForm,plan:selectedPlan})});
         const order=await orderRes.json().catch(()=>({}));
         if(!orderRes.ok||order.error) throw new Error(order.error||"Could not create order");
         const razorpayKey=order.keyId||order.key;
@@ -2599,16 +4649,16 @@ const CheckoutPage = memo(() => {
         const options={
           key:razorpayKey,amount:order.amount,currency:order.currency||"INR",
           name:"BudgetPro",description:plan.label,order_id:razorpayOrderId,
-          prefill:{name:cf.name,email:cf.email,contact:cf.phone},
+          prefill:{name:cleanForm.name,email:cleanForm.email,contact:cleanForm.phone},
           theme:{color:"#6366f1"},
           handler:async function(response){
             try{
               const vr=await fetch("/api/verify-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({razorpay_order_id:response.razorpay_order_id,razorpay_payment_id:response.razorpay_payment_id,razorpay_signature:response.razorpay_signature})});
               const result=await vr.json().catch(()=>({}));
               if(!vr.ok||result.error) throw new Error(result.error||"Payment verification failed");
-              if(result.success){navigate("/success",{state:{name:result.customerName||cf.name,email:result.customerEmail||cf.email,plan:result.plan||selectedPlan,token:result.downloadToken||result.token}});window.scrollTo({top:0,behavior:"smooth"});}
-              else alert("Payment verification failed. Contact support with payment ID: "+response.razorpay_payment_id);
-            }catch(ve){alert((ve&&ve.message)||"Verification failed. Please contact support.");}
+              if(result.success){navigate("/success",{state:{name:result.customerName||cleanForm.name,email:result.customerEmail||cleanForm.email,plan:result.plan||selectedPlan,token:result.downloadToken||result.token}});window.scrollTo({top:0,behavior:"smooth"});}
+              else setPageError("Payment verification failed. Contact support with payment ID: "+response.razorpay_payment_id);
+            }catch(ve){setPageError((ve&&ve.message)||"Verification failed. Please contact support.");}
             finally{setLoading(false);}
           },
           modal:{ondismiss(){setLoading(false);}},
@@ -2616,164 +4666,144 @@ const CheckoutPage = memo(() => {
         const ok=await loadRazorpayScript();
         if(!ok||!window.Razorpay) throw new Error("Payment system failed to load. Please refresh.");
         new window.Razorpay(options).open();
-      }catch(err){alert((err&&err.message)||"Something went wrong.");setLoading(false);}
+      }catch(err){setPageError((err&&err.message)||"Something went wrong.");setLoading(false);}
     })();
-  },[form,selectedPlan,plan,navigate]);
-
-  const inp = field=>({width:"100%",padding:"13px 16px",borderRadius:DS.radius.lg,border:`1.5px solid ${errors[field]?"#ef4444":DS.color.border}`,fontSize:DS.type.body,color:DS.color.navy,background:"rgba(255,255,255,0.80)",transition:`all 0.2s ${DS.ease.smooth}`,fontFamily:"inherit",backdropFilter:"blur(8px)"});
-  const payMethods=[{id:"upi",label:"UPI",icon:"phone"},{id:"card",label:"Card",icon:"creditCard"},{id:"netbanking",label:"Net Banking",icon:"building"}];
-  const upiApps=[
-    {id:"googlepay",label:"Google Pay",mark:"G"},
-    {id:"phonepe",label:"PhonePe",mark:"Pe"},
-    {id:"paytm",label:"Paytm",mark:"Pay"},
-    {id:"bhim",label:"BHIM UPI",mark:"BH"},
-  ];
+  },[checkoutTimer.expired,loading,navigate,plan,selectedPlan,validateCheckout]);
 
   return (
-    <div style={{background:DS.grad.section,minHeight:"100vh"}}>
-      {/* Checkout header */}
-      <div style={{background:DS.grad.cta,padding:"20px 24px",borderBottom:"1px solid rgba(255,255,255,0.15)"}}>
-        <div style={{maxWidth:900,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <span style={{fontSize:22}}>📊</span>
-            <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:18,color:"#fff"}}>Budget<span style={{color:"rgba(255,255,255,0.75)"}}>Pro</span></span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <Icon name="lock" size={14} color="rgba(255,255,255,0.80)"/>
-            <span style={{color:"rgba(255,255,255,0.70)",fontSize:DS.type.sm}}>Secure Checkout · Powered by Razorpay</span>
+    <main className="bp-commerce-page bp-checkout-page">
+      <header className="bp-checkout-header">
+        <div className="bp-checkout-header__inner">
+          <button type="button" onClick={()=>navigate("/product")} style={{display:"inline-flex",alignItems:"center",gap:10,color:"#fff",background:"transparent",border:0,cursor:"pointer",fontFamily:DS.font.body,fontSize:18,fontWeight:900}}>
+            <span style={{width:38,height:38,borderRadius:14,display:"grid",placeItems:"center",background:"rgba(255,255,255,0.16)",border:"1px solid rgba(255,255,255,0.28)"}}>
+              <Icon name="chart" size={20} color="#fff"/>
+            </span>
+            BudgetPro
+          </button>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,color:"rgba(255,255,255,0.82)",fontSize:13,fontWeight:800}}>
+            <Icon name="lock" size={15} color="rgba(255,255,255,0.86)"/>
+            Secure checkout powered by Razorpay
           </div>
         </div>
-      </div>
+      </header>
 
-      <div style={{maxWidth:900,margin:"0 auto",padding:"40px 20px"}}>
-        <div style={{textAlign:"center",marginBottom:28}}>
-          <Badge style={{marginBottom:14}}>Secure Purchase</Badge>
-          <h1 style={{fontFamily:DS.font.heading,fontSize:DS.type.h2,fontWeight:900,color:DS.color.navy,marginBottom:10,letterSpacing:"-0.02em"}}>Get Smart Expense Tracker</h1>
-          <p style={{color:DS.color.slateLight,fontSize:DS.type.body,lineHeight:1.7,maxWidth:560,margin:"0 auto"}}>Start tracking every rupee with a premium Excel dashboard delivered instantly after payment.</p>
+      <section className="bp-checkout-shell">
+        <div className="bp-checkout-title">
+          <GlassBadge>Secure Purchase</GlassBadge>
+          <h1>Complete Your<br/>Order</h1>
+          <p>Choose the tracker you want, enter delivery details, and continue to Razorpay for the secure payment step.</p>
         </div>
 
-        {/* Plan toggle */}
-        <div className="glass-card glass-segment" style={{borderRadius:DS.radius.xl,padding:4,display:"flex",gap:5,marginBottom:32,maxWidth:430}}>
-          {[{id:"monthly",label:"Monthly",price:"₹19"},{id:"yearly",label:"Full Year",price:"₹49"}].map(p=>(
-            <button key={p.id} className={`premium-btn checkout-glass-button ${selectedPlan===p.id?"active":""}`} onClick={()=>setSelectedPlan(p.id)} style={{flex:1,padding:"11px 14px",borderRadius:DS.radius.lg,cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",color:selectedPlan===p.id?"#fff":DS.color.slate,transition:`all 0.22s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-              {p.label}<span style={{fontFamily:DS.font.number,fontWeight:900}}>{p.price}</span>
+        <CheckoutSessionTimer timer={checkoutTimer}/>
+
+        <div className="bp-plan-toggle" aria-label="Choose tracker plan">
+          {Object.entries(livePrices).map(([id,item])=>(
+            <button
+              type="button"
+              key={id}
+              className={"bp-plan-chip " + (selectedPlan===id ? "is-active" : "")}
+              aria-pressed={selectedPlan===id}
+              onClick={()=>{setSelectedPlan(id);setPageError("");}}
+            >
+              {id==="yearly" ? "Full Year" : "Monthly"} - {"\u20B9"+item.price}
             </button>
           ))}
         </div>
 
-        <div className="checkout-grid" style={{display:"grid",gridTemplateColumns:"1fr 360px",gap:28}}>
-          {/* Form */}
-          <div style={{display:"grid",gap:20}}>
-            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
-              <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Personal Information</h3>
-              <div style={{display:"grid",gap:18}}>
-                {[{key:"name",label:"Full Name",placeholder:"Rahul Sharma",hint:null,maxLength:60},{key:"email",label:"Email Address",placeholder:"rahul@email.com",hint:"Your download link will be sent here",maxLength:100},{key:"phone",label:"Mobile Number",placeholder:"9876543210",hint:null,maxLength:10}].map(({key,label,placeholder,hint,maxLength})=>(
-                  <div key={key}>
-                    <label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:7}}>{label}</label>
-                    <input style={inp(key)} placeholder={placeholder} value={form[key]} maxLength={maxLength} onChange={e=>{setForm({...form,[key]:e.target.value});setErrors({...errors,[key]:null});}}/>
-                    {errors[key]&&<div style={{color:"#ef4444",fontSize:DS.type.xs,marginTop:5,fontWeight:600}}>⚠ {errors[key]}</div>}
-                    {hint&&<div style={{fontSize:DS.type.xs,color:DS.color.slateLight,marginTop:5}}>{hint}</div>}
+        <div className="bp-checkout-grid">
+          <div>
+            <section className="bp-glass bp-checkout-card" aria-labelledby="buyer-details-title">
+              <h2 id="buyer-details-title">Buyer details</h2>
+              <div className="bp-field-stack">
+                {fieldData.map(field=>(
+                  <div className="bp-field" key={field.key}>
+                    <label htmlFor={"checkout-"+field.key}>{field.label}</label>
+                    <input
+                      id={"checkout-"+field.key}
+                      type={field.type}
+                      value={form[field.key]}
+                      placeholder={field.placeholder}
+                      autoComplete={field.autoComplete}
+                      maxLength={field.maxLength}
+                      inputMode={field.inputMode}
+                      pattern={field.pattern}
+                      aria-invalid={Boolean(errors[field.key])}
+                      aria-describedby={(field.hint ? "checkout-"+field.key+"-hint " : "") + (errors[field.key] ? "checkout-"+field.key+"-error" : "")}
+                      onChange={event=>setField(field.key,event.target.value)}
+                    />
+                    {field.hint&&<p className="bp-field__hint" id={"checkout-"+field.key+"-hint"}>{field.hint}</p>}
+                    {errors[field.key]&&<p className="bp-field__error" id={"checkout-"+field.key+"-error"}>{errors[field.key]}</p>}
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],padding:"22px"}}>
-              <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Payment Method</h3>
-              <div style={{display:"flex",gap:8,marginBottom:22}}>
-                {payMethods.map(m=>(
-                  <button key={m.id} className={`checkout-glass-button ${payMethod===m.id?"active":""}`} onClick={()=>setPayMethod(m.id)} style={{flex:1,padding:"13px 10px",borderRadius:DS.radius.lg,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:7,transition:`all 0.2s ${DS.ease.smooth}`}}>
-                    <Icon name={m.icon} size={20} color={payMethod===m.id?"#fff":"#4f46e5"}/><span style={{fontSize:DS.type.xs,fontWeight:800,color:payMethod===m.id?"#fff":DS.color.slate}}>{m.label}</span>
-                  </button>
+            <section className="bp-glass bp-razorpay-panel" aria-labelledby="razorpay-title">
+              <h2 id="razorpay-title">Payment happens in Razorpay</h2>
+              <p>BudgetPro does not ask for or store card numbers, CVV, UPI PIN, UPI ID, bank login details, or other sensitive payment credentials on this website.</p>
+              <div className="bp-security-note">
+                <Icon name="shield" size={18} color="#059669" style={{flexShrink:0,marginTop:2}}/>
+                <span>After you continue, Razorpay opens its hosted checkout where you can choose UPI, cards, wallets, or net banking if enabled for the merchant account.</span>
+              </div>
+              <div className="bp-trust-timeline" aria-label="Checkout steps">
+                {["Order created","Razorpay collects payment","Download unlocks instantly"].map((step,index)=>(
+                  <div key={step}><span>{index+1}</span>{step}</div>
                 ))}
               </div>
-              {payMethod==="upi"&&(
-                <div>
-                  <label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:10}}>Select UPI App</label>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
-                    {upiApps.map(a=>(
-                      <button key={a.id} className={`checkout-glass-button ${upiApp===a.id?"active":""}`} onClick={()=>setUpiApp(a.id)} style={{padding:"10px 12px",borderRadius:DS.radius.lg,cursor:"pointer",fontWeight:800,fontSize:DS.type.sm,fontFamily:"inherit",color:upiApp===a.id?"#fff":DS.color.slate,transition:`all 0.18s ${DS.ease.smooth}`,display:"flex",alignItems:"center",justifyContent:"center",gap:9}}>
-                        <span className={`upi-symbol ${a.id}`}>{a.mark}</span>
-                        <span>{a.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <input style={inp("upi")} placeholder="yourname@upi"/>
-                  <div style={{fontSize:DS.type.xs,color:DS.color.slateLight,marginTop:5}}>Or enter your UPI ID above</div>
-                </div>
-              )}
-              {payMethod==="card"&&(
-                <div style={{display:"grid",gap:14}}>
-                  <div><label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:6}}>Card Number</label><input style={inp("card")} placeholder="1234 5678 9012 3456" maxLength={19}/></div>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-                    <div><label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:6}}>Expiry</label><input style={inp("exp")} placeholder="MM / YY" maxLength={7}/></div>
-                    <div><label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:6}}>CVV</label><input style={inp("cvv")} placeholder="•••" maxLength={3} type="password"/></div>
-                  </div>
-                  <div><label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:6}}>Name on Card</label><input style={inp("cardname")} placeholder="Rahul Sharma"/></div>
-                </div>
-              )}
-              {payMethod==="netbanking"&&(
-                <div><label style={{fontSize:DS.type.sm,fontWeight:700,color:DS.color.slate,display:"block",marginBottom:10}}>Select Bank</label>
-                  <select style={{...inp("bank"),cursor:"pointer"}}>
-                    {["SBI","HDFC Bank","ICICI Bank","Axis Bank","Kotak Bank","PNB","Bank of Baroda","Union Bank","Canara Bank","Other Banks"].map(b=><option key={b}>{b}</option>)}
-                  </select>
-                </div>
-              )}
-            </div>
+            </section>
           </div>
 
-          {/* Order summary */}
-          <div style={{position:"sticky",top:20}}>
-            <div className="glass-card checkout-glass-card" style={{borderRadius:DS.radius["2xl"],border:"1.5px solid rgba(99,102,241,0.18)"}}>
-              <div style={{padding:"20px"}}>
-                <h3 style={{fontFamily:DS.font.heading,fontWeight:800,color:DS.color.navy,marginBottom:20,fontSize:DS.type.h4}}>Order Summary</h3>
-                <div style={{display:"flex",gap:12,alignItems:"center",padding:14,background:"rgba(99,102,241,0.05)",borderRadius:DS.radius.xl,marginBottom:18,border:"1px solid rgba(99,102,241,0.10)"}}>
-                  <div style={{background:DS.grad.cta,borderRadius:DS.radius.lg,padding:"10px 14px",color:"#fff",fontSize:22}}>📊</div>
-                  <div>
-                    <div style={{fontWeight:800,color:DS.color.navy,fontSize:13}}>{plan.label}</div>
-                    <div style={{color:DS.color.slateLight,fontSize:DS.type.xs,marginTop:2}}>{plan.desc}</div>
-                    {selectedPlan==="yearly"&&<div style={{color:DS.color.gold,fontSize:DS.type.xs,fontWeight:700,marginTop:3}}>⭐ Best Value</div>}
-                  </div>
-                </div>
-                <div style={{borderTop:`1px solid ${DS.color.border}`,paddingTop:16,marginBottom:22}}>
-                  {[["Original Price",`₹${plan.original}`,true,null],[`Discount (${plan.discount})`,`-₹${plan.original-plan.price}`,false,"#16a34a"],["GST (18%)",`₹${(plan.price*0.18).toFixed(2)}`,false,null]].map(([l,v,strike,color])=>(
-                    <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
-                      <span style={{color:DS.color.slateLight,fontSize:DS.type.sm}}>{l}</span>
-                      <span style={{fontFamily:DS.font.number,color:strike?DS.color.slateLight:(color||DS.color.slate),fontSize:DS.type.sm,fontWeight:600,textDecoration:strike?"line-through":"none"}}>{v}</span>
-                    </div>
-                  ))}
-                  <div style={{display:"flex",justifyContent:"space-between",borderTop:`1px solid ${DS.color.border}`,paddingTop:14,marginTop:8}}>
-                    <span style={{fontWeight:800,color:DS.color.navy,fontSize:DS.type.h4}}>Total</span>
-                    <span style={{fontFamily:DS.font.number,fontWeight:900,background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontSize:28}}>₹{plan.price}</span>
-                  </div>
-                </div>
-                <LiquidBtn variant="cta" size="lg" onClick={handlePay} disabled={loading} style={{width:"100%",justifyContent:"center",animation:!loading?"pulse 2.5s infinite":"none"}}>
-                  {loading?(
-                    <span style={{display:"flex",alignItems:"center",gap:8}}>
-                      <span style={{width:17,height:17,border:"2.5px solid rgba(255,255,255,0.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin 0.7s linear infinite",display:"inline-block"}}/>
-                      Processing...
-                    </span>
-                  ):(<><Icon name="lock" size={18} color="#fff"/> Pay ₹{plan.price} Securely</>)}
-                </LiquidBtn>
-                <div style={{textAlign:"center",marginTop:12,color:DS.color.slateLight,fontSize:DS.type.xs}}>🔒 Powered by Razorpay · 256-bit SSL</div>
-                <div style={{marginTop:14,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
-                  {["Visa","Mastercard","RuPay","UPI","Paytm"].map(p=>(
-                    <span key={p} style={{background:"rgba(15,23,42,0.04)",border:`1px solid ${DS.color.border}`,borderRadius:DS.radius.sm,padding:"3px 10px",fontSize:10,color:DS.color.slateLight,fontWeight:600}}>{p}</span>
-                  ))}
-                </div>
-                <div style={{marginTop:16,background:"rgba(245,158,11,0.08)",borderRadius:DS.radius.lg,padding:"10px 14px",fontSize:DS.type.xs,color:"#b45309",fontWeight:600,textAlign:"center",border:"1px solid rgba(245,158,11,0.18)"}}>⚡ Limited-time pricing — don't miss out!</div>
+          <aside className="bp-glass bp-checkout-summary" aria-label="Order summary">
+            <h2>Order summary</h2>
+            <div className="bp-summary-product">
+              <img src={previewImage} alt={plan.label+" preview"}/>
+              <div>
+                <strong>{plan.label}</strong>
+                <span>{plan.desc}</span>
               </div>
             </div>
-          </div>
+            <ul className="bp-summary-features">
+              {planFeatures.map(feature=><li key={feature}>{feature}</li>)}
+            </ul>
+            <div className="bp-summary-lines">
+              {summaryRows.map(([label,value,tone])=>(
+                <div className="bp-summary-line" key={label}>
+                  <span>{label}</span>
+                  <strong className={tone==="discount" ? "is-discount" : undefined}>{value}</strong>
+                </div>
+              ))}
+            </div>
+            <div className="bp-summary-total">
+              <span>Total payable</span>
+              <strong>{"\u20B9"+plan.price}</strong>
+            </div>
+            {pageError&&<div role="alert" className="bp-payment-error">{pageError}</div>}
+            <GlassButton onClick={handlePay} disabled={paymentDisabled} style={{width:"100%",justifyContent:"center"}}>
+              {loading ? "Preparing Razorpay..." : "Continue to Secure Payment - \u20B9"+plan.price}
+            </GlassButton>
+            <PaymentTrustRow/>
+            <p className="bp-delivery-copy">Verified payments route to the existing download flow and email delivery. GST is included in the displayed price.</p>
+            <div className="bp-legal-links">
+              <button type="button" onClick={()=>navigate("/terms")} style={{background:"none",border:0,cursor:"pointer",color:"#4338ca",fontWeight:800}}>Terms</button>
+              <button type="button" onClick={()=>navigate("/privacy")} style={{background:"none",border:0,cursor:"pointer",color:"#4338ca",fontWeight:800}}>Privacy</button>
+            </div>
+          </aside>
         </div>
+      </section>
+
+      <div className="bp-checkout-mobile-cta">
+        <div className="bp-checkout-mobile-cta__top">
+          <span>{selectedPlan==="yearly" ? "Full Year" : "Monthly"}</span>
+          <strong>{"\u20B9"+plan.price}</strong>
+        </div>
+        <GlassButton onClick={handlePay} disabled={paymentDisabled} style={{width:"100%",justifyContent:"center"}}>
+          {loading ? "Preparing Razorpay..." : "Continue Securely"}
+        </GlassButton>
       </div>
-    </div>
+    </main>
   );
 });
 
-// ═══════════════════════════════════════════════════════════════════
-//  SUCCESS PAGE
-// ═══════════════════════════════════════════════════════════════════
 const SuccessPage = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -2917,7 +4947,7 @@ const AdminDashboard = memo(({ onLogout, token }) => {
   return (
     <div style={{background:DS.grad.section,minHeight:"100vh"}}>
       <div style={{background:DS.grad.cta,padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}><span style={{fontSize:20}}>📊</span><span style={{fontFamily:DS.font.heading,fontWeight:800,fontSize:17,color:"#fff"}}>BudgetPro <span style={{color:"rgba(255,255,255,0.70)"}}>Admin</span></span></div>
+        <div style={{display:"flex",alignItems:"center",gap:12}}><span style={{fontSize:20}}>📊</span><span style={{fontFamily:DS.font.body,fontWeight:800,fontSize:17,color:"#fff"}}>BudgetPro <span style={{color:"rgba(255,255,255,0.70)"}}>Admin</span></span></div>
         <div style={{display:"flex",gap:3,alignItems:"center"}}>
           {adminTabs.map(t=>(
             <button key={t} onClick={()=>setActiveTab(t)} style={{padding:"7px 16px",borderRadius:DS.radius.pill,border:"none",cursor:"pointer",fontWeight:700,fontSize:DS.type.sm,background:activeTab===t?"rgba(255,255,255,0.18)":"transparent",color:activeTab===t?"#fff":"rgba(255,255,255,0.55)",textTransform:"capitalize",transition:`all 0.18s ${DS.ease.smooth}`,fontFamily:"inherit"}}>{t}</button>
@@ -3031,7 +5061,7 @@ const Footer = memo(() => {
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
               <span style={{fontSize:24}}>📊</span>
-              <span style={{fontFamily:DS.font.heading,fontWeight:900,fontSize:20,color:DS.color.navy}}>Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span></span>
+              <span style={{fontFamily:DS.font.body,fontWeight:900,fontSize:20,color:DS.color.navy}}>Budget<span style={{background:DS.grad.cta,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Pro</span></span>
             </div>
             <p style={{fontSize:DS.type.sm,lineHeight:1.8,marginBottom:24,maxWidth:260,color:DS.color.slateLight}}>BudgetPro Smart Expense Tracker helps Indians see every rupee clearly, save smarter, and take control of monthly spending.</p>
             <div style={{display:"flex",gap:10}}>
