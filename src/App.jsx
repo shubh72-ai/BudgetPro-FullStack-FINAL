@@ -2353,14 +2353,23 @@ const GlobalStyles = () => (
       white-space: nowrap;
     }
     .bp-proof-rating strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       color: #111827;
       font-family: var(--bp-number);
       font-size: 15px;
       font-weight: 900;
       letter-spacing: 0;
     }
+    .bp-proof-rating-star {
+      color: #f59e0b;
+      font-size: 16px;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.85);
+    }
     .bp-proof-rating small {
-      color: #64748b;
+      color: #15803d;
       font-size: 12px;
       font-weight: 800;
     }
@@ -4174,7 +4183,10 @@ const HomePage = memo(() => {
               className="bp-proof-rating"
               aria-label="4.5 out of 5. Very Good based on 6,291 ratings by Verified Buyers"
             >
-              <strong>4.5 *</strong>
+              <strong>
+                <span>4.5</span>
+                <span className="bp-proof-rating-star" aria-hidden="true">★</span>
+              </strong>
               <span>Very Good</span>
               <small>based on 6,291 ratings by Verified Buyers</small>
             </span>

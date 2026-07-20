@@ -7,7 +7,8 @@ const SOURCE_END_FRAME = 240;
 const DESKTOP_FRAME_STEP = 2;
 const MOBILE_FRAME_STEP = 4;
 const STATIC_FRAME = 151;
-const HERO_FRAME_ZOOM = 1.06;
+const HERO_FRAME_ZOOM = 1.1;
+const TARGET_CANVAS_WIDTH = 2048;
 const INITIAL_PRELOAD_COUNT = 12;
 const NEXT_FRAME_PRELOAD = 6;
 const PREVIOUS_FRAME_PRELOAD = 4;
@@ -144,7 +145,10 @@ export default function HeroScrollSequence() {
     if (!canvas || !sticky) return null;
 
     const rect = sticky.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const rawDpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const minimumDpr =
+      rect.width > 0 ? TARGET_CANVAS_WIDTH / rect.width : rawDpr;
+    const dpr = Math.min(MAX_DPR, Math.max(rawDpr, minimumDpr));
     const pixelWidth = Math.max(1, Math.round(rect.width * dpr));
     const pixelHeight = Math.max(1, Math.round(rect.height * dpr));
 
@@ -215,10 +219,11 @@ export default function HeroScrollSequence() {
 
     if (width <= 0 || height <= 0) return false;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const dprX = canvas.width / width || Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const dprY = canvas.height / height || dprX;
 
     context.save();
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.setTransform(dprX, 0, 0, dprY, 0, 0);
     context.clearRect(0, 0, width, height);
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
