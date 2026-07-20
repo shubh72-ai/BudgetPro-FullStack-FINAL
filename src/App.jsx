@@ -3,7 +3,7 @@ import {
   BrowserRouter, Routes, Route, useNavigate,
   useLocation, useSearchParams, Navigate,
 } from "react-router-dom";
-import HeroScrollSequence, { HeroSequenceCopy } from "./HeroScrollSequence";
+import HeroScrollSequence from "./HeroScrollSequence";
 import monthlyDashboardPreview from "./assets/monthly-dashboard-preview.png";
 import annualDashboardPreview from "./assets/annual-dashboard-preview.png";
 import ProductStory from "./components/commerce/ProductStory";
@@ -2343,6 +2343,27 @@ const GlobalStyles = () => (
       color: #334155;
       font-weight: 800;
     }
+    .bp-proof-rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      color: #334155;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .bp-proof-rating strong {
+      color: #111827;
+      font-family: var(--bp-number);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .bp-proof-rating small {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+    }
     .bp-home-reviews__grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2555,6 +2576,10 @@ const GlobalStyles = () => (
       .bp-proof-weekly,
       .bp-proof-fallback {
         grid-column: 2;
+      }
+      .bp-proof-rating {
+        grid-column: 2;
+        white-space: normal;
       }
       .bp-home-reviews__header p {
         font-size: 15px;
@@ -4027,8 +4052,6 @@ const HomePage = memo(() => {
         <span style={{color:"#fff",fontSize:DS.type.sm,fontWeight:700}}><strong>Instant download</strong> with GST included and payment handled securely by Razorpay.</span>
       </div>
 
-      <HeroSequenceCopy />
-
       {/* PRICING */}
       <section id="pricing" style={{padding:"96px 20px",background:DS.grad.section}}>
         <div style={{maxWidth:920,margin:"0 auto"}}>
@@ -4147,6 +4170,14 @@ const HomePage = memo(() => {
                 Helping BudgetPro customers build clearer money habits.
               </span>
             )}
+            <span
+              className="bp-proof-rating"
+              aria-label="4.5 out of 5. Very Good based on 6,291 ratings by Verified Buyers"
+            >
+              <strong>4.5 *</strong>
+              <span>Very Good</span>
+              <small>based on 6,291 ratings by Verified Buyers</small>
+            </span>
           </div>
           <div className="bp-home-reviews__grid">
             {approvedTestimonials.map((t) => (

@@ -2,36 +2,48 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const START_FRAME = 31;
-const END_FRAME = 240;
-const FRAME_STEP = 2;
-const ENDING_FRAME_START = 201;
+const SOURCE_START_FRAME = 51;
+const SOURCE_END_FRAME = 240;
+const DESKTOP_FRAME_STEP = 2;
+const MOBILE_FRAME_STEP = 4;
 const STATIC_FRAME = 151;
-const INITIAL_PRELOAD_COUNT = 10;
-const NEXT_FRAME_PRELOAD = 5;
-const PREVIOUS_FRAME_PRELOAD = 3;
+const HERO_FRAME_ZOOM = 1.06;
+const INITIAL_PRELOAD_COUNT = 12;
+const NEXT_FRAME_PRELOAD = 6;
+const PREVIOUS_FRAME_PRELOAD = 4;
 const IDLE_BATCH_SIZE = 4;
 const MAX_DPR = 2;
-const MAX_CANVAS_WIDTH = 2560;
-const MAX_CANVAS_HEIGHT = 1440;
-const HERO_FRAME_ZOOM = 1.08;
 
-const frameNumbers = [];
+const createFrameNumbers = (start, end, step) => {
+  const numbers = [];
 
-for (
-  let frame = START_FRAME;
-  frame <= END_FRAME;
-  frame += frame >= ENDING_FRAME_START ? 1 : FRAME_STEP
-) {
-  frameNumbers.push(frame);
-}
+  for (let frame = start; frame <= end; frame += step) {
+    numbers.push(frame);
+  }
 
-const frameIndexByNumber = new Map(
-  frameNumbers.map((frameNumber, index) => [frameNumber, index])
+  if (numbers[numbers.length - 1] !== end) {
+    numbers.push(end);
+  }
+
+  return numbers;
+};
+
+const desktopFrameNumbers = createFrameNumbers(
+  SOURCE_START_FRAME,
+  SOURCE_END_FRAME,
+  DESKTOP_FRAME_STEP
 );
-
-const LAST_SEQUENCE_FRAME = frameNumbers[frameNumbers.length - 1];
-const LAST_SEQUENCE_INDEX = frameNumbers.length - 1;
+const mobileFrameNumbers = createFrameNumbers(
+  SOURCE_START_FRAME,
+  SOURCE_END_FRAME,
+  MOBILE_FRAME_STEP
+);
+const desktopFrameIndexByNumber = new Map(
+  desktopFrameNumbers.map((frameNumber, index) => [frameNumber, index])
+);
+const mobileFrameIndexByNumber = new Map(
+  mobileFrameNumbers.map((frameNumber, index) => [frameNumber, index])
+);
 
 const getFramePath = (frameNumber) =>
   `/frames/frame_${String(frameNumber).padStart(4, "0")}.webp`;
@@ -42,6 +54,17 @@ const getStaticPreference = () => {
   if (typeof window === "undefined" || !window.matchMedia) return false;
 
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+};
+
+const getNavOffset = () => {
+  if (typeof window === "undefined") return 66;
+
+  const rawValue = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue("--budgetpro-nav-height");
+  const parsedValue = Number.parseFloat(rawValue);
+
+  return Number.isFinite(parsedValue) ? parsedValue : 66;
 };
 
 const requestIdle = (callback) => {
@@ -73,7 +96,7 @@ export default function HeroScrollSequence() {
   const stickyRef = useRef(null);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
-  const copyScrollStateRef = useRef(null);
+  const scrollHintRef = useRef(null);
   const imageCacheRef = useRef(new Map());
   const targetFrameRef = useRef(0);
   const renderedFrameRef = useRef(0);
@@ -84,36 +107,44 @@ export default function HeroScrollSequence() {
   const idleRequestRef = useRef(null);
   const destroyedRef = useRef(false);
   const [isStaticHero, setIsStaticHero] = useState(false);
+  const [isMobileHero, setIsMobileHero] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const activeFrameNumbers = isMobileHero ? mobileFrameNumbers : desktopFrameNumbers;
+  const activeFrameIndexByNumber = isMobileHero
+    ? mobileFrameIndexByNumber
+    : desktopFrameIndexByNumber;
+  const activeFrameStep = isMobileHero ? MOBILE_FRAME_STEP : DESKTOP_FRAME_STEP;
+  const lastSequenceFrame = activeFrameNumbers[activeFrameNumbers.length - 1];
+  const lastSequenceIndex = activeFrameNumbers.length - 1;
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return undefined;
 
+    const mobileQuery = window.matchMedia("(max-width: 767.98px)");
     const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMode = () => setIsStaticHero(getStaticPreference());
+    const updateMode = () => {
+      setIsMobileHero(mobileQuery.matches);
+      setIsStaticHero(getStaticPreference());
+    };
 
     updateMode();
 
+    mobileQuery.addEventListener?.("change", updateMode);
     reduceMotionQuery.addEventListener?.("change", updateMode);
 
     return () => {
+      mobileQuery.removeEventListener?.("change", updateMode);
       reduceMotionQuery.removeEventListener?.("change", updateMode);
     };
   }, []);
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return null;
+    const sticky = stickyRef.current;
+    if (!canvas || !sticky) return null;
 
-    const rect = canvas.getBoundingClientRect();
-    const cssWidth = Math.max(1, rect.width);
-    const cssHeight = Math.max(1, rect.height);
-    const dpr = Math.min(
-      window.devicePixelRatio || 1,
-      MAX_DPR,
-      MAX_CANVAS_WIDTH / cssWidth,
-      MAX_CANVAS_HEIGHT / cssHeight
-    );
+    const rect = sticky.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     const pixelWidth = Math.max(1, Math.round(rect.width * dpr));
     const pixelHeight = Math.max(1, Math.round(rect.height * dpr));
 
@@ -142,11 +173,11 @@ export default function HeroScrollSequence() {
       return staticRecord?.loaded ? STATIC_FRAME : null;
     }
 
-    const targetIndex = clamp(Math.round(sequenceIndex), 0, LAST_SEQUENCE_INDEX);
+    const targetIndex = clamp(Math.round(sequenceIndex), 0, lastSequenceIndex);
 
-    for (let distance = 0; distance <= LAST_SEQUENCE_INDEX; distance += 1) {
-      const beforeFrame = frameNumbers[targetIndex - distance];
-      const afterFrame = frameNumbers[targetIndex + distance];
+    for (let distance = 0; distance <= lastSequenceIndex; distance += 1) {
+      const beforeFrame = activeFrameNumbers[targetIndex - distance];
+      const afterFrame = activeFrameNumbers[targetIndex + distance];
 
       if (beforeFrame !== undefined && imageCacheRef.current.get(beforeFrame)?.loaded) {
         return beforeFrame;
@@ -162,7 +193,7 @@ export default function HeroScrollSequence() {
     }
 
     return null;
-  }, []);
+  }, [activeFrameNumbers, lastSequenceIndex]);
 
   const drawFrame = useCallback((image) => {
     const canvas = canvasRef.current;
@@ -192,15 +223,20 @@ export default function HeroScrollSequence() {
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
     context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-over";
     context.filter = "none";
 
-    const scale =
-      Math.max(width / image.naturalWidth, height / image.naturalHeight) *
-      HERO_FRAME_ZOOM;
+    const baseScale = Math.max(
+      width / image.naturalWidth,
+      height / image.naturalHeight
+    );
+    const scale = baseScale * HERO_FRAME_ZOOM;
     const renderedWidth = image.naturalWidth * scale;
     const renderedHeight = image.naturalHeight * scale;
-    const x = (width - renderedWidth) / 2;
-    const y = (height - renderedHeight) * 0.44;
+    const focalX = 0.5;
+    const focalY = 0.46;
+    const x = width * focalX - renderedWidth * focalX;
+    const y = height * focalY - renderedHeight * focalY;
 
     context.drawImage(
       image,
@@ -222,7 +258,7 @@ export default function HeroScrollSequence() {
     const image = record?.img;
     const targetFrame = staticMode
       ? STATIC_FRAME
-      : frameNumbers[clamp(Math.round(sequenceIndex), 0, LAST_SEQUENCE_INDEX)];
+      : activeFrameNumbers[clamp(Math.round(sequenceIndex), 0, lastSequenceIndex)];
 
     if (!record?.loaded) return false;
 
@@ -232,13 +268,13 @@ export default function HeroScrollSequence() {
       mode: staticMode ? "static" : "sequence",
       frame: frameNumber,
       targetFrame,
-      startFrame: START_FRAME,
-      endFrame: END_FRAME,
-      lastSequenceFrame: LAST_SEQUENCE_FRAME,
-      step: FRAME_STEP,
+      sourceStartFrame: SOURCE_START_FRAME,
+      sourceEndFrame: SOURCE_END_FRAME,
+      lastSequenceFrame: lastSequenceFrame,
+      step: activeFrameStep,
       drawSucceeded,
       loaded: imageCacheRef.current.size,
-      total: staticMode ? 1 : frameNumbers.length,
+      total: staticMode ? 1 : activeFrameNumbers.length,
       path: getFramePath(frameNumber),
     };
 
@@ -247,7 +283,14 @@ export default function HeroScrollSequence() {
     displayedFrameRef.current = frameNumber;
 
     return true;
-  }, [drawFrame, getNearestLoadedFrame]);
+  }, [
+    activeFrameNumbers,
+    activeFrameStep,
+    drawFrame,
+    getNearestLoadedFrame,
+    lastSequenceFrame,
+    lastSequenceIndex,
+  ]);
 
   useEffect(() => {
     destroyedRef.current = false;
@@ -261,41 +304,23 @@ export default function HeroScrollSequence() {
     let hasLoadedPoster = false;
     const priorityFrames = Array.from(
       new Set([
-        ...frameNumbers.slice(0, INITIAL_PRELOAD_COUNT),
+        activeFrameNumbers[0],
+        ...activeFrameNumbers.slice(0, INITIAL_PRELOAD_COUNT),
         STATIC_FRAME,
-        LAST_SEQUENCE_FRAME,
+        lastSequenceFrame,
       ])
     );
     let resizeObserver = null;
     const renderRetryFrames = new Set();
     const renderRetryTimers = new Set();
 
-    const getCopyState = (progress) => {
-      if (progress <= 0.18) {
-        return { opacity: 1, translateY: 0, scale: 1 };
-      }
+    const updateScrollHint = (progress) => {
+      const scrollHint = scrollHintRef.current;
+      if (!scrollHint) return;
 
-      if (progress >= 0.36) {
-        return { opacity: 0, translateY: -22, scale: 0.985 };
-      }
-
-      const localProgress = (progress - 0.18) / (0.36 - 0.18);
-
-      return {
-        opacity: 1 - localProgress,
-        translateY: -22 * localProgress,
-        scale: 1 - 0.015 * localProgress,
-      };
-    };
-
-    const updateCopyOverlay = (progress) => {
-      const copyScrollState = copyScrollStateRef.current;
-      if (!copyScrollState) return;
-
-      const state = getCopyState(progress);
-      copyScrollState.style.opacity = String(state.opacity);
-      copyScrollState.style.transform = `translate3d(0, ${state.translateY}px, 0) scale(${state.scale})`;
-      copyScrollState.style.pointerEvents = state.opacity < 0.1 ? "none" : "auto";
+      const opacity = progress >= 0.12 ? 0 : 1 - progress / 0.12;
+      scrollHint.style.opacity = String(opacity);
+      scrollHint.style.transform = `translate3d(-50%, ${progress > 0.02 ? 6 : 0}px, 0)`;
     };
 
     const retryRender = (sequenceIndex, staticMode) => {
@@ -341,7 +366,7 @@ export default function HeroScrollSequence() {
 
           const isPosterFrame = isStaticHero
             ? frameNumber === STATIC_FRAME
-            : frameNumber === START_FRAME;
+            : frameNumber === activeFrameNumbers[0];
 
           if (!hasLoadedPoster && isPosterFrame) {
             hasLoadedPoster = true;
@@ -351,13 +376,13 @@ export default function HeroScrollSequence() {
             return;
           }
 
-          const frameIndex = frameIndexByNumber.get(frameNumber) ?? 0;
+          const frameIndex = activeFrameIndexByNumber.get(frameNumber) ?? 0;
 
           if (isStaticHero) {
             retryRender(0, true);
           } else if (
-            frameNumber === START_FRAME ||
-            frameNumber === LAST_SEQUENCE_FRAME ||
+            frameNumber === activeFrameNumbers[0] ||
+            frameNumber === lastSequenceFrame ||
             Math.abs(frameIndex - targetFrameRef.current) <= NEXT_FRAME_PRELOAD
           ) {
             retryRender(renderedFrameRef.current, false);
@@ -387,17 +412,17 @@ export default function HeroScrollSequence() {
     const loadPriorityAroundIndex = (sequenceIndex) => {
       if (isStaticHero) return;
 
-      const targetIndex = clamp(Math.round(sequenceIndex), 0, LAST_SEQUENCE_INDEX);
+      const targetIndex = clamp(Math.round(sequenceIndex), 0, lastSequenceIndex);
 
-      loadImage(frameNumbers[targetIndex], true);
+      loadImage(activeFrameNumbers[targetIndex], true);
 
       for (let offset = 1; offset <= NEXT_FRAME_PRELOAD; offset += 1) {
-        const nextFrame = frameNumbers[targetIndex + offset];
+        const nextFrame = activeFrameNumbers[targetIndex + offset];
         if (nextFrame !== undefined) loadImage(nextFrame);
       }
 
       for (let offset = 1; offset <= PREVIOUS_FRAME_PRELOAD; offset += 1) {
-        const previousFrame = frameNumbers[targetIndex - offset];
+        const previousFrame = activeFrameNumbers[targetIndex - offset];
         if (previousFrame !== undefined) loadImage(previousFrame);
       }
     };
@@ -405,7 +430,7 @@ export default function HeroScrollSequence() {
     const animate = () => {
       const current = renderedFrameRef.current;
       const target = targetFrameRef.current;
-      const next = current + (target - current) * 0.2;
+      const next = current + (target - current) * 0.18;
 
       renderedFrameRef.current = Math.abs(target - next) < 0.025 ? target : next;
       renderSequenceIndex(renderedFrameRef.current, false);
@@ -432,17 +457,26 @@ export default function HeroScrollSequence() {
       const maxScrollable = section.offsetHeight - sticky.offsetHeight;
       if (maxScrollable <= 0) return;
 
-      const rawProgress = (window.scrollY - section.offsetTop) / maxScrollable;
+      const navOffset = getNavOffset();
+      const trackStart = section.offsetTop - navOffset;
+      const trackEnd = trackStart + maxScrollable;
+      const rawProgress = (window.scrollY - trackStart) / maxScrollable;
       const progress = clamp(rawProgress, 0, 1);
 
-      updateCopyOverlay(progress);
+      sticky.classList.toggle(
+        "is-fixed",
+        window.scrollY >= trackStart && window.scrollY <= trackEnd
+      );
+      sticky.classList.toggle("is-ended", window.scrollY > trackEnd);
+
+      updateScrollHint(progress);
 
       if (isStaticHero) {
         renderSequenceIndex(0, true);
         return;
       }
 
-      targetFrameRef.current = progress * LAST_SEQUENCE_INDEX;
+      targetFrameRef.current = progress * lastSequenceIndex;
       loadPriorityAroundIndex(targetFrameRef.current);
       startAnimation();
     };
@@ -471,7 +505,7 @@ export default function HeroScrollSequence() {
     const startIdleLoading = () => {
       if (isStaticHero) return;
 
-      const remainingFrames = frameNumbers.filter(
+      const remainingFrames = activeFrameNumbers.filter(
         (frameNumber) => !priorityFrames.includes(frameNumber)
       );
       let remainingIndex = 0;
@@ -501,6 +535,7 @@ export default function HeroScrollSequence() {
 
     resizeCanvas();
     window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("wheel", onScroll, { passive: true });
     window.addEventListener("touchmove", onScroll, { passive: true });
@@ -515,7 +550,7 @@ export default function HeroScrollSequence() {
       updateScrollTarget();
     } else {
       priorityFrames.forEach((frameNumber, index) => {
-        loadImage(frameNumber, index === 0 || frameNumber === STATIC_FRAME || frameNumber === LAST_SEQUENCE_FRAME);
+        loadImage(frameNumber, index === 0 || frameNumber === STATIC_FRAME || frameNumber === lastSequenceFrame);
       });
       loadPriorityAroundIndex(0);
       updateScrollTarget();
@@ -525,6 +560,7 @@ export default function HeroScrollSequence() {
     return () => {
       destroyedRef.current = true;
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onScroll);
       window.removeEventListener("touchmove", onScroll);
@@ -560,33 +596,60 @@ export default function HeroScrollSequence() {
       });
       imageCacheRef.current.clear();
     };
-  }, [isStaticHero, renderSequenceIndex, resizeCanvas]);
+  }, [
+    activeFrameIndexByNumber,
+    activeFrameNumbers,
+    isStaticHero,
+    lastSequenceFrame,
+    lastSequenceIndex,
+    renderSequenceIndex,
+    resizeCanvas,
+  ]);
 
   return (
+    <>
     <section
       ref={sectionRef}
       data-hero-scroll-sequence
       className="hero-sequence-section"
     >
       <style>{`
+        :root {
+          --budgetpro-nav-height: 66px;
+        }
         .hero-sequence-section {
           position: relative;
           width: 100%;
-          height: 280vh;
+          height: 190svh;
+          min-height: 1200px;
           margin: 0;
           padding: 0;
           overflow: visible;
           background: #f1eff8;
         }
         .hero-sequence-sticky {
-          position: sticky;
+          position: absolute;
           top: 0;
+          left: 0;
+          right: 0;
           width: 100%;
-          height: 100svh;
-          min-height: 100vh;
+          height: calc(100svh - var(--budgetpro-nav-height));
+          min-height: calc(100vh - var(--budgetpro-nav-height));
+          margin: 0;
+          padding: 0;
           overflow: hidden;
           background: #f1eff8;
           isolation: isolate;
+        }
+        .hero-sequence-sticky.is-fixed {
+          position: fixed;
+          top: var(--budgetpro-nav-height);
+          bottom: auto;
+        }
+        .hero-sequence-sticky.is-ended {
+          position: absolute;
+          top: auto;
+          bottom: 0;
         }
         .hero-sequence-canvas {
           position: absolute;
@@ -601,70 +664,35 @@ export default function HeroScrollSequence() {
           filter: none !important;
           opacity: 1;
           transform: none !important;
-          aspect-ratio: 16 / 9;
           image-rendering: auto;
         }
-        .hero-copy-positioner {
-          --hero-copy-gap: clamp(18px, 3svh, 34px);
+        .hero-copy-section {
           position: relative;
-          z-index: 12;
-          top: auto;
-          left: auto;
-          width: min(calc(100% - 48px), 820px);
-          margin: var(--hero-copy-gap) auto;
-          transform: none;
-          pointer-events: auto;
+          z-index: 2;
+          margin: 0;
+          padding: clamp(34px, 5vw, 72px) 20px clamp(38px, 5vw, 80px);
+          background: #f1eff8;
           color: #0b1220;
         }
-        .hero-copy-scroll-state {
+        .hero-copy-positioner {
+          width: min(100%, 980px);
+          margin: 0 auto;
+          color: #0b1220;
+        }
+        .hero-copy-scroll-state,
+        .hero-copy-float,
+        .hero-copy-card {
           width: 100%;
-          pointer-events: auto;
-          opacity: 1 !important;
-          transform: none !important;
-          will-change: auto;
-        }
-        .hero-copy-float {
-          animation: heroCopyFloat 7s ease-in-out infinite;
-        }
-        @keyframes heroCopyFloat {
-          0%, 100% { transform: translate3d(0, 0, 0); }
-          50% { transform: translate3d(0, -7px, 0); }
         }
         .hero-copy-card {
           position: relative;
-          width: 100%;
-          overflow: hidden;
-          padding: clamp(22px, 2vw, 28px);
-          border-radius: 30px;
-          background:
-            radial-gradient(
-              circle at 15% 8%,
-              rgba(255,255,255,0.94),
-              rgba(255,255,255,0.20) 45%,
-              transparent 70%
-            ),
-            linear-gradient(
-              145deg,
-              rgba(255,255,255,0.79),
-              rgba(246,247,255,0.55)
-            );
-          border: 1px solid rgba(255,255,255,0.88);
-          box-shadow:
-            0 26px 72px rgba(15,23,42,0.14),
-            0 12px 34px rgba(99,102,241,0.13),
-            inset 0 1px 0 rgba(255,255,255,0.96);
-          backdrop-filter: blur(16px) saturate(145%);
-          -webkit-backdrop-filter: blur(16px) saturate(145%);
-        }
-        .hero-copy-card::before {
-          display: none;
-        }
-        .hero-copy-title,
-        .hero-copy-description,
-        .hero-copy-card .hero-sequence-kicker,
-        .hero-copy-card .hero-sequence-actions {
-          position: relative;
-          z-index: 2;
+          overflow: visible;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          box-shadow: none;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
         }
         .hero-sequence-kicker {
           display: inline-flex;
@@ -686,14 +714,15 @@ export default function HeroScrollSequence() {
           letter-spacing: 0.12em;
         }
         .hero-copy-title {
-          margin: 18px 0 16px;
+          margin: 19px 0 14px;
+          width: 100%;
           max-width: 100%;
           color: #0b1220;
           font-family: "Playfair Display", Georgia, serif;
-          font-size: clamp(38px, 3vw, 50px);
+          font-size: clamp(38px, 3.1vw, 53px);
           font-weight: 700;
-          line-height: 0.98;
-          letter-spacing: -0.045em;
+          line-height: 0.96;
+          letter-spacing: 0;
           text-wrap: balance;
           overflow-wrap: normal;
           word-break: normal;
@@ -706,42 +735,47 @@ export default function HeroScrollSequence() {
           display: block;
         }
         .hero-copy-title span + span {
-          margin-top: 10px;
+          margin-top: 8px;
         }
         .hero-copy-description {
-          max-width: 38ch;
-          margin: 0 0 22px;
+          max-width: 36ch;
+          margin: 0 0 20px;
           color: #475569;
           font-family: var(--bp-body, 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-          font-size: clamp(14px, 1.15vw, 17px);
-          line-height: 1.65;
+          font-size: clamp(14px, 1vw, 16px);
+          line-height: 1.58;
           font-weight: 650;
           text-shadow: 0 1px 0 rgba(255,255,255,0.82);
         }
-        .hero-sequence-actions {
+        .hero-copy-actions {
           display: flex;
-          flex-wrap: nowrap;
-          gap: 11px;
           align-items: center;
+          gap: 11px;
+          flex-wrap: nowrap;
         }
-        .hero-sequence-actions a {
-          min-height: 44px;
+        .hero-copy-actions a {
+          min-height: 50px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0 18px;
+          padding: 0 20px;
           border-radius: 999px;
           text-decoration: none;
           font-family: var(--bp-body, 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
           font-size: 13px;
           font-weight: 850;
+          white-space: nowrap;
           color: #ffffff;
           background: linear-gradient(135deg, #2563eb, #4f46e5 48%, #8b5cf6);
           box-shadow:
             0 16px 38px rgba(79,70,229,0.26),
             inset 0 1px 0 rgba(255,255,255,0.48);
         }
-        .hero-sequence-actions a + a {
+        .hero-copy-actions a:focus-visible {
+          outline: 3px solid rgba(59,130,246,0.55);
+          outline-offset: 3px;
+        }
+        .hero-copy-actions a + a {
           color: #1e293b;
           background: linear-gradient(145deg, rgba(255,255,255,0.84), rgba(219,234,254,0.54), rgba(237,233,254,0.58));
           border: 1px solid rgba(255,255,255,0.90);
@@ -749,10 +783,50 @@ export default function HeroScrollSequence() {
             0 12px 30px rgba(15,23,42,0.08),
             inset 0 1px 0 rgba(255,255,255,0.94);
         }
-        @media (max-height: 759.98px) and (min-width: 768px) {
-          .hero-copy-positioner {
-            --hero-copy-gap: 18px;
+        @media (max-height: 760px) {
+          .hero-sequence-section {
+            height: 175svh;
+            min-height: 980px;
           }
+          .hero-copy-title {
+            font-size: clamp(38px, 5vw, 62px);
+          }
+        }
+        .hero-scroll-hint {
+          position: absolute;
+          left: 50%;
+          bottom: 20px;
+          z-index: 10;
+          transform: translateX(-50%);
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 36px;
+          padding: 8px 13px;
+          border-radius: 999px;
+          color: #475569;
+          font-family: var(--bp-body, 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+          font-size: 10px;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          white-space: nowrap;
+          background: rgba(255,255,255,0.62);
+          border: 1px solid rgba(255,255,255,0.82);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 10px 28px rgba(15,23,42,0.08);
+          pointer-events: none;
+          transition: opacity 160ms ease, transform 160ms ease;
+        }
+        .hero-scroll-hint__mouse {
+          content: "";
+          display: inline-block;
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: #6366f1;
+          box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
         }
         .hero-sequence-status {
           position: absolute;
@@ -770,17 +844,11 @@ export default function HeroScrollSequence() {
           font-weight: 850;
         }
         @media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
-          .hero-copy-positioner {
-            --hero-copy-gap: 14px;
+          .hero-copy-section {
+            padding: 30px 14px 44px;
           }
           .hero-copy-positioner {
-            width: min(calc(100% - 28px), 640px);
-            margin-top: var(--hero-copy-gap);
-            margin-bottom: var(--hero-copy-gap);
-          }
-          .hero-copy-card {
-            padding: 18px;
-            border-radius: 24px;
+            width: 100%;
           }
           .hero-sequence-kicker {
             min-height: 28px;
@@ -790,25 +858,25 @@ export default function HeroScrollSequence() {
           }
           .hero-copy-title {
             max-width: 100%;
-            font-size: clamp(34px, 9.5vw, 48px);
+            font-size: clamp(32px, 9vw, 45px);
             line-height: 0.97;
           }
           .hero-copy-description {
             max-width: 100%;
             margin: 13px 0 17px;
-            font-size: 13px;
-            line-height: 1.54;
+            font-size: 14px;
+            line-height: 1.55;
           }
-          .hero-sequence-actions {
+          .hero-copy-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 9px;
           }
-          .hero-sequence-actions a {
+          .hero-copy-actions a {
+            flex: 1;
             min-width: 0;
-            min-height: 44px;
             padding: 0 12px;
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
           }
           .hero-sequence-status {
@@ -819,61 +887,49 @@ export default function HeroScrollSequence() {
         }
         @media (max-width: 767.98px) {
           .hero-sequence-section {
-            height: 220vh;
+            height: 145svh;
+            min-height: 920px;
             margin: 0;
             padding: 0;
             overflow: visible;
           }
           .hero-sequence-sticky {
-            position: sticky;
-            top: 0;
-            height: 100svh;
-            min-height: 100vh;
+            height: calc(100svh - var(--budgetpro-nav-height));
+            min-height: calc(100vh - var(--budgetpro-nav-height));
             overflow: hidden;
           }
           .hero-sequence-canvas {
             position: absolute;
             height: 100%;
-          }
-          .hero-copy-positioner {
-            position: relative;
-            top: auto;
-            left: auto;
-            bottom: auto;
-            width: min(calc(100% - 28px), 640px);
-            margin: 14px auto;
-            transform: none;
-            pointer-events: auto;
-          }
-          .hero-copy-scroll-state {
-            opacity: 1 !important;
-            transform: none !important;
-            pointer-events: auto !important;
           }
           .hero-copy-float {
             animation: none;
           }
         }
         @media (max-width: 389.98px) {
-          .hero-sequence-actions {
+          .hero-copy-actions {
             grid-template-columns: 1fr;
           }
         }
         @media (prefers-reduced-motion: reduce) {
           .hero-sequence-section {
-            height: auto;
+            height: calc(100svh - var(--budgetpro-nav-height));
+            min-height: 520px;
             overflow: hidden;
           }
           .hero-sequence-sticky {
             position: relative;
-            top: auto;
-            height: min(100svh, 56.25vw);
+            top: 0;
+            height: calc(100svh - var(--budgetpro-nav-height));
             min-height: 320px;
             overflow: hidden;
           }
           .hero-sequence-canvas {
             position: absolute;
             height: 100%;
+          }
+          .hero-scroll-hint {
+            display: none;
           }
           .hero-copy-float {
             animation: none;
@@ -888,35 +944,38 @@ export default function HeroScrollSequence() {
           aria-hidden="true"
         />
 
+        <div ref={scrollHintRef} className="hero-scroll-hint" aria-hidden="true">
+          <span>Scroll to explore</span>
+          <span className="hero-scroll-hint__mouse" />
+        </div>
+
         {isLoading && (
           <div className="hero-sequence-status">Loading dashboard preview...</div>
         )}
       </div>
     </section>
-  );
-}
-
-export function HeroSequenceCopy({ scrollStateRef = null }) {
-  return (
-    <div className="hero-copy-positioner">
-      <div ref={scrollStateRef} className="hero-copy-scroll-state">
-        <div className="hero-copy-float">
-          <div className="hero-copy-card">
-            <div className="hero-sequence-kicker">THE SMARTER WAY TO MANAGE MONEY</div>
-            <h1 className="hero-copy-title">
-              <span>Your money isn&apos;t disappearing &mdash;</span>
-              <span>now you can see exactly where it goes.</span>
-            </h1>
-            <p className="hero-copy-description">
-              A beautifully designed tracker that transforms everyday spending into complete financial clarity.
-            </p>
-            <div className="hero-sequence-actions">
-              <a href="/#pricing">Get BudgetPro</a>
-              <a href="/product">Explore Dashboard</a>
+    <section className="hero-copy-section" aria-labelledby="budgetpro-hero-title">
+      <div className="hero-copy-positioner">
+        <div className="hero-copy-scroll-state">
+          <div className="hero-copy-float">
+            <div className="hero-copy-card">
+              <div className="hero-sequence-kicker">THE SMARTER WAY TO MANAGE MONEY</div>
+              <h1 id="budgetpro-hero-title" className="hero-copy-title">
+                <span>Your money isn&apos;t disappearing &mdash;</span>
+                <span>now you can see exactly where it goes.</span>
+              </h1>
+              <p className="hero-copy-description">
+                A beautifully designed tracker that transforms everyday spending into complete financial clarity.
+              </p>
+              <div className="hero-copy-actions">
+                <a href="/#pricing">Get BudgetPro</a>
+                <a href="/product">Explore Dashboard</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+    </>
   );
 }
